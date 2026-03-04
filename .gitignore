@@ -9,6 +9,9 @@ __pycache__/
 *.pyo
 *.pyd
 
+# Jupyter
+.ipynb_checkpoints/
+
 # Environment variables
 .env
 
@@ -24,13 +27,13 @@ Thumbs.db
 *.log
 
 # Python build artifacts
-dist/
 build/
+dist/
 *.egg-info/
-
-# Jupyter
-.ipynb_checkpoints/
 
 # Coverage
 .coverage
 htmlcov/
+
+# Local data
+data/raw/
