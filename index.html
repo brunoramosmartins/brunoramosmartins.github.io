@@ -1,11 +1,179 @@
 <!DOCTYPE html>
-<html lang="en"> 
-    <head>
-        <title>
-            My Site!
-        </title>
-    </head>
-    <body>
-        <h1> This is my GitHub Pages website!</h1>
-    </body>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Bruno Ramos Martins — Academic ML Engineering Portfolio. Machine Learning, Data Science, and structured technical writing." />
+  <title>Bruno Ramos Martins</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+</head>
+<body>
+
+  <!-- =========================================================
+       HEADER
+  ========================================================== -->
+  <header class="site-header" role="banner">
+    <div class="container container--wide">
+      <a href="index.html" class="site-logo">Bruno Ramos Martins</a>
+
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="site-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav id="site-nav" class="site-nav" role="navigation" aria-label="Main navigation">
+        <a href="index.html" class="active" aria-current="page">Home</a>
+        <a href="projects.html">Projects</a>
+        <a href="articles.html">Articles</a>
+        <a href="about.html">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       MAIN CONTENT
+  ========================================================== -->
+  <main class="site-main" id="main-content">
+
+    <!-- Hero -->
+    <section class="page-hero" aria-labelledby="hero-title">
+      <div class="container container--wide">
+        <p class="page-hero__label">ML Engineering · Data Science</p>
+        <h1 class="page-hero__title" id="hero-title">Bruno Ramos Martins</h1>
+        <p class="page-hero__description">
+          Academic portfolio documenting machine learning projects, structured
+          technical studies, and engineering practice. Built with discipline and
+          designed for long-form thinking.
+        </p>
+      </div>
+    </section>
+
+    <!-- Featured Projects -->
+    <section class="page-section" aria-labelledby="projects-heading">
+      <div class="container container--wide">
+        <div class="section-header">
+          <h2 class="section-title" id="projects-heading">Featured Projects</h2>
+          <a href="projects.html" class="section-link">All projects →</a>
+        </div>
+
+        <div class="grid-cards grid-cards--2col" id="featured-projects">
+          <!-- Placeholder card 1 -->
+          <article class="card">
+            <div class="card__meta">
+              <span class="card__date">2025</span>
+              <span class="card__status">In Progress</span>
+            </div>
+            <h3 class="card__title">Project Title Placeholder</h3>
+            <p class="card__description">
+              A brief description of the project, its objective, and the
+              techniques applied. This card will be rendered dynamically via
+              JavaScript in v0.3.
+            </p>
+            <div class="card__footer">
+              <div class="tags">
+                <span class="tag">Python</span>
+                <span class="tag">ML</span>
+              </div>
+              <a href="#" class="card__link">View →</a>
+            </div>
+          </article>
+
+          <!-- Placeholder card 2 -->
+          <article class="card">
+            <div class="card__meta">
+              <span class="card__date">2025</span>
+              <span class="card__status">Complete</span>
+            </div>
+            <h3 class="card__title">Project Title Placeholder</h3>
+            <p class="card__description">
+              A brief description of the project, its objective, and the
+              techniques applied. This card will be rendered dynamically via
+              JavaScript in v0.3.
+            </p>
+            <div class="card__footer">
+              <div class="tags">
+                <span class="tag">PyTorch</span>
+                <span class="tag">NLP</span>
+              </div>
+              <a href="#" class="card__link">View →</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Articles -->
+    <section class="page-section" aria-labelledby="articles-heading">
+      <div class="container container--wide">
+        <div class="section-header">
+          <h2 class="section-title" id="articles-heading">Recent Articles</h2>
+          <a href="articles.html" class="section-link">All articles →</a>
+        </div>
+
+        <div class="article-list" id="recent-articles">
+          <article class="article-item">
+            <time class="article-item__date" datetime="2025-01">Jan 2025</time>
+            <div class="article-item__body">
+              <h3 class="article-item__title">
+                <a href="#">Article Title Placeholder</a>
+              </h3>
+              <p class="article-item__excerpt">
+                A short excerpt summarizing the article's core argument or
+                finding. This list will be rendered dynamically in v0.3.
+              </p>
+              <div class="tags">
+                <span class="tag">Deep Learning</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="article-item">
+            <time class="article-item__date" datetime="2025-01">Jan 2025</time>
+            <div class="article-item__body">
+              <h3 class="article-item__title">
+                <a href="#">Article Title Placeholder</a>
+              </h3>
+              <p class="article-item__excerpt">
+                A short excerpt summarizing the article's core argument or
+                finding. This list will be rendered dynamically in v0.3.
+              </p>
+              <div class="tags">
+                <span class="tag">Statistics</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================
+       FOOTER
+  ========================================================== -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container container--wide">
+      <span class="footer-copy">© 2025 Bruno Ramos Martins</span>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="https://github.com/" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="about.html">About</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- Nav toggle script -->
+  <script src="assets/js/navigation.js" defer></script>
+
+</body>
 </html>

@@ -1,0 +1,180 @@
+/* ============================================================
+   BASE.CSS
+   Variables · Reset · Typography
+   Bruno Ramos Martins — Academic ML Portfolio
+   ============================================================ */
+
+/* === CSS VARIABLES === */
+:root {
+  /* --- Colors --- */
+  --color-bg:             #ffffff;
+  --color-surface:        #f7f6f3;
+  --color-border:         #e2dfd9;
+  --color-text-primary:   #1c1c1c;
+  --color-text-secondary: #5c5c5c;
+  --color-text-muted:     #8a8a8a;
+  --color-accent:         #1d3557;
+  --color-accent-hover:   #457b9d;
+  --color-code-bg:        #f0ede8;
+
+  /* --- Typography --- */
+  --font-serif: 'IBM Plex Serif', Georgia, serif;
+  --font-mono:  'IBM Plex Mono', 'Courier New', monospace;
+
+  /* --- Type Scale --- */
+  --text-xs:   0.75rem;    /* 12px */
+  --text-sm:   0.875rem;   /* 14px */
+  --text-base: 1rem;       /* 16px */
+  --text-lg:   1.125rem;   /* 18px */
+  --text-xl:   1.25rem;    /* 20px */
+  --text-2xl:  1.5rem;     /* 24px */
+  --text-3xl:  1.875rem;   /* 30px */
+  --text-4xl:  2.25rem;    /* 36px */
+  --text-5xl:  3rem;       /* 48px */
+
+  /* --- Font Weights --- */
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  /* --- Line Heights --- */
+  --leading-tight:   1.25;
+  --leading-snug:    1.4;
+  --leading-normal:  1.6;
+  --leading-relaxed: 1.75;
+
+  /* --- Spacing Scale (base: 8px) --- */
+  --space-1:  0.25rem;  /*  4px */
+  --space-2:  0.5rem;   /*  8px */
+  --space-3:  0.75rem;  /* 12px */
+  --space-4:  1rem;     /* 16px */
+  --space-5:  1.25rem;  /* 20px */
+  --space-6:  1.5rem;   /* 24px */
+  --space-8:  2rem;     /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
+
+  /* --- Layout --- */
+  --container-max:  780px;
+  --container-wide: 1100px;
+  --header-height:  64px;
+
+  /* --- Borders --- */
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  /* --- Transitions --- */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+}
+
+/* === RESET === */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-serif);
+  font-size: var(--text-base);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg);
+}
+
+img, svg { display: block; max-width: 100%; }
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+a:hover { color: var(--color-accent-hover); }
+
+ul, ol { list-style: none; }
+
+/* === TYPOGRAPHY — Heading Hierarchy === */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  line-height: var(--leading-tight);
+  color: var(--color-text-primary);
+}
+h1 { font-size: var(--text-5xl); font-weight: var(--weight-bold); }
+h2 { font-size: var(--text-4xl); font-weight: var(--weight-bold); }
+h3 { font-size: var(--text-3xl); font-weight: var(--weight-semibold); }
+h4 { font-size: var(--text-2xl); font-weight: var(--weight-semibold); }
+h5 { font-size: var(--text-xl);  font-weight: var(--weight-medium); }
+h6 { font-size: var(--text-lg);  font-weight: var(--weight-medium); }
+
+p {
+  margin-bottom: var(--space-4);
+  line-height: var(--leading-relaxed);
+}
+p:last-child { margin-bottom: 0; }
+
+/* === TYPOGRAPHY — Code & Mono === */
+code, kbd, pre, samp {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+code {
+  background-color: var(--color-code-bg);
+  padding: 0.15em 0.4em;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+}
+
+pre {
+  background-color: var(--color-code-bg);
+  padding: var(--space-6);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  margin-bottom: var(--space-6);
+  border-left: 3px solid var(--color-accent);
+}
+pre code {
+  background: none;
+  padding: 0;
+  line-height: var(--leading-relaxed);
+}
+
+blockquote {
+  border-left: 3px solid var(--color-accent);
+  padding-left: var(--space-6);
+  margin: var(--space-8) 0;
+  font-style: italic;
+  color: var(--color-text-secondary);
+}
+
+strong { font-weight: var(--weight-semibold); }
+em     { font-style: italic; }
+
+/* === UTILITY === */
+.text-sm       { font-size: var(--text-sm); }
+.text-muted    { color: var(--color-text-muted); }
+.text-secondary{ color: var(--color-text-secondary); }
+.font-mono     { font-family: var(--font-mono); }
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+}
