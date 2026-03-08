@@ -1,0 +1,61 @@
+/**
+ * filters.js
+ * Responsible for client-side filtering logic.
+ * Operates on the JSON dataset — no page reload required.
+ */
+
+/**
+ * Filters a list of projects by a given tag.
+ * Matches against both `tags` and `stack` arrays.
+ *
+ * @param {Array}  projectList - Full list of project objects.
+ * @param {string} tag         - Tag to filter by. 'all' returns the full list.
+ * @returns {Array}
+ */
+export function filterProjectsByTag(projectList, tag) {
+  if (!tag || tag === 'all') return projectList;
+  const normalised = tag.toLowerCase();
+  return projectList.filter(project => {
+    const combined = [
+      ...(project.tags  || []),
+      ...(project.stack || []),
+    ].map(t => t.toLowerCase());
+    return combined.includes(normalised);
+  });
+}
+
+/**
+ * Filters a list of articles by category.
+ *
+ * @param {Array}  articleList - Full list of article objects.
+ * @param {string} category    - Category to filter by. 'all' returns full list.
+ * @returns {Array}
+ */
+export function filterArticlesByCategory(articleList, category) {
+  if (!category || category === 'all') return articleList;
+  return articleList.filter(a => a.category === category);
+}
+
+/**
+ * Initialises filter button UI behaviour for a given filter bar.
+ * Marks the clicked button as active and triggers a callback.
+ *
+ * @param {HTMLElement}  filterBar  - Container element holding filter buttons.
+ * @param {Function}     onFilter   - Callback invoked with the selected filter value.
+ */
+export function initFilterBar(filterBar, onFilter) {
+  if (!filterBar) return;
+
+  filterBar.addEventListener('click', (event) => {
+    const btn = event.target.closest('[data-filter]');
+    if (!btn) return;
+
+    // Update active state
+    filterBar.querySelectorAll('[data-filter]').forEach(b => {
+      b.classList.remove('tag--active');
+    });
+    btn.classList.add('tag--active');
+
+    onFilter(btn.dataset.filter);
+  });
+}

@@ -1,36 +1,26 @@
 <!DOCTYPE html>
+<!-- v0.3: content removed from HTML, rendered dynamically via main.js -->
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Articles — Bruno Ramos Martins. Technical studies and long-form writing on machine learning and data science." />
+  <meta name="description" content="Articles — Bruno Ramos Martins." />
   <title>Articles — Bruno Ramos Martins</title>
-
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet" />
-
-  <!-- Styles -->
   <link rel="stylesheet" href="assets/css/base.css" />
   <link rel="stylesheet" href="assets/css/layout.css" />
   <link rel="stylesheet" href="assets/css/components.css" />
 </head>
-<body>
+<body data-page="articles">
 
-  <!-- =========================================================
-       HEADER
-  ========================================================== -->
   <header class="site-header" role="banner">
     <div class="container container--wide">
       <a href="index.html" class="site-logo">Bruno Ramos Martins</a>
-
       <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="site-nav">
-        <span></span>
-        <span></span>
-        <span></span>
+        <span></span><span></span><span></span>
       </button>
-
       <nav id="site-nav" class="site-nav" role="navigation" aria-label="Main navigation">
         <a href="index.html">Home</a>
         <a href="projects.html">Projects</a>
@@ -40,104 +30,30 @@
     </div>
   </header>
 
-  <!-- =========================================================
-       MAIN CONTENT
-  ========================================================== -->
   <main class="site-main" id="main-content">
     <div class="container container--wide">
 
-      <!-- Page Title -->
       <header class="page-title">
         <h1>Articles</h1>
         <p>Short technical studies, structured notes, and long-form writing.
            Generated from Markdown via the Python content engine.</p>
       </header>
 
-      <!-- Filter tags -->
-      <div class="tags article-filters" aria-label="Filter by topic">
-        <button class="tag tag--active" type="button">All</button>
-        <button class="tag" type="button">Deep Learning</button>
-        <button class="tag" type="button">Statistics</button>
-        <button class="tag" type="button">Engineering</button>
-        <button class="tag" type="button">Notes</button>
+      <!-- Filter bar — data-filter values must match category values in articles.json -->
+      <div id="articles-filter" class="tags" style="margin-bottom: var(--space-10);" aria-label="Filter articles by category">
+        <button class="tag tag--active" data-filter="all"              type="button">All</button>
+        <button class="tag"             data-filter="machine-learning" type="button">Machine Learning</button>
+        <button class="tag"             data-filter="deep-learning"    type="button">Deep Learning</button>
+        <button class="tag"             data-filter="engineering"      type="button">Engineering</button>
+        <button class="tag"             data-filter="notes"            type="button">Notes</button>
       </div>
 
-      <!-- Article list — will be replaced by JS in v0.3 -->
-      <div class="article-list" id="articles-list">
+      <!-- Injected by main.js → articleRenderer.js -->
+      <div class="article-list" id="articles-list" aria-live="polite"></div>
 
-        <article class="article-item">
-          <time class="article-item__date" datetime="2025-01">Jan 2025</time>
-          <div class="article-item__body">
-            <h2 class="article-item__title">
-              <a href="#">Article Title Placeholder</a>
-            </h2>
-            <p class="article-item__excerpt">
-              A short excerpt presenting the core argument, finding, or
-              technique covered in this article. Two to three sentences.
-            </p>
-            <div class="tags">
-              <span class="tag">Deep Learning</span>
-              <span class="tag">Notes</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="article-item">
-          <time class="article-item__date" datetime="2025-01">Jan 2025</time>
-          <div class="article-item__body">
-            <h2 class="article-item__title">
-              <a href="#">Article Title Placeholder</a>
-            </h2>
-            <p class="article-item__excerpt">
-              A short excerpt presenting the core argument, finding, or
-              technique covered in this article. Two to three sentences.
-            </p>
-            <div class="tags">
-              <span class="tag">Statistics</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="article-item">
-          <time class="article-item__date" datetime="2024-12">Dec 2024</time>
-          <div class="article-item__body">
-            <h2 class="article-item__title">
-              <a href="#">Article Title Placeholder</a>
-            </h2>
-            <p class="article-item__excerpt">
-              A short excerpt presenting the core argument, finding, or
-              technique covered in this article. Two to three sentences.
-            </p>
-            <div class="tags">
-              <span class="tag">Engineering</span>
-              <span class="tag">Python</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="article-item">
-          <time class="article-item__date" datetime="2024-11">Nov 2024</time>
-          <div class="article-item__body">
-            <h2 class="article-item__title">
-              <a href="#">Article Title Placeholder</a>
-            </h2>
-            <p class="article-item__excerpt">
-              A short excerpt presenting the core argument, finding, or
-              technique covered in this article. Two to three sentences.
-            </p>
-            <div class="tags">
-              <span class="tag">Notes</span>
-            </div>
-          </div>
-        </article>
-
-      </div>
     </div>
   </main>
 
-  <!-- =========================================================
-       FOOTER
-  ========================================================== -->
   <footer class="site-footer" role="contentinfo">
     <div class="container container--wide">
       <span class="footer-copy">© 2025 Bruno Ramos Martins</span>
@@ -149,8 +65,8 @@
     </div>
   </footer>
 
-  <!-- Nav toggle script -->
   <script src="assets/js/navigation.js" defer></script>
+  <script type="module" src="assets/js/main.js"></script>
 
 </body>
 </html>
