@@ -4,10 +4,7 @@
  * All other modules consume data exclusively through this service.
  */
 
-const BASE_PATH = window.location.hostname === 'localhost' ||
-                  window.location.protocol === 'file:'
-  ? ''
-  : '';
+const BASE_PATH = '';
 
 /**
  * Generic fetch wrapper with error handling.
