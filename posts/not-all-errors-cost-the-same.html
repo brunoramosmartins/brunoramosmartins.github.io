@@ -1,10 +1,19 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="{{article_description}}" />
-  <title>{{article_title}} — Bruno Ramos Martins</title>
+  <meta name="description" content="Bayesian foundations of evaluation metrics for fraud detection — from F1 to Precision@Recall. Connecting evaluation metrics to business cost, error asymmetry, and threshold choice." />
+  <title>Not All Errors Cost the Same — Bruno Ramos Martins</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="article" />
+  <meta property="og:title"       content="Not All Errors Cost the Same — Bruno Ramos Martins" />
+  <meta property="og:description" content="Bayesian foundations of evaluation metrics for fraud detection — from F1 to Precision@Recall. Connecting evaluation metrics to business cost, error asymmetry, and threshold choice." />
+  <meta property="og:url"         content="https://brunoramosmartins.github.io/posts/not-all-errors-cost-the-same.html" />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -146,18 +155,35 @@
       <!-- Article Header -->
       <header class="article-header">
         <a href="../articles.html" class="article-header__back">← Articles</a>
-        <h1 class="article-header__title">{{article_title}}</h1>
+        <h1 class="article-header__title">Not All Errors Cost the Same</h1>
         <div class="article-header__meta">
-          <time class="article-header__date" datetime="{{article_date_iso}}">{{article_date}}</time>
+          <time class="article-header__date" datetime="2026-03-15">Mar 2026</time>
           <div class="tags">
-            {{article_tags}}
+            <span class="tag">machine-learning</span>
           </div>
         </div>
       </header>
 
       <!-- Article Body — injected by build_blog.py -->
       <article class="article-prose" aria-label="Article content">
-        {{article_content}}
+        <blockquote>
+<p>Work in progress. Full article coming soon.</p>
+</blockquote>
+<p>A technical case interview revealed I had been using F1 on autopilot — without consciously connecting it to business cost, error asymmetry, or threshold choice. This article is the study I should have done before that interview.</p>
+<h2 id="what-this-is-about">What This Is About</h2>
+<p>Precision and Recall are conditional probabilities. Their relationship is governed by Bayes' theorem. Class imbalance is the base rate problem in disguise. F1 treats all errors as equally costly; Precision@Recall does not. In fraud detection, the difference matters.</p>
+<h2 id="topics-covered">Topics Covered</h2>
+<ul>
+<li>Confusion matrix as a probability space — Precision as a posterior, Recall as a likelihood.</li>
+<li>Bayes' theorem connecting Precision, Recall, and base rate.</li>
+<li>Cost-sensitive decision theory: optimal threshold derivation under asymmetric costs.</li>
+<li>F1 and the F-beta family — what "equal weight" actually means.</li>
+<li>ROC curve vs Precision-Recall curve — what each reveals and what each hides.</li>
+<li>Precision@Recall — definition, business interpretation, and why it beats F1 for fraud detection.</li>
+<li>Five reproducible experiments connecting theory to evidence.</li>
+</ul>
+<h2 id="source">Source</h2>
+<p>The full article source and reproducible experiments are available on <a href="https://github.com/brunoramosmartins/precision-recall-fraud">GitHub</a>.</p>
       </article>
 
     </div>
@@ -168,10 +194,10 @@
   ========================================================== -->
   <footer class="site-footer" role="contentinfo">
     <div class="container container--wide">
-      <span class="footer-copy">© 2025 Bruno Ramos Martins</span>
+      <span class="footer-copy">© 2026 Bruno Ramos Martins</span>
       <nav class="footer-links" aria-label="Footer navigation">
-        <a href="https://github.com/" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="https://github.com/brunoramosmartins" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/bruno-ramos-martins-22a6a61a0/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
         <a href="../about.html">About</a>
       </nav>
     </div>

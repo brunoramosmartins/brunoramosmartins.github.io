@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="{{article_description}}" />
+  <title>{{article_title}} — Bruno Ramos Martins</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="article" />
+  <meta property="og:title"       content="{{article_title}} — Bruno Ramos Martins" />
+  <meta property="og:description" content="{{article_description}}" />
+  <meta property="og:url"         content="https://brunoramosmartins.github.io/posts/{{article_id}}.html" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/layout.css" />
+  <link rel="stylesheet" href="../assets/css/components.css" />
+
+  <style>
+    /* === Article-specific prose styles === */
+    .article-prose {
+      max-width: var(--container-max);
+      margin: 0 auto;
+    }
+
+    .article-prose h2 {
+      font-size: var(--text-3xl);
+      font-weight: var(--weight-bold);
+      letter-spacing: -0.02em;
+      margin-top: var(--space-16);
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-3);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .article-prose h3 {
+      font-size: var(--text-2xl);
+      font-weight: var(--weight-semibold);
+      letter-spacing: -0.01em;
+      margin-top: var(--space-10);
+      margin-bottom: var(--space-3);
+    }
+
+    .article-prose h4 {
+      font-size: var(--text-xl);
+      font-weight: var(--weight-medium);
+      margin-top: var(--space-8);
+      margin-bottom: var(--space-2);
+    }
+
+    .article-prose p {
+      font-size: var(--text-base);
+      line-height: var(--leading-relaxed);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-5);
+    }
+
+    .article-prose ul,
+    .article-prose ol {
+      list-style: revert;
+      padding-left: var(--space-6);
+      margin-bottom: var(--space-5);
+      color: var(--color-text-secondary);
+      line-height: var(--leading-relaxed);
+    }
+
+    .article-prose li { margin-bottom: var(--space-2); }
+
+    .article-prose img {
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      margin: var(--space-8) 0;
+    }
+
+    .article-header {
+      padding: var(--space-16) 0 var(--space-10);
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: var(--space-12);
+    }
+
+    .article-header__back {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+      display: inline-block;
+      margin-bottom: var(--space-6);
+      transition: color var(--transition-fast);
+    }
+    .article-header__back:hover { color: var(--color-accent); }
+
+    .article-header__title {
+      font-size: var(--text-4xl);
+      font-weight: var(--weight-bold);
+      letter-spacing: -0.03em;
+      line-height: var(--leading-tight);
+      margin-bottom: var(--space-4);
+    }
+
+    .article-header__meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .article-header__date {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      letter-spacing: 0.06em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================
+       HEADER
+  ========================================================== -->
+  <header class="site-header" role="banner">
+    <div class="container container--wide">
+      <a href="../index.html" class="site-logo">Bruno Ramos Martins</a>
+
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="site-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav id="site-nav" class="site-nav" role="navigation" aria-label="Main navigation">
+        <a href="../index.html">Home</a>
+        <a href="../projects.html">Projects</a>
+        <a href="../articles.html" class="active" aria-current="page">Articles</a>
+        <a href="../about.html">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       MAIN CONTENT
+  ========================================================== -->
+  <main class="site-main" id="main-content">
+    <div class="container container--wide">
+
+      <!-- Article Header -->
+      <header class="article-header">
+        <a href="../articles.html" class="article-header__back">← Articles</a>
+        <h1 class="article-header__title">{{article_title}}</h1>
+        <div class="article-header__meta">
+          <time class="article-header__date" datetime="{{article_date_iso}}">{{article_date}}</time>
+          <div class="tags">
+            {{article_tags}}
+          </div>
+        </div>
+      </header>
+
+      <!-- Article Body — injected by build_blog.py -->
+      <article class="article-prose" aria-label="Article content">
+        {{article_content}}
+      </article>
+
+    </div>
+  </main>
+
+  <!-- =========================================================
+       FOOTER
+  ========================================================== -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container container--wide">
+      <span class="footer-copy">© 2026 Bruno Ramos Martins</span>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="https://github.com/brunoramosmartins" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/bruno-ramos-martins-22a6a61a0/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="../about.html">About</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- Nav toggle script -->
+  <script src="../assets/js/navigation.js" defer></script>
+
+</body>
+</html>

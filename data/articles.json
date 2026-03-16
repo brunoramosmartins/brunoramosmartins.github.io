@@ -1,38 +1,11 @@
 [
   {
-    "id": "bias-variance-tradeoff",
-    "title": "Understanding Bias-Variance Tradeoff",
-    "description": "Conceptual overview of the bias-variance tradeoff in supervised learning, with intuitions on how model complexity affects generalization error.",
+    "id": "not-all-errors-cost-the-same",
+    "title": "Not All Errors Cost the Same",
+    "description": "Bayesian foundations of evaluation metrics for fraud detection — from F1 to Precision@Recall. Connecting evaluation metrics to business cost, error asymmetry, and threshold choice.",
     "category": "machine-learning",
-    "date": "2026-03-10",
-    "reading_time": "5 min",
-    "url": "/posts/bias_variance.html"
-  },
-  {
-    "id": "gradient-descent-variants",
-    "title": "Gradient Descent Variants: SGD, Momentum, and Adam",
-    "description": "Structured comparison of the most common gradient-based optimizers, covering convergence properties, hyperparameter sensitivity, and practical usage guidelines.",
-    "category": "deep-learning",
-    "date": "2026-02-18",
-    "reading_time": "8 min",
-    "url": "/posts/gradient_descent_variants.html"
-  },
-  {
-    "id": "pandas-performance-patterns",
-    "title": "Performance Patterns in Pandas",
-    "description": "Notes on vectorization, avoiding iterrows, and leveraging Pandas internals to write faster data transformation pipelines.",
-    "category": "engineering",
-    "date": "2026-01-30",
-    "reading_time": "6 min",
-    "url": "/posts/pandas_performance.html"
-  },
-  {
-    "id": "evaluation-metrics-classification",
-    "title": "Evaluation Metrics for Imbalanced Classification",
-    "description": "A review of precision, recall, F1, ROC-AUC, and PR-AUC — with focus on which metrics matter in class-imbalanced settings like fraud detection and medical diagnosis.",
-    "category": "machine-learning",
-    "date": "2025-12-05",
-    "reading_time": "7 min",
-    "url": "/posts/evaluation_metrics.html"
+    "date": "2026-03-15",
+    "reading_time": "12 min",
+    "url": "/posts/not-all-errors-cost-the-same.html"
   }
 ]

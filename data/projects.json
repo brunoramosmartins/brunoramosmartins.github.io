@@ -1,38 +1,26 @@
 [
   {
-    "id": "fraud-detection-pipeline",
-    "title": "Fraud Detection ML Pipeline",
-    "description": "End-to-end machine learning pipeline for financial fraud detection. Covers data preprocessing, feature engineering, model training with class imbalance handling, and evaluation metrics focused on precision-recall tradeoff.",
-    "tags": ["machine-learning", "classification", "data"],
-    "stack": ["Python", "Scikit-learn", "Pandas", "NumPy"],
-    "github_url": "https://github.com/brunorms/fraud-detection",
+    "id": "rag-pix-regulation",
+    "title": "RAG Pix Regulation",
+    "description": "Retrieval-Augmented Generation system for interpreting Brazilian Pix regulatory documents (BCB resolutions + MED 2.0). Compares baseline LLM responses against RAG-enhanced responses, evaluates retrieval quality (Recall@K, Precision@K), grounding, and hallucination rates with Phoenix observability.",
+    "tags": ["rag", "nlp", "llm"],
+    "stack": ["Python", "Weaviate", "sentence-transformers", "Streamlit", "Docker"],
+    "github_url": "https://github.com/brunoramosmartins/rag-pix-regulation",
     "demo_url": "",
     "featured": true,
     "status": "complete",
-    "date": "2026-03-01"
+    "date": "2026-03-10"
   },
   {
-    "id": "sentiment-analysis-transformer",
-    "title": "Sentiment Analysis with Transformers",
-    "description": "Fine-tuning a pre-trained BERT model on a domain-specific sentiment corpus. Explores transfer learning, tokenization strategies, and inference optimization for production-like constraints.",
-    "tags": ["nlp", "deep-learning", "transformers"],
-    "stack": ["Python", "PyTorch", "HuggingFace", "Transformers"],
-    "github_url": "https://github.com/brunorms/sentiment-bert",
+    "id": "fraud-detection-ml",
+    "title": "Fraud Detection ML System",
+    "description": "End-to-end machine learning system for card-not-present fraud detection. Cost-sensitive threshold optimization, temporal validation, modular ML pipelines, artifact versioning, FastAPI scoring service, Docker deployment, PSI-based drift monitoring, and automated retraining simulation. ROC-AUC 0.861, 58.7% expected loss reduction.",
+    "tags": ["machine-learning", "classification", "mlops"],
+    "stack": ["Python", "scikit-learn", "FastAPI", "Docker", "Pandas"],
+    "github_url": "https://github.com/brunoramosmartins/fraud-detection-ml",
     "demo_url": "",
     "featured": true,
-    "status": "complete",
-    "date": "2025-11-15"
-  },
-  {
-    "id": "exploratory-data-analysis-framework",
-    "title": "EDA Framework for Tabular Data",
-    "description": "Reusable Python module for automated exploratory data analysis on tabular datasets. Generates structured reports covering distributions, correlations, missing values, and outlier detection.",
-    "tags": ["data", "python", "automation"],
-    "stack": ["Python", "Pandas", "Matplotlib", "Seaborn"],
-    "github_url": "https://github.com/brunorms/eda-framework",
-    "demo_url": "",
-    "featured": false,
     "status": "in-progress",
-    "date": "2026-01-20"
+    "date": "2026-03-07"
   }
 ]
