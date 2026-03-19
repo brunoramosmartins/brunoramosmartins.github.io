@@ -11,7 +11,7 @@
 import { fetchProjects, fetchArticles, fetchFeaturedProjects, fetchRecentArticles } from './dataService.js';
 import { renderProjects } from './projectRenderer.js';
 import { renderArticles }  from './articleRenderer.js';
-import { filterProjectsByTag, filterArticlesByCategory, initFilterBar } from './filters.js';
+import { filterProjectsByTag, filterArticlesByCategory, initFilterBar, buildCategoryButtons } from './filters.js';
 
 // ─── Page detection ────────────────────────────────────────────────────────────
 const page = document.body.dataset.page;
@@ -78,6 +78,7 @@ async function initArticlesPage() {
   const filterBar = document.getElementById('articles-filter');
 
   const allArticles = await fetchArticles();
+  buildCategoryButtons(filterBar, allArticles);
   renderArticles(allArticles, container);
 
   initFilterBar(filterBar, (category) => {
