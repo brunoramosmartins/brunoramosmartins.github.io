@@ -37,6 +37,30 @@ export function filterArticlesByCategory(articleList, category) {
 }
 
 /**
+ * Builds filter buttons dynamically from article categories.
+ * Always includes an "All" button first.
+ *
+ * @param {HTMLElement} filterBar  - Container element for filter buttons.
+ * @param {Array}       articles  - Full list of article objects with .category.
+ */
+export function buildCategoryButtons(filterBar, articles) {
+  if (!filterBar) return;
+
+  const categories = [...new Set(
+    articles.map(a => a.category).filter(Boolean)
+  )].sort();
+
+  const formatLabel = (cat) =>
+    cat.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+  let html = '<button class="tag tag--active" data-filter="all" type="button">All</button>';
+  for (const cat of categories) {
+    html += `<button class="tag" data-filter="${cat}" type="button">${formatLabel(cat)}</button>`;
+  }
+  filterBar.innerHTML = html;
+}
+
+/**
  * Initialises filter button UI behaviour for a given filter bar.
  * Marks the clicked button as active and triggers a callback.
  *

@@ -59,7 +59,7 @@ ARTICLES_JSON = ROOT / "data" / "articles.json"
 # Front matter parser
 # ---------------------------------------------------------------------------
 
-_FRONT_MATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL)
+_FRONT_MATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*(?:\n|$)", re.DOTALL)
 _KV_LINE_RE      = re.compile(r'^(\w[\w_-]*):\s*"?(.*?)"?\s*$')
 
 
@@ -245,7 +245,40 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Parse and preview metadata without writing any files",
     )
+    parser.add_argument(
+        "--prune",
+        action="store_true",
+        help="Remove orphan entries from articles.json (and their HTML) "
+             "whose .md source no longer exists in markdown_posts/",
+    )
     return parser.parse_args()
+
+
+def prune_orphans() -> int:
+    """Remove articles.json entries (and HTML files) whose .md source is gone."""
+    articles = load_articles_json()
+    if not articles:
+        print("Nothing to prune — articles.json is empty.")
+        return 0
+
+    existing_stems = {p.stem for p in MD_DIR.glob("*.md")}
+    orphans = [a for a in articles if a["id"] not in existing_stems]
+
+    if not orphans:
+        print("No orphan entries found.")
+        return 0
+
+    for entry in orphans:
+        print(f"  Removing orphan: {entry['id']}")
+        html_path = POSTS_DIR / f"{entry['id']}.html"
+        if html_path.exists():
+            html_path.unlink()
+            print(f"    Deleted {html_path.relative_to(ROOT)}")
+
+    kept = [a for a in articles if a["id"] in existing_stems]
+    save_articles_json(kept)
+    print(f"Pruned {len(orphans)} orphan(s).")
+    return 0
 
 
 def main() -> int:
@@ -262,6 +295,10 @@ def main() -> int:
             print(f"Error: Required path not found: {path}")
             print(f"       Expected '{label}' to exist in the project root.")
             return 1
+
+    # Prune mode
+    if args.prune:
+        return prune_orphans()
 
     # Load template
     template = TEMPLATE_PATH.read_text(encoding="utf-8")
