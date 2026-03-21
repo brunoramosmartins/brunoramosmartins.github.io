@@ -259,6 +259,61 @@
   margin-bottom: var(--space-10);
 }
 
+/* === ARTICLE TABLES === */
+.article-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--space-6) 0;
+  font-size: 0.9rem;
+}
+
+.article-prose th {
+  background: var(--color-surface);
+  font-weight: var(--weight-semibold);
+  text-align: left;
+  border-bottom: 2px solid var(--color-accent);
+}
+
+.article-prose th,
+.article-prose td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.article-prose tbody tr:hover {
+  background: var(--color-surface);
+}
+
+/* === ARTICLE FIGURES === */
+.article-prose figure {
+  margin: var(--space-8) 0;
+  text-align: center;
+}
+
+.article-prose figure img {
+  max-width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
+.article-prose figcaption {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  font-style: italic;
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* === MATHJAX DISPLAY EQUATIONS === */
+.article-prose .MathJax_Display,
+.article-prose mjx-container[display="true"] {
+  margin: var(--space-6) 0 !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 /* === RESPONSIVE === */
 @media (max-width: 768px) {
   .article-item {
@@ -274,4 +329,8 @@
   }
   .about-sidebar { position: static; }
 
+  .article-prose table {
+    display: block;
+    overflow-x: auto;
+  }
 }
