@@ -32,6 +32,7 @@ import argparse
 import json
 import re
 import sys
+import uuid
 from datetime import datetime
 from pathlib import Path
 
@@ -107,6 +108,65 @@ def format_date_display(date_str: str) -> str:
         return dt.strftime("%b %Y")
     except ValueError:
         return date_str
+
+
+# ---------------------------------------------------------------------------
+# LaTeX math protection (pre/post-processing)
+# ---------------------------------------------------------------------------
+
+def protect_math(text: str) -> tuple[str, list[tuple[str, str]]]:
+    """
+    Replace $$...$$ and $...$ with UUID placeholders before markdown parsing.
+
+    This prevents python-markdown from interpreting LaTeX characters
+    (_, *, |, {}) as formatting. Display math ($$) is processed first
+    to avoid partial matches with inline math ($).
+    """
+    placeholders: list[tuple[str, str]] = []
+
+    # Display math first ($$...$$) — may span multiple lines
+    def _replace_display(m: re.Match) -> str:
+        ph = f"MATHBLOCK{uuid.uuid4().hex}"
+        placeholders.append((ph, m.group(0)))
+        return ph
+
+    text = re.sub(r"\$\$(.+?)\$\$", _replace_display, text, flags=re.DOTALL)
+
+    # Inline math ($...$) — single line, non-greedy
+    def _replace_inline(m: re.Match) -> str:
+        ph = f"MATHINLINE{uuid.uuid4().hex}"
+        placeholders.append((ph, m.group(0)))
+        return ph
+
+    text = re.sub(r"(?<!\$)\$(?!\$)(.+?)(?<!\$)\$(?!\$)", _replace_inline, text)
+
+    return text, placeholders
+
+
+def restore_math(html: str, placeholders: list[tuple[str, str]]) -> str:
+    """Reinject original LaTeX strings in place of UUID placeholders."""
+    for ph, original in placeholders:
+        html = html.replace(ph, original)
+    return html
+
+
+# ---------------------------------------------------------------------------
+# Post-processing: semantic figures
+# ---------------------------------------------------------------------------
+
+def wrap_figures(html: str) -> str:
+    """
+    Convert bare <p><img></p> blocks into semantic <figure> elements
+    with <figcaption> derived from the alt text.
+    """
+    pattern = r'<p>\s*<img\s+alt="([^"]*?)"\s+src="([^"]*?)"\s*/?\s*>\s*</p>'
+    replacement = (
+        '<figure>'
+        '<img src="\\2" alt="\\1" loading="lazy">'
+        '<figcaption>\\1</figcaption>'
+        '</figure>'
+    )
+    return re.sub(pattern, replacement, html)
 
 
 # ---------------------------------------------------------------------------
@@ -200,10 +260,20 @@ def build_article(md_path: Path, template: str, dry_run: bool = False) -> dict |
     # Derive article id from filename if not provided in front matter
     meta.setdefault("id", md_path.stem)
 
+    # Protect LaTeX math from markdown parser
+    protected_body, math_placeholders = protect_math(body)
+
     html_body = markdown.markdown(
-        body,
-        extensions=["fenced_code", "tables", "toc", "nl2br"],
+        protected_body,
+        extensions=["fenced_code", "codehilite", "tables", "toc", "nl2br"],
+        extension_configs={
+            "codehilite": {"css_class": "highlight", "guess_lang": False},
+        },
     )
+
+    # Restore LaTeX and convert images to semantic figures
+    html_body = restore_math(html_body, math_placeholders)
+    html_body = wrap_figures(html_body)
 
     output_html = render_template(template, meta, html_body)
 
