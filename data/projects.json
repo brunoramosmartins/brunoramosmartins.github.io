@@ -20,7 +20,31 @@
     "github_url": "https://github.com/brunoramosmartins/fraud-detection-ml",
     "demo_url": "",
     "featured": true,
-    "status": "in-progress",
+    "status": "complete",
     "date": "2026-03-07"
+  },
+  {
+    "id": "ml-experiment-analyst-agent",
+    "title": "ML Experiment Analyst Agent",
+    "description": "Autonomous AI agent that analyzes machine learning experiments from MLflow, detecting patterns like overfitting, correlating hyperparameters with performance, and proposing next experimental configurations with justifications. Includes governance mechanisms (token budgets, execution timeouts, audit trails) and human-in-the-loop workflows.",
+    "tags": ["agents", "llm", "mlops"],
+    "stack": ["Python", "LangGraph", "MLflow", "Ollama", "Streamlit", "LangSmith"],
+    "github_url": "https://github.com/brunoramosmartins/ml-experiment-analyst-agent",
+    "demo_url": "",
+    "featured": true,
+    "status": "in-progress",
+    "date": "2026-03-21"
+  },
+  {
+    "id": "bike-availability-forecasting-system",
+    "title": "Bike Availability Forecasting System",
+    "description": "End-to-end data engineering and ML system that forecasts bike availability in São Paulo's bike-sharing stations (Bike Itaú/Bike Sampa). Continuous pipeline ingests real-time GBFS data every 5 min via GitHub Actions, stores in PostgreSQL, and trains time-series models (baseline to LightGBM) for t+15 min predictions with drift monitoring.",
+    "tags": ["data-engineering", "machine-learning", "time-series"],
+    "stack": ["Python", "PostgreSQL", "LightGBM", "FastAPI", "GitHub Actions", "Evidently AI"],
+    "github_url": "https://github.com/brunoramosmartins/bike-availability-forecasting-system",
+    "demo_url": "",
+    "featured": true,
+    "status": "in-progress",
+    "date": "2026-03-21"
   }
 ]
