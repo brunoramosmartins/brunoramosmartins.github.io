@@ -46,5 +46,41 @@
     "featured": true,
     "status": "in-progress",
     "date": "2026-03-21"
+  },
+  {
+    "id": "agentic-dev-tool",
+    "title": "Agentic Dev Tool (adt)",
+    "description": "Production-ready Python CLI demonstrating agentic AI architecture. Routes natural language questions to specialized agents (repository analysis, GitHub project tracking, technical research) using OpenAI tool-calling capabilities with an MCP-style orchestration layer.",
+    "tags": ["agents", "llm", "cli"],
+    "stack": ["Python", "OpenAI API", "Typer", "Pydantic", "FastAPI", "pytest"],
+    "github_url": "https://github.com/brunoramosmartins/agentic-dev-tool",
+    "demo_url": "",
+    "featured": true,
+    "status": "complete",
+    "date": "2026-04-01"
+  },
+  {
+    "id": "customer-churn-mlops-pipeline",
+    "title": "Customer Churn MLOps Pipeline",
+    "description": "End-to-end ML pipeline for binary classification predicting customer churn in telecommunications. Covers the full ML lifecycle: data validation with Pandera, feature engineering, model training and evaluation, FastAPI deployment, and drift monitoring.",
+    "tags": ["machine-learning", "classification", "mlops"],
+    "stack": ["Python", "scikit-learn", "LightGBM", "MLflow", "Pandera", "FastAPI", "Docker"],
+    "github_url": "https://github.com/brunoramosmartins/customer-churn-mlops-pipeline",
+    "demo_url": "",
+    "featured": true,
+    "status": "complete",
+    "date": "2026-03-28"
+  },
+  {
+    "id": "wids-wildfire-threat",
+    "title": "WiDS 2026 — Wildfire Threat Prediction",
+    "description": "End-to-end ML pipeline for the WiDS Global Datathon 2026. Applies survival analysis techniques to predict when active wildfires will pose threats to evacuation zones using real-time Watch Duty data.",
+    "tags": ["machine-learning", "data-science", "competition"],
+    "stack": ["Python", "scikit-learn", "XGBoost", "LightGBM", "lifelines", "MLflow"],
+    "github_url": "https://github.com/brunoramosmartins/wids-wildfire-threat",
+    "demo_url": "",
+    "featured": false,
+    "status": "in-progress",
+    "date": "2026-03-25"
   }
 ]
