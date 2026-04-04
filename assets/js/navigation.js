@@ -30,4 +30,13 @@
   };
 
   navToggle.addEventListener("click", toggleNavigation);
+
+  // Close mobile nav when a link is clicked
+  siteNav.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      siteNav.classList.remove('is-open');
+      navToggle.classList.remove('is-open');
+      navToggle.setAttribute('aria-expanded', 'false');
+    });
+  });
 })();
