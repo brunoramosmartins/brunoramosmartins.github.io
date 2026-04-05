@@ -136,23 +136,19 @@ EOF
 echo ""
 
 # ----------------------------------------------------------
-# STEP 3: Get milestone numbers
+# STEP 3: Resolve milestone titles (gh issue create uses titles, not numbers)
 # ----------------------------------------------------------
-echo "--- Resolving milestone numbers ---"
+echo "--- Resolving milestone titles ---"
 
-get_milestone_number() {
-  gh api repos/$REPO/milestones --jq ".[] | select(.title | startswith(\"$1\")) | .number"
-}
+M7_TITLE=$(gh api repos/$REPO/milestones --jq '.[] | select(.title | startswith("v0.7")) | .title')
+M8_TITLE=$(gh api repos/$REPO/milestones --jq '.[] | select(.title | startswith("v0.8")) | .title')
+M9_TITLE=$(gh api repos/$REPO/milestones --jq '.[] | select(.title | startswith("v0.9")) | .title')
+M10_TITLE=$(gh api repos/$REPO/milestones --jq '.[] | select(.title | startswith("v1.0")) | .title')
 
-M7_NUM=$(get_milestone_number "v0.7")
-M8_NUM=$(get_milestone_number "v0.8")
-M9_NUM=$(get_milestone_number "v0.9")
-M10_NUM=$(get_milestone_number "v1.0")
-
-echo "  v0.7 = #$M7_NUM"
-echo "  v0.8 = #$M8_NUM"
-echo "  v0.9 = #$M9_NUM"
-echo "  v1.0 = #$M10_NUM"
+echo "  v0.7 = $M7_TITLE"
+echo "  v0.8 = $M8_TITLE"
+echo "  v0.9 = $M9_TITLE"
+echo "  v1.0 = $M10_TITLE"
 echo ""
 
 # ----------------------------------------------------------
@@ -167,7 +163,7 @@ echo "=== v0.7 — CV/Resume & Reading List ==="
 
 gh issue create --repo "$REPO" \
   --title "Create resume.html page with JSON-driven CV rendering" \
-  --milestone "$M7_NUM" \
+  --milestone "$M7_TITLE" \
   --label "type:feature,page:resume,priority:high" \
   --body "$(cat <<'EOF'
 ## Objective
@@ -203,7 +199,7 @@ echo "  Created: resume.html issue"
 
 gh issue create --repo "$REPO" \
   --title "Create reading.html page with curated reading list" \
-  --milestone "$M7_NUM" \
+  --milestone "$M7_TITLE" \
   --label "type:feature,page:reading,priority:high" \
   --body "$(cat <<'EOF'
 ## Objective
@@ -239,7 +235,7 @@ echo "  Created: reading.html issue"
 
 gh issue create --repo "$REPO" \
   --title "Update global navigation to include Resume and Reading links" \
-  --milestone "$M7_NUM" \
+  --milestone "$M7_TITLE" \
   --label "type:feature,priority:medium" \
   --body "$(cat <<'EOF'
 ## Objective
@@ -269,7 +265,7 @@ echo "=== v0.8 — TIL / Short Notes ==="
 
 gh issue create --repo "$REPO" \
   --title "Add TIL category support to build_blog.py" \
-  --milestone "$M8_NUM" \
+  --milestone "$M8_TITLE" \
   --label "type:feature,page:til,priority:high" \
   --body "$(cat <<'EOF'
 ## Objective
@@ -302,7 +298,7 @@ echo "  Created: TIL build support issue"
 
 gh issue create --repo "$REPO" \
   --title "Create til.html page for short notes listing" \
-  --milestone "$M8_NUM" \
+  --milestone "$M8_TITLE" \
   --label "type:feature,page:til,priority:high" \
   --body "$(cat <<'EOF'
 ## Objective
@@ -335,7 +331,7 @@ echo "  Created: til.html page issue"
 
 gh issue create --repo "$REPO" \
   --title "Write and publish 2 seed TIL posts" \
-  --milestone "$M8_NUM" \
+  --milestone "$M8_TITLE" \
   --label "type:content,page:til,priority:medium" \
   --body "$(cat <<'EOF'
 ## Objective
@@ -375,7 +371,7 @@ echo "=== v0.9 — Automated News Feed ==="
 
 gh issue create --repo "$REPO" \
   --title "Create Python script to fetch and curate RSS feeds" \
-  --milestone "$M9_NUM" \
+  --milestone "$M9_TITLE" \
   --label "type:automation,page:news,priority:high" \
   --body "$(cat <<'EOF'
 ## Objective
@@ -419,7 +415,7 @@ echo "  Created: RSS fetch script issue"
 
 gh issue create --repo "$REPO" \
   --title "Create GitHub Action to run news feed on daily schedule" \
-  --milestone "$M9_NUM" \
+  --milestone "$M9_TITLE" \
   --label "type:automation,page:news,priority:high" \
   --body "$(cat <<'EOF'
 ## Objective
@@ -474,7 +470,7 @@ echo "  Created: GitHub Action issue"
 
 gh issue create --repo "$REPO" \
   --title "Create news.html page with source filtering and date grouping" \
-  --milestone "$M9_NUM" \
+  --milestone "$M9_TITLE" \
   --label "type:feature,page:news,priority:high" \
   --body "$(cat <<'EOF'
 ## Objective
@@ -518,7 +514,7 @@ echo "=== v1.0 — Public Release (existing milestone) ==="
 
 gh issue create --repo "$REPO" \
   --title "Final navigation audit and consistency check across all pages" \
-  --milestone "$M10_NUM" \
+  --milestone "$M10_TITLE" \
   --label "type:docs,priority:medium,ux" \
   --body "$(cat <<'EOF'
 ## Objective
