@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Statistical foundations of inter-annotator agreement — from observed agreement to Krippendorff's Alpha." />
+  <title>When Agreement Is an Illusion — Bruno Ramos Martins</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="article" />
+  <meta property="og:title"       content="When Agreement Is an Illusion — Bruno Ramos Martins" />
+  <meta property="og:description" content="Statistical foundations of inter-annotator agreement — from observed agreement to Krippendorff's Alpha." />
+  <meta property="og:url"         content="https://brunoramosmartins.github.io/posts/krippendorff-alpha.html" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet" />
+
+  <!-- MathJax — renders LaTeX math ($...$, $$...$$) -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath:  [['$', '$']],
+        displayMath: [['$$', '$$']],
+      },
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/layout.css" />
+  <link rel="stylesheet" href="../assets/css/components.css" />
+  <link rel="stylesheet" href="../assets/css/highlight.css" />
+
+  <style>
+    /* === Article-specific prose styles === */
+    .article-prose {
+      max-width: var(--container-max);
+      margin: 0 auto;
+    }
+
+    .article-prose h2 {
+      font-size: var(--text-3xl);
+      font-weight: var(--weight-bold);
+      letter-spacing: -0.02em;
+      margin-top: var(--space-16);
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-3);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .article-prose h3 {
+      font-size: var(--text-2xl);
+      font-weight: var(--weight-semibold);
+      letter-spacing: -0.01em;
+      margin-top: var(--space-10);
+      margin-bottom: var(--space-3);
+    }
+
+    .article-prose h4 {
+      font-size: var(--text-xl);
+      font-weight: var(--weight-medium);
+      margin-top: var(--space-8);
+      margin-bottom: var(--space-2);
+    }
+
+    .article-prose p {
+      font-size: var(--text-base);
+      line-height: var(--leading-relaxed);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-5);
+    }
+
+    .article-prose ul,
+    .article-prose ol {
+      list-style: revert;
+      padding-left: var(--space-6);
+      margin-bottom: var(--space-5);
+      color: var(--color-text-secondary);
+      line-height: var(--leading-relaxed);
+    }
+
+    .article-prose li { margin-bottom: var(--space-2); }
+
+    .article-prose img {
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      margin: var(--space-8) 0;
+    }
+
+    .article-header {
+      padding: var(--space-16) 0 var(--space-10);
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: var(--space-12);
+    }
+
+    .article-header__back {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+      display: inline-block;
+      margin-bottom: var(--space-6);
+      transition: color var(--transition-fast);
+    }
+    .article-header__back:hover { color: var(--color-accent); }
+
+    .article-header__title {
+      font-size: var(--text-4xl);
+      font-weight: var(--weight-bold);
+      letter-spacing: -0.03em;
+      line-height: var(--leading-tight);
+      margin-bottom: var(--space-4);
+    }
+
+    .article-header__meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .article-header__date {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      letter-spacing: 0.06em;
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <!-- =========================================================
+       HEADER
+  ========================================================== -->
+  <header class="site-header" role="banner">
+    <div class="container container--wide">
+      <a href="../index.html" class="site-logo">Bruno Ramos Martins</a>
+
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="site-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav id="site-nav" class="site-nav" role="navigation" aria-label="Main navigation">
+        <a href="../index.html">Home</a>
+        <a href="../projects.html">Projects</a>
+        <a href="../articles.html" class="active" aria-current="page">Articles</a>
+        <a href="../about.html">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       MAIN CONTENT
+  ========================================================== -->
+  <main class="site-main" id="main-content">
+    <div class="container container--wide">
+
+      <!-- Article Header -->
+      <header class="article-header">
+        <a href="../articles.html" class="article-header__back">← Articles</a>
+        <h1 class="article-header__title">When Agreement Is an Illusion</h1>
+        <div class="article-header__meta">
+          <time class="article-header__date" datetime="2026-04-21">Apr 2026</time>
+          <div class="tags">
+            <span class="tag">machine-learning</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Article Body — injected by build_blog.py -->
+      <article class="article-prose" aria-label="Article content">
+        <h1 id="when-agreement-is-an-illusion">When Agreement Is an Illusion</h1>
+<p><em>Statistical foundations of inter-annotator agreement — from observed agreement to Krippendorff's Alpha.</em></p>
+<blockquote>
+<p><strong>Thesis.</strong> An agreement score of 0.80 can be misleading when chance agreement is not explicitly modelled. Under class imbalance and independent marginals, high observed overlap emerges without shared understanding. Krippendorff's Alpha addresses this by modelling <strong>disagreement</strong> under a randomness benchmark and generalising across raters, missing data, and measurement scales.</p>
+</blockquote>
+<hr />
+<h2 id="1-introduction">1. Introduction</h2>
+<p>You run an annotation exercise with a small panel of analysts. The task is simple: assign each work item to one of a few predefined categories based on its description. In parallel, you prompt an LLM to perform the same classification. The expectation is straightforward — humans provide the reference, the model approximates them.</p>
+<p>What happens instead is less comfortable. The annotators do not consistently agree with each other. The same item is mapped to different categories depending on who reads it. Meanwhile, the LLM — given a fixed prompt — produces stable, repeatable outputs. At that point, a natural question emerges: if humans do not agree among themselves, what exactly are we asking the model to replicate?</p>
+<p>I first encountered this setup in a workplace project where the pragmatic conclusion was that the LLM may be preferable precisely because it is consistent, even if humans are not. This conclusion is operationally appealing — but statistically fragile.</p>
+<p>A high observed agreement, whether between humans or between humans and a model, does not necessarily indicate shared understanding. It may reflect <strong>prevalence</strong> (one category dominates), bias in marginal distributions, or structured randomness. Under skewed class distributions, independent annotators who share no latent signal can still agree on more than half of all items — and a model that shadows the majority class can look excellent without adding careful judgement.</p>
+<p>Computational linguistics has relied on agreement coefficients since the era of corpus annotation (Artstein and Poesio, 2008), yet the community's maturity about $\kappa$ remains uneven: leaderboards still mix accuracy-style summaries with prevalence-heavy tasks. As <strong>foundation models</strong> become default labellers — deterministic annotators conditioned on prompts — the question shifts from "did we hit 80%?" to "does this automation <strong>track</strong> human exchangeability under the same instructions?" That reframing pushes toward coefficients that tolerate <strong>partial</strong> observation and respect <strong>scale</strong>.</p>
+<p>This article follows one arc:</p>
+<ol>
+<li>Formalise agreement as an <strong>estimator</strong> and separate <strong>signal</strong> from <strong>chance</strong> (Sections 2–3).</li>
+<li>Introduce <strong>Cohen's</strong> and <strong>Fleiss'</strong> $\kappa$ as the standard correction, then show where they <strong>break</strong> (Sections 4–5).</li>
+<li>Reframe reliability through <strong>disagreement</strong> and the <strong>coincidence matrix</strong>, leading to <strong>Krippendorff's</strong> $\alpha$ (Sections 6–7).</li>
+<li><strong>Validate</strong> with four controlled simulations (Section 8).</li>
+<li>Close with a <strong>practical framework</strong> and honest limits (Sections 9–10).</li>
+</ol>
+<p><strong>Notation.</strong> $K$ categories, $n$ items (units), $m$ raters unless stated otherwise. The annotation matrix is $(X_{ij})$ with $X_{ij} \in \{1,\ldots,K\}$. Missing judgments are allowed where noted.</p>
+<hr />
+<h2 id="2-agreement-as-an-estimator">2. Agreement as an estimator</h2>
+<h3 id="21-the-annotation-problem">2.1 The annotation problem</h3>
+<p>We consider a reliability study in which multiple annotators assign one of $K$ nominal categories to each of $n$ items. This setup appears deceptively simple. In practice, it often corresponds to tasks such as categorising work items based on textual descriptions, assigning labels in NLP pipelines, or evaluating model outputs against human judgement.</p>
+<p>Crucially, <strong>no ground truth is directly observed</strong>. What we observe is a collection of human judgments, each shaped by interpretation, ambiguity, and individual bias. We are not measuring accuracy — we are measuring <strong>consistency</strong> of a measurement process under repeated application.</p>
+<p>In the motivating example from the introduction, different annotators frequently disagreed on the same item — not because they were careless, but because the task itself allowed multiple plausible interpretations. The LLM, by contrast, enforced a single interpretation through a fixed prompt. This highlights the central object of study: <strong>reliability is not about correctness, but about whether the process is reproducible across agents</strong>.</p>
+<p>This distinction between <strong>reliability</strong> (replicability of the procedure) and <strong>validity</strong> (whether categories match the world) is fundamental. Reliability can be high while validity is poor — everyone applies the same wrong rubric — and vice versa. This article addresses <strong>only</strong> reliability. Claims about ground truth or downstream utility require additional evidence.</p>
+<p>If annotators disagree, the problem is not necessarily that agreement is low — it may be that the task does not define a single latent truth.</p>
+<p>Formally, we represent the data as an annotation matrix $(X_{ij})$, where $X_{ij} \in \{1,\ldots,K\}$ is the label assigned by rater $j$ to item $i$. Missing entries are allowed, reflecting real annotation settings where not every rater labels every item.</p>
+<h3 id="22-pairwise-observed-agreement">2.2 Pairwise observed agreement</h3>
+<p>Fix an item $i$. Let $S_i$ be the set of unordered rater pairs $(j,\ell)$, $j<\ell$, such that <strong>both</strong> $X_{ij}$ and $X_{i\ell}$ are observed. Define an agreement indicator $I_{ij\ell} = 1$ if $X_{ij} = X_{i\ell}$, else $0$.</p>
+<p>The <strong>observed agreement</strong> is the fraction of comparable pairs that agree:</p>
+<p>$$
+A_o = \frac{\displaystyle\sum_{i=1}^n \sum_{(j,\ell)\in S_i} I_{ij\ell}}{\displaystyle\sum_{i=1}^n |S_i|}.
+$$</p>
+<p>So $A_o$ is a <strong>sample proportion</strong> of agreeing pairs, pooled over items. It estimates the probability that two randomly drawn <strong>observed</strong> ratings on the <strong>same</strong> item match, under the implicit design that weights each eligible pair equally.</p>
+<p><strong>Worked example (three items, two raters).</strong> Items 1 and 3 agree; item 2 disagrees. Then $A_o = 2/3$.</p>
+<h3 id="23-global-agreement-pooling-judgments-with-replacement">2.3 Global agreement: pooling judgments with replacement</h3>
+<p>Some reporting pipelines use an alternative <strong>global</strong> summary: pool all observed judgments, let $N$ be the pool size and $n_k$ the count for category $k$, and imagine drawing <strong>two judgments uniformly at random with replacement</strong> from the pool. The probability both draws equal $k$ is $(n_k/N)^2$, so</p>
+<p>$$
+P(\text{agree}) = \sum_{k=1}^K \Bigl(\frac{n_k}{N}\Bigr)^2.
+$$</p>
+<p>This quantity coincides with the pairwise-within-item $A_o$ in simple balanced designs but <strong>diverges</strong> when the number of raters varies by item or missingness is uneven. It remains useful as an intuitive "overall overlap" index and matches the $\sum_k p_k^2$ algebra that reappears in Fleiss' expected agreement $\bar P_e$. The companion code implements both variants so experiments can be checked against the definition you standardise in your protocol.</p>
+<h3 id="24-what-mathinlinecce82d9fdee54636a88ad3a98b11832e-estimates-and-what-it-misses">2.4 What $A_o$ estimates — and what it misses</h3>
+<p>$A_o$ is a transparent <strong>descriptive</strong> statistic. What it is <strong>not</strong> is a calibrated measure of "how much better than chance" the panel behaves. Two independent annotators who each draw labels from a skewed distribution $\pi$ will still agree with probability $\sum_k \pi_k^2$, often far above zero. If your reported $A_o$ is close to that quantity, the data are compatible with <strong>independence</strong>, not with a shared latent truth.</p>
+<p>Like any binomial-style proportion, $A_o$ has <strong>sampling variability</strong>. Wide items and sparse rare classes can make point estimates noisy; the experiments in Section 8 use $n = 10\,000$ items partly to make curves visually stable. In applied work, complement point estimates with <strong>confidence intervals</strong> (bootstrap over items is common) and with <strong>disaggregated</strong> views (per-stratum agreement, confusion matrices).</p>
+<p>Hence the framing: treat $A_o$ as an <strong>estimator</strong> of overlap under your sampling scheme, and always ask what <strong>benchmark</strong> it should be compared to.</p>
+<h3 id="25-two-data-generating-processes">2.5 Two data generating processes</h3>
+<p>The experiments in this article rely on two distinct generative models. Conflating them leads to misinterpretation, so we state them explicitly.</p>
+<p><strong>Model 1 — Pure random labelling (no signal).</strong> Each annotator draws $X_{ij} \sim \pi$ independently. There is no latent truth per item; agreement arises <strong>only</strong> from shared marginals. This model is the null hypothesis for Sections 3 and 8.1.</p>
+<p><strong>Model 2 — Noisy annotation around latent truth.</strong> Each item $i$ has a latent true label $Y_i \sim \pi$. Each annotator observes $Y_i$ with noise:</p>
+<p>$$
+P(X_{ij} = k \mid Y_i) = \begin{cases} 1 - \varepsilon & \text{if } k = Y_i, \\ \varepsilon / (K-1) & \text{otherwise.} \end{cases}
+$$</p>
+<p>Here $\varepsilon \in [0, 1]$ controls annotation noise. At $\varepsilon = 0$, all raters agree perfectly; at $\varepsilon = (K-1)/K$, Model 2 reduces to Model 1. Experiments B, C, and D use this model with varying $\varepsilon$ and $\pi$.</p>
+<p>The distinction matters: under Model 1, <strong>any</strong> observed agreement is pure chance. Under Model 2, agreement decomposes into a <strong>signal</strong> component (shared latent truth) and a <strong>chance</strong> component (marginal overlap). The coefficients in this article are designed to strip away the chance component — but they assume noise is <strong>symmetric and item-independent</strong>. Structured errors (e.g. an LLM that systematically over-predicts the majority class) violate this assumption and require additional diagnostic tools beyond what $\alpha$ alone provides (see Section 9.5).</p>
+<hr />
+<h2 id="3-the-chance-agreement-problem">3. The chance agreement problem</h2>
+<h3 id="31-expected-agreement-under-independence">3.1 Expected agreement under independence</h3>
+<p><strong>Model.</strong> Two annotators assign labels <strong>independently</strong>, each following the same category distribution $\pi = (\pi_1,\ldots,\pi_K)$, $\pi_k \ge 0$, $\sum_k \pi_k = 1$ (Model 1 from Section 2.5). Then</p>
+<p>$$
+A_e = P(\text{both pick the same category}) = \sum_{k=1}^K \pi_k^2.
+$$</p>
+<p>For <strong>uniform</strong> $\pi_k = 1/K$, we get $A_e = K \cdot (1/K)^2 = 1/K$. With $K=2$, independent coin-flip labellers agree half the time <strong>with no shared truth</strong>. With $K=3$, $A_e = 1/3$.</p>
+<p><strong>Imbalanced example.</strong> If $\pi = (0.7, 0.2, 0.1)$,</p>
+<p>$$
+A_e = 0.7^2 + 0.2^2 + 0.1^2 = 0.54.
+$$</p>
+<p>Prevalence alone pushes the independence baseline upward.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>$A_e = \sum_k \pi_k^2$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$K=2$, uniform</td>
+<td>$0.50$</td>
+</tr>
+<tr>
+<td>$K=3$, uniform</td>
+<td>$1/3 \approx 0.333$</td>
+</tr>
+<tr>
+<td>$K=3$, $\pi=(0.7,0.2,0.1)$</td>
+<td>$0.54$</td>
+</tr>
+</tbody>
+</table>
+<p>The third row is the <strong>warning shot</strong> for applied reports: <strong>more than half</strong> of independent draws would already match even though three categories exist.</p>
+<h3 id="32-random-annotators-why-mathinlinedb5cc2f905154d28abb0c8dddb81f7ed-does-not-go-to-zero">3.2 Random annotators: why $A_o$ does not go to zero</h3>
+<p>Suppose every matrix entry is drawn <strong>independently</strong> from $\pi$ (no shared latent item truth). Then two ratings on the same item are independent draws from $\pi$, and the probability they agree is <strong>exactly</strong> $A_e = \sum_k \pi_k^2 > 0$ for any non-degenerate $\pi$.</p>
+<p>So <strong>"random" does not mean "zero agreement"</strong>; it means agreement at the <strong>chance</strong> level implied by the marginals. Any headline that cites $A_o$ without that context risks overstating reliability.</p>
+<h3 id="33-empirical-check-convergence-to-mathinline9fc80bd34b65426eb209ae64d60cedb4">3.3 Empirical check: convergence to $\sum_k \pi_k^2$</h3>
+<p>The companion codebase simulates Model 1 annotators and tracks $A_o$ as item count grows. The simulation matches theory: empirical agreement concentrates on $\sum_k \pi_k^2$. If real data looked like this, the annotation process would carry no item-specific signal. Real studies usually violate that assumption — which is why we need coefficients that separate structured agreement from prevalence-driven overlap.</p>
+<figure><img src="../figures/random_agreement_convergence.png" alt="Simulated convergence of observed agreement to the independence baseline under i.i.d. random labelling." loading="lazy"><figcaption>Simulated convergence of observed agreement to the independence baseline under i.i.d. random labelling.</figcaption></figure>
+<p><strong>Figure 1.</strong> Random i.i.d. annotators: empirical observed agreement approaches the theoretical expected agreement $A_e = \sum_k \pi_k^2$ as sample size increases.</p>
+<p>The implication is clear: $A_o$ alone cannot distinguish between genuine consensus and prevalence-driven overlap. We need a correction that <strong>subtracts</strong> the chance baseline before interpreting what remains. That is exactly what the Kappa family provides.</p>
+<hr />
+<h2 id="4-the-kappa-family">4. The Kappa family</h2>
+<h3 id="41-the-chance-correction-pattern">4.1 The chance-correction pattern</h3>
+<p>Given an observed agreement $A_o$ and an expected agreement $A_e$ under a stated <strong>chance model</strong>, define</p>
+<p>$$
+\kappa \;=\; \frac{A_o - A_e}{1 - A_e}.
+$$</p>
+<p>When $A_e < 1$:</p>
+<ul>
+<li>$\kappa = 1$ if $A_o = 1$ (perfect overlap).</li>
+<li>$\kappa = 0$ if $A_o = A_e$ (overlap matches the baseline).</li>
+<li>$\kappa < 0$ if $A_o < A_e$ (worse than the baseline).</li>
+</ul>
+<p>Different coefficients differ in how $A_o$ and $A_e$ are operationalised. The denominator $1-A_e$ rescales the excess agreement so that $\kappa$ lives on a <strong>comparable</strong> scale across tasks with different baselines: the same raw gap $A_o - A_e$ means more when chance agreement was already rare than when it was ubiquitous. That rescaling is intellectually satisfying but also explains why $\kappa$ can swing dramatically when <strong>small changes</strong> in rare-class counts move $A_e$: the coefficient is <strong>ratio-based</strong>, not variance-stabilised.</p>
+<h3 id="42-cohens-mathinline8bf031c2dab04d3a8fff45e2b8130431-two-fixed-raters">4.2 Cohen's $\kappa$ (two fixed raters)</h3>
+<p>Two annotators rate the same $n$ items: $X_{i1}, X_{i2} \in \{1,\ldots,K\}$.</p>
+<p><strong>Observed agreement:</strong></p>
+<p>$$
+A_o \;=\; \frac{1}{n}\sum_{i=1}^n \mathbf{1}\{X_{i1}=X_{i2}\}.
+$$</p>
+<p><strong>Expected agreement</strong> uses the <strong>empirical</strong> rater marginals. Let $p_{k\cdot} = \frac{1}{n}\sum_i \mathbf{1}\{X_{i1}=k\}$ and $p_{\cdot k} = \frac{1}{n}\sum_i \mathbf{1}\{X_{i2}=k\}$. Under independence with those marginals,</p>
+<p>$$
+A_e \;=\; \sum_{k=1}^K p_{k\cdot}\,p_{\cdot k}.
+$$</p>
+<p><strong>Cohen's kappa:</strong> $\kappa_C = (A_o - A_e)/(1-A_e)$.</p>
+<p><strong>Worked $2\times 2$ example (three items).</strong> With encodings A/B giving $A_o = 2/3$ and marginals $(2/3, 1/3)$ vs $(1/3, 2/3)$, one obtains $A_e = 4/9$ and $\kappa_C = 0.4$.</p>
+<p>Cohen's $\kappa$ is <strong>symmetric</strong> in the two raters for this definition and is widely implemented (e.g. scikit-learn). Its weakness for modern annotation is structural: <strong>only two</strong> fixed individuals, no native slot for "sometimes three crowd workers, sometimes two," and ad hoc handling of missing pairs by <strong>dropping</strong> items. Those limitations are acceptable in classic test–retest studies; they bite in crowdsourcing and LLM–human panels.</p>
+<h3 id="43-fleiss-mathinlinee6ec88fa382b4ea283f6716e155f3ca2-several-raters-per-item">4.3 Fleiss' $\kappa$ (several raters per item)</h3>
+<p>There are $n$ items and $m$ raters per item (balanced design). For item $i$, let $n_{ik}$ be the count of raters who chose category $k$ ($\sum_k n_{ik} = m$).</p>
+<p><strong>Extent of agreement on item $i$:</strong></p>
+<p>$$
+P_i \;=\; \frac{1}{m(m-1)}\sum_{k=1}^K n_{ik}(n_{ik}-1),
+$$</p>
+<p>the fraction of <strong>unordered</strong> rater pairs on item $i$ that agree.</p>
+<p><strong>Mean observed agreement:</strong> $\bar P = \frac{1}{n}\sum_i P_i$.</p>
+<p><strong>Pooled category proportions:</strong> $p_k = \frac{1}{nm}\sum_i n_{ik}$.</p>
+<p><strong>Expected agreement:</strong> $\bar P_e = \sum_k p_k^2$ (same functional form as Section 3 when all judgments share one marginal).</p>
+<p><strong>Fleiss' kappa:</strong> $\kappa_F = (\bar P - \bar P_e)/(1 - \bar P_e)$.</p>
+<p><strong>Tiny sanity check ($n=2$ items, $m=3$ raters, $K=2$).</strong> Item 1 with label counts $(2,1)$ gives $P_1 = (2\cdot 1 + 1\cdot 0)/(3\cdot 2) = 1/3$. Item 2 with counts $(0,3)$ gives $P_2 = 1$. Hence $\bar P = (1/3 + 1)/2 = 2/3$. Pooling six judgments yields $p_0 = 1/3$, $p_1 = 2/3$, so $\bar P_e = (1/3)^2 + (2/3)^2 = 5/9$ and $\kappa_F = (2/3 - 5/9)/(1 - 5/9) = (1/9)/(4/9) = 0.25$. The hand calculation matches the unit tests in the codebase — a useful anchor when debugging new simulation pipelines.</p>
+<h3 id="44-why-kappa-helps">4.4 Why Kappa helps</h3>
+<p>Both $\kappa_C$ and $\kappa_F$ <strong>re-express</strong> overlap relative to a <strong>data-driven</strong> chance baseline. When $A_o$ is high only because $\bar P_e$ is high, $\kappa_F$ moves toward zero, signalling that apparent harmony is largely <strong>prevalence-driven</strong>. That is the right direction for interpretation — until the baseline and structural assumptions themselves become inadequate (Section 5).</p>
+<hr />
+<h2 id="5-limitations-of-kappa">5. Limitations of Kappa</h2>
+<h3 id="51-the-kappa-paradox">5.1 The Kappa paradox</h3>
+<p>When one category is <strong>very prevalent</strong>, independent raters still agree often because $\bar P_e = \sum_k p_k^2$ is dominated by $p_{\text{major}}^2$. A high <strong>raw</strong> agreement can therefore coexist with <strong>low</strong> $\kappa$: the coefficient is doing its job, but readers who only track $A_o$ feel a <strong>paradox</strong>.</p>
+<p>Clinicians have long documented <strong>"high agreement but low kappa"</strong> scenarios (Feinstein and Cicchetti, 1990): the statistical structure is the same <strong>prevalence inflation</strong> of the chance baseline. The paradox is not a quirk of one subfield — it is the predictable algebra of $\sum_k p_k^2$ when one $p_k$ nears one.</p>
+<p>The companion codebase sweeps imbalance at fixed noise; Fleiss' $\kappa$ can sit far below raw agreement while $A_o$ stays in the "excellent" band on naive scales. The figure is not a proof; it is a <strong>visual reminder</strong> that <strong>ranking models</strong> by raw agreement can invert a ranking by $\kappa_F$ when class balance differs across conditions.</p>
+<figure><img src="../figures/kappa_paradox.png" alt="Fleiss' kappa versus class imbalance at fixed annotation noise (Kappa paradox)." loading="lazy"><figcaption>Fleiss' kappa versus class imbalance at fixed annotation noise (Kappa paradox).</figcaption></figure>
+<p><strong>Figure 2.</strong> As the majority-class mass grows, expected agreement under independence grows with it; $\kappa_F$ can fall sharply even when naive overlap remains high. Note the narrower y-axis scale in the right panel.</p>
+<h3 id="52-structural-constraints">5.2 Structural constraints</h3>
+<table>
+<thead>
+<tr>
+<th>Limitation</th>
+<th>Cohen</th>
+<th>Fleiss</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Number of raters</td>
+<td>Exactly <strong>two</strong></td>
+<td>Same $m \ge 2$ for every item</td>
+</tr>
+<tr>
+<td>Missing data</td>
+<td>Not native</td>
+<td><strong>Complete</strong> matrix typically required</td>
+</tr>
+<tr>
+<td>Scale</td>
+<td><strong>Nominal</strong></td>
+<td><strong>Nominal</strong> (weighted variants exist)</td>
+</tr>
+</tbody>
+</table>
+<p>Ordinal, interval, and ratio data can be squeezed into nominal bins or <strong>weighted</strong> $\kappa$, but there is no single Kappa object that natively carries <strong>metric</strong> distances between categories while handling <strong>variable</strong> numbers of judgments and <strong>missing</strong> cells in one framework.</p>
+<h3 id="53-building-the-case-for-mathinline40b9b9465fe9419c80c5d174f238fc12">5.3 Building the case for $\alpha$</h3>
+<p>We need a coefficient that:</p>
+<ol>
+<li>Compares observed <strong>disagreement</strong> to a <strong>chance</strong> level of disagreement under a clear random pairing model.</li>
+<li>Allows <strong>missing</strong> ratings without discarding entire items arbitrarily.</li>
+<li>Supports <strong>distances</strong> between values (ordinal steps, squared interval gaps, ratio penalties).</li>
+</ol>
+<p>Krippendorff's $\alpha$ is built for that role. It does not erase the need for careful <strong>study design</strong>: if instructions are ambiguous, no coefficient will rescue interpretability. What $\alpha$ offers is a <strong>single algebraic skeleton</strong> that extends from nominal through ratio scales and respects <strong>pairable</strong> information only — the same philosophical move as using <strong>effective sample sizes</strong> in other parts of statistics.</p>
+<hr />
+<h2 id="6-from-agreement-to-disagreement">6. From agreement to disagreement</h2>
+<h3 id="61-why-shift-the-lens">6.1 Why shift the lens</h3>
+<p>Raw agreement and Kappa-style numerators count <strong>matches</strong>: how many pairs gave the same label? An equivalent dual view counts <strong>mismatches</strong> weighted by how far apart the assigned categories are. For nominal data, "distance" is binary — same or not. For interval data, squared differences penalise large errors more than small ones. This dual view turns out to be more general: it naturally accommodates <strong>measurement scales</strong> beyond the nominal and leads to a single formula that unifies all cases.</p>
+<h3 id="62-the-reliability-matrix">6.2 The reliability matrix</h3>
+<p>Krippendorff's construction starts from a <strong>reliability matrix</strong>: rows are <strong>units</strong> (items), columns are <strong>raters</strong>, entries are values (categories or numeric scores). Missing entries are <strong>excluded</strong> from all calculations; only pairs of distinct raters on the same unit contribute information. A unit with a single observed label cannot form a pair and is silently dropped — no imputation, no row deletion.</p>
+<h3 id="63-building-the-coincidence-matrix-a-worked-example">6.3 Building the coincidence matrix — a worked example</h3>
+<p>Consider three items rated by three annotators on a binary domain $\{A, B\}$:</p>
+<table>
+<thead>
+<tr>
+<th>Unit</th>
+<th>Rater 1</th>
+<th>Rater 2</th>
+<th>Rater 3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>A</td>
+<td>A</td>
+<td>B</td>
+</tr>
+<tr>
+<td>2</td>
+<td>B</td>
+<td>B</td>
+<td>—</td>
+</tr>
+<tr>
+<td>3</td>
+<td>A</td>
+<td>A</td>
+<td>A</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Step 1 — count vectors.</strong> For each unit, count how many times each value appears among <strong>observed</strong> ratings:</p>
+<ul>
+<li>Unit 1: $\mathbf{n}_1 = (2, 1)$, with $m_1 = 3$ raters.</li>
+<li>Unit 2: $\mathbf{n}_2 = (0, 2)$, with $m_2 = 2$ raters (Rater 3 is missing).</li>
+<li>Unit 3: $\mathbf{n}_3 = (3, 0)$, with $m_3 = 3$ raters.</li>
+</ul>
+<p><strong>Step 2 — local coincidence contributions.</strong> For each unit, the contribution to the coincidence matrix is proportional to how often pairs of <strong>distinct</strong> raters assigned each combination of values. For a unit with count vector $\mathbf{n}_i$, the off-diagonal entry $(c, c')$ receives $n_{ic} \cdot n_{ic'}/(m_i - 1)$, and the diagonal entry $(c, c)$ receives $n_{ic}(n_{ic} - 1)/(m_i - 1)$. The denominator $m_i - 1$ ensures that each unit contributes <strong>one unit of total mass</strong> regardless of how many raters observed it.</p>
+<p>Applying this to our example:</p>
+<ul>
+<li><strong>Unit 1</strong> ($m_1 = 3$): diagonal $(A,A) = 2 \cdot 1 / 2 = 1$; diagonal $(B,B) = 1 \cdot 0 / 2 = 0$; off-diagonal $(A,B) = 2 \cdot 1 / 2 = 1$.</li>
+<li><strong>Unit 2</strong> ($m_2 = 2$): diagonal $(B,B) = 2 \cdot 1 / 1 = 2$; all other entries zero.</li>
+<li><strong>Unit 3</strong> ($m_3 = 3$): diagonal $(A,A) = 3 \cdot 2 / 2 = 3$; all other entries zero.</li>
+</ul>
+<p><strong>Step 3 — sum to get $\mathbf{O}$.</strong> Add the contributions across units:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>A</th>
+<th>B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A</strong></td>
+<td>4</td>
+<td>1</td>
+</tr>
+<tr>
+<td><strong>B</strong></td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>The marginals are $n_A = 5$, $n_B = 3$, and the total pairable mass is $N = 8$.</p>
+<p><strong>Step 4 — expected coincidence $\mathbf{E}$.</strong> Under the null hypothesis that pairs are formed by random re-pairing of the same marginal totals, the expected matrix entries are $E_{cc'} = (n_c n_{c'} - n_c \delta_{cc'}) / (N - 1)$. For instance, $E_{AB} = (5 \cdot 3) / 7 \approx 2.14$ and $E_{AA} = (5 \cdot 4) / 7 \approx 2.86$.</p>
+<h3 id="64-from-coincidence-to-disagreement">6.4 From coincidence to disagreement</h3>
+<p>The <strong>observed disagreement</strong> is the weighted sum $D_o^* = \sum_{c,c'} O_{cc'} D_{cc'}$, where $D_{cc'} = \delta(c, c')$ encodes distance. The <strong>expected disagreement</strong> $D_e^*$ uses $\mathbf{E}$ in the same formula. The ratio $D_o^* / D_e^*$ tells us how the panel's actual pattern of mismatches compares to what random pairing would produce.</p>
+<p>The conceptual shift is simple: instead of "how often do we agree?", ask <strong>"how much farther apart are we than random pairing would predict?"</strong> Agreement is the special case in which distance is zero on the diagonal and one elsewhere (nominal $\delta$). Section 7 assembles these pieces into the full $\alpha$ formula.</p>
+<hr />
+<h2 id="7-krippendorffs-alpha">7. Krippendorff's Alpha</h2>
+<h3 id="71-definition">7.1 Definition</h3>
+<p>Let $\delta(c,c')$ be a <strong>metric</strong> between category values (nominal, ordinal, interval, ratio — see below). Let $\mathbf{D}$ have entries $D_{cc'} = \delta(v_c, v_{c'})$ on an ordered value domain $(v_1,\ldots,v_V)$.</p>
+<p>From the data, build the <strong>observed coincidence matrix</strong> $\mathbf{O}$ (symmetric, nonnegative) and the <strong>expected</strong> matrix $\mathbf{E}$ under the random-pairing null that preserves marginal totals derived from $\mathbf{O}$. Define scalar disagreements</p>
+<p>$$
+D_o^* = \sum_{c,c'} O_{cc'}\,D_{cc'},
+\qquad
+D_e^* = \sum_{c,c'} E_{cc'}\,D_{cc'}.
+$$</p>
+<p><strong>Krippendorff's alpha</strong> is</p>
+<p>$$
+\alpha = 1 - \frac{D_o^*}{D_e^*}.
+$$</p>
+<p>When $D_e^*$ is zero (degenerate case), $\alpha$ is not defined as a finite ratio.</p>
+<h3 id="72-building-mathinline3c9a80eea9f948a99940c562acb6ea72-sketch">7.2 Building $\mathbf{O}$ (sketch)</h3>
+<p>For each unit $i$ with $m_i \ge 2$ observed judgments, form the count vector $\mathbf{n}_i = (n_{i1},\ldots,n_{iV})$ of how many raters used each domain value. Unnormalised co-occurrence is related to $\mathbf{n}_i\mathbf{n}_i^\top$ with the diagonal adjusted so self-pairs from the <strong>same</strong> rater do not count. Scale by $1/(m_i-1)$ and sum over units. <strong>Missing</strong> raters are dropped before forming $\mathbf{n}_i$; no pair is formed with a missing cell.</p>
+<p>Concretely, for a single unit with three raters and counts $(2,1,0)$ on domain $(v_1,v_2,v_3)$, the adjustment subtracts rater self-pairs from the outer product of counts, then divides by $m_i-1$. The resulting local matrix contributes off-diagonal mass where <strong>cross-category</strong> pairings occur; the diagonal records <strong>within-category</strong> pairings that survive the subtraction. Summing these contributions over <strong>all</strong> units yields $\mathbf{O}$. The implementation in the repository follows Krippendorff (2004) and is cross-checked against the <code>krippendorff</code> Python package on reference reliability matrices.</p>
+<h3 id="73-expected-coincidence">7.3 Expected coincidence</h3>
+<p>Let $n_c$ be marginals derived from $\mathbf{O}$ and $N = \sum_c n_c$ the total pairable mass. Under the standard null,</p>
+<p>$$
+E_{cc'} = \frac{n_c n_{c'} - n_c\,\delta_{cc'}}{N-1},
+$$</p>
+<p>symmetric and aligned with sampling-without-replacement intuition on pair slots.</p>
+<h3 id="74-distance-functions">7.4 Distance functions</h3>
+<ul>
+<li><strong>Nominal:</strong> $\delta(c,c') = 0$ if $c=c'$, else $1$.</li>
+<li><strong>Interval:</strong> $(c-c')^2$.</li>
+<li><strong>Ratio:</strong> $\bigl((c-c')/(c+c')\bigr)^2$ (with convention at $c+c'=0$).</li>
+<li><strong>Ordinal:</strong> uses the ordered domain and category masses (not plain rank gaps without weights); see Krippendorff (2004, Ch. 11).</li>
+</ul>
+<h3 id="75-boundary-behaviour">7.5 Boundary behaviour</h3>
+<p>Assume $D_e^* > 0$.</p>
+<ul>
+<li><strong>Perfect reliability</strong> (for nominal $\delta$, all pairable judgments on a unit coincide): off-diagonal mass vanishes appropriately, $D_o^* = 0$, hence $\alpha = 1$.</li>
+<li><strong>Chance-level</strong> disagreement: $D_o^* = D_e^*$ implies $\alpha = 0$.</li>
+<li><strong>Systematic</strong> disagreement beyond the null: $D_o^* > D_e^*$ implies $\alpha < 0$.</li>
+</ul>
+<p><strong>Reading $\alpha$ as a scaled excess.</strong> When $D_e^* > 0$, rearrange $\alpha = 1 - D_o^*/D_e^*$ as</p>
+<p>$$
+\alpha = \frac{D_e^* - D_o^*}{D_e^*}.
+$$</p>
+<p>So $\alpha$ is the <strong>fractional reduction</strong> of observed disagreement relative to the expected matrix under the null — analogous in spirit to how $\kappa$ expresses excess agreement relative to $1-A_e$, but built on <strong>metric</strong> weights rather than a single scalar $A_o$. Negative $\alpha$ means the pattern of weighted distances is <strong>more discordant</strong> than random pairing would predict under fixed exposure, a warning sign of <strong>systematic</strong> divergence (ambiguous guidelines, adversarial items, or instrument drift).</p>
+<h3 id="76-relation-to-cohens-mathinlinea7e81531163d4d599cd3f73086bc8215">7.6 Relation to Cohen's $\kappa$</h3>
+<p>Cohen's $\kappa$ uses <strong>per-rater</strong> marginals on the same items. Krippendorff's $\alpha$ uses <strong>pooled</strong> coincidence marginals from $\mathbf{O}$. For <strong>two</strong> raters and <strong>nominal</strong> data, both correct for chance, but the <strong>numerical value</strong> need not equal $\kappa_C$ when $K>2$: the chance models differ. In practice, report <strong>one</strong> coefficient and stick to its interpretation, or compare both explicitly in a sensitivity table.</p>
+<h3 id="77-software-and-reproducibility">7.7 Software and reproducibility</h3>
+<p>The article's claims about $\alpha$ are backed by <code>krippendorff_alpha()</code> in the companion package, validated against published examples and the reference library. <strong>Nominal</strong>, <strong>interval</strong>, <strong>ratio</strong>, and <strong>ordinal</strong> levels are implemented with explicit <strong>value domains</strong> so that unused categories do not distort distances. When you port formulas into another language, the fragile details are usually the <strong>ordinal</strong> weights and the treatment of <strong>all-missing</strong> units — test against the reference package before trusting edge cases.</p>
+<h3 id="78-ordinal-and-interval-scales-in-practice">7.8 Ordinal and interval scales in practice</h3>
+<p>For <strong>interval</strong> ratings (e.g. 1–5 Likert), squaring differences in $\delta$ penalises <strong>large</strong> jumps more harshly than small ones — a natural match when errors farther apart are substantively worse. For <strong>ordinal</strong> labels, Krippendorff's construction uses the empirical totals $n_v$ to weight distances between <strong>steps</strong> on the ordered domain; this avoids the mistake of treating ordered categories as if they were equally spaced numbers unless your measurement theory supports that identification. In <strong>NLP</strong>, many "scales" are ordinal by design (fine-grained sentiment buckets); reporting <strong>nominal</strong> $\alpha$ on those buckets is conservative with respect to order information, while <strong>ordinal</strong> $\alpha$ uses more structure and therefore demands <strong>defensible</strong> spacing assumptions encoded in the value domain.</p>
+<p>With the definition, construction, and boundary properties of $\alpha$ in place, the next step is empirical: do these properties hold in controlled simulations, and how does $\alpha$ compare to $A_o$ and $\kappa_F$ when we can compute ground-truth expectations?</p>
+<hr />
+<h2 id="8-experiments">8. Experiments</h2>
+<p>Four simulations (Phase 4 of the codebase) isolate properties of $A_o$, $\kappa_F$, and $\alpha$. All use <strong>fixed seeds</strong> and are reproducible via <code>make experiments</code> or the individual <code>scripts/experiment_*.py</code> commands.</p>
+<p>They are <strong>synthetic</strong> on purpose: closed-form targets exist for random labelling, and grids over noise and imbalance are cheap to repeat. Translating the qualitative lessons to a live LLM API requires additional layers (calibration, adversarial prompts, human factors) that fall outside this article — but the <strong>algebraic</strong> pitfalls of raw agreement and the <strong>structural</strong> limits of Fleiss remain.</p>
+<h3 id="81-experiment-a-random-annotators-sanity-check">8.1 Experiment A: random annotators (sanity check)</h3>
+<p><strong>Setup.</strong> Model 1 (pure random labelling), uniform $\pi$, sweep $K \in \{2,\ldots,10\}$ with $n = 10\,000$, $m=5$.</p>
+<p><strong>Expectation.</strong> $A_o \approx 1/K$; $\kappa_F \approx 0$; $\alpha \approx 0$.</p>
+<p><strong>Result.</strong> Empirical curves match theory within tight tolerance. This is a <strong>sanity check</strong>, not a finding: chance-corrected coefficients vanish when there is no shared structure. The near-perfect overlap between the $A_o$ curve and $1/K$ is a property of the model, not a bug — we simulated exactly the analytic scenario.</p>
+<figure><img src="../figures/exp_a_random_metrics.png" alt="Experiment A: $A_o$, Fleiss' $\kappa_F$, and Krippendorff's $\alpha$ across $K$ for random i.i.d. raters." loading="lazy"><figcaption>Experiment A: $A_o$, Fleiss' $\kappa_F$, and Krippendorff's $\alpha$ across $K$ for random i.i.d. raters.</figcaption></figure>
+<p><strong>Figure 3.</strong> Random annotators: observed agreement tracks $1/K$; $\kappa_F$ and $\alpha$ track zero.</p>
+<h3 id="82-experiment-b-the-agreement-trap">8.2 Experiment B: the agreement trap</h3>
+<p><strong>Setup.</strong> Model 2 (noisy truth) with severe class skew and low $\varepsilon$ on a five-rater panel. Grid over imbalance and noise.</p>
+<p><strong>Formal definition.</strong> The <strong>agreement trap</strong> is the region of parameter space where raw agreement is comfortably high but chance-corrected reliability is low:</p>
+<p>$$
+\mathcal{T} = \{(\pi, \varepsilon) : A_o(\pi, \varepsilon) > 0.80 \;\wedge\; \alpha(\pi, \varepsilon) < 0.40\}.
+$$</p>
+<p>This region exists because $A_e = \sum_k \pi_k^2$ grows with class imbalance. When $\pi_{\text{major}}$ nears 1, even noisy annotators agree on the dominant class most of the time, inflating $A_o$ without genuine item-level signal.</p>
+<p><strong>Result.</strong> Heatmaps of $A_o$ and $\alpha$ show a visible wedge occupying $\mathcal{T}$. A concrete example: with $\pi = (0.85, 0.10, 0.05)$ and $\varepsilon = 0.05$, one obtains $A_o \approx 0.84$ while $\alpha \approx 0.35$. Stakeholders see a comfortable raw percentage; the chance-corrected coefficient reveals the panel is only modestly better than a prevalence-aware random benchmark. The operational lesson: put <strong>both</strong> views in the same table by default.</p>
+<figure><img src="../figures/exp_b_agreement_trap_heatmap.png" alt="Experiment B: heatmaps of $\alpha$ and $A_o$ over imbalance and noise; red boxes mark the trap region." loading="lazy"><figcaption>Experiment B: heatmaps of $\alpha$ and $A_o$ over imbalance and noise; red boxes mark the trap region.</figcaption></figure>
+<p><strong>Figure 4.</strong> Agreement trap: high raw overlap coexists with low chance-corrected reliability under skew + low noise.</p>
+<h3 id="83-experiment-c-llm-versus-humans-synthetic">8.3 Experiment C: LLM versus humans (synthetic)</h3>
+<p><strong>Setup.</strong> Model 2 with three "human" annotators ($\varepsilon = 0.10$) and one "LLM" annotator ($\varepsilon$ swept in $[0, 0.5]$) on a three-class task.</p>
+<p><strong>Result.</strong> $\alpha$ tracks panel quality; adding a noisier rater reduces panel $\alpha$ relative to humans-only. The sensitivity curve makes the dose–response visible.</p>
+<p><strong>Important caveat.</strong> This experiment models LLM error as <strong>symmetric i.i.d. noise</strong> (Model 2). In practice, LLM errors are <strong>structured</strong>: a model may systematically over-predict the majority class, exhibit prompt-dependent bias, or fail on specific semantic patterns. Symmetric noise is a useful baseline, but real LLM evaluation requires additional diagnostics — confusion matrices stratified by class, adversarial probes, and analysis of <strong>where</strong> (not just how often) disagreements occur. A scenario with <strong>directional bias</strong> (e.g. the LLM always predicts the majority class when uncertain) would likely show $\alpha$ degrading faster than the symmetric case predicts.</p>
+<figure><img src="../figures/exp_c_llm_vs_humans.png" alt="Experiment C: sensitivity of $\alpha$ to synthetic LLM noise; humans-only vs full panel." loading="lazy"><figcaption>Experiment C: sensitivity of $\alpha$ to synthetic LLM noise; humans-only vs full panel.</figcaption></figure>
+<p><strong>Figure 5.</strong> Synthetic LLM vs humans: $\alpha$ responds to injected LLM noise; compare humans-only to full panel.</p>
+<h3 id="84-experiment-d-missing-data">8.4 Experiment D: missing data</h3>
+<p><strong>Setup.</strong> Fixed balanced panel with moderate noise; inject MCAR missingness from 0% to 50%.</p>
+<p><strong>Expectation.</strong> Fleiss' formulation (complete matrix) becomes <strong>undefined</strong> or <strong>NaN</strong> once entries are missing; $\alpha$ <strong>degrades gracefully</strong> because it is defined on pairable units.</p>
+<p><strong>Result.</strong> $\alpha$ remains stable near its complete-data value while Fleiss drops out — a practical reason to prefer $\alpha$ in sparse annotation regimes. The <strong>pairwise retention advantage</strong> is key: $\alpha$ uses all available pair information per unit, while Fleiss requires the full grid. Dropping to complete cases introduces <strong>complete-case bias</strong> when missingness correlates with item difficulty or annotator workload.</p>
+<p>Real annotators quit mid-batch, merge requests split reviewer pools, and LLM calls time out. $\alpha$'s coincidence logic is not magic — if missingness is <strong>informative</strong> (harder items are more often skipped), no coefficient is safe — but it avoids the <strong>structural</strong> failure mode of requiring imputation or row deletion just to return a number.</p>
+<figure><img src="../figures/exp_d_missing_robustness.png" alt="Experiment D: $\alpha$ vs Fleiss' $\kappa$ as missing rate increases." loading="lazy"><figcaption>Experiment D: $\alpha$ vs Fleiss' $\kappa$ as missing rate increases.</figcaption></figure>
+<p><strong>Figure 6.</strong> Missing data: $\alpha$ stays informative (mean $\pm$ 1 SD over 10 seeds); Fleiss requires a complete matrix.</p>
+<h3 id="85-synthesis">8.5 Synthesis</h3>
+<p>Together, the experiments support the thesis: <strong>raw agreement misleads</strong> under independence and skew; <strong>Kappa</strong> partially corrects but inherits structural limits; <strong>$\alpha$</strong> handles missingness and unifies disagreement-based thinking — validated here on synthetic ground truth where expectations are analytic or visually clear.</p>
+<hr />
+<h2 id="9-a-practical-framework">9. A practical framework</h2>
+<h3 id="91-when-to-use-which-metric">9.1 When to use which metric</h3>
+<ul>
+<li><strong>Report $A_o$</strong> as a <strong>transparent</strong> prevalence-sensitive summary, <strong>always</strong> alongside a chance-aware coefficient.</li>
+<li><strong>Cohen's $\kappa$</strong> when there are <strong>exactly two</strong> fixed raters, <strong>complete</strong> data, and <strong>nominal</strong> (or weighted) categories.</li>
+<li><strong>Fleiss' $\kappa$</strong> when every item has the <strong>same</strong> number of raters and the matrix is <strong>complete</strong>.</li>
+<li><strong>Krippendorff's $\alpha$</strong> when you have <strong>missing</strong> judgments, <strong>variable</strong> numbers of raters per unit, or you need <strong>ordinal/interval/ratio</strong> distances in one framework.</li>
+</ul>
+<h3 id="92-decision-flowchart-ascii">9.2 Decision flowchart (ASCII)</h3>
+<div class="highlight"><pre><span></span><code>                    Start: reliability study
+                              |
+              Do you have missing ratings or varying m_i per unit?
+                     /                              \
+                   Yes                              No
+                    |                                |
+         Prefer Krippendorff&#39;s alpha          Exactly 2 fixed raters?
+         (pick level: nominal / ordinal /              /            \
+          interval / ratio)                          Yes            No
+            |                                        |              |
+            |                                   Cohen&#39;s kappa   Same m, complete grid?
+            |                                                      /        \
+            |                                                    Yes        No
+            |                                            Fleiss&#39; kappa   -&gt; alpha
+            v
+     Report alpha with clear value domain and distance;
+     optionally also report Ao and a Kappa where valid for comparison.
+</code></pre></div>
+
+<h3 id="93-thresholds-with-caveats">9.3 Thresholds (with caveats)</h3>
+<p>No universal magic cutoff replaces domain judgment. Rules of thumb in the literature (e.g. Landis and Koch) were not built for modern skewed NLP corpora. Treat any <strong>single</strong> threshold as <strong>heuristic</strong>: use confidence intervals, <strong>sensitivity</strong> to prevalence, and <strong>error analysis</strong> on disagreed items. If $\alpha \ll 0$ while $A_o$ is high, prioritise <strong>prevalence and chance</strong> explanations before celebrating reliability.</p>
+<h3 id="94-reporting-checklist">9.4 Reporting checklist</h3>
+<p>When writing the methods section of a paper or an internal model card:</p>
+<ol>
+<li>State <strong>which</strong> agreement definition you use (within-item pairs vs global pool).</li>
+<li>Report <strong>$A_o$</strong> (or equivalent) <strong>and</strong> at least one <strong>chance-aware</strong> coefficient appropriate to your design.</li>
+<li>Disclose <strong>$K$</strong>, <strong>approximate class frequencies</strong>, and <strong>missingness</strong> rates.</li>
+<li>For $\alpha$, name the <strong>measurement level</strong> (nominal vs ordinal, …) and the <strong>value domain</strong>.</li>
+<li>Archive <strong>code and seeds</strong> so figures and tables recompute.</li>
+</ol>
+<h3 id="95-reliability-is-not-validity-the-systematic-bias-problem">9.5 Reliability is not validity (the systematic bias problem)</h3>
+<p>High $\alpha$ means annotators <strong>reproduce</strong> each other's judgments. It does <strong>not</strong> mean those judgments are correct. If all annotators consistently apply the same wrong interpretation — or if an LLM and its human trainers share the same systematic bias — reliability will be high while <strong>validity</strong> is poor. This is not a theoretical edge case: in content moderation, annotators trained on the same guidelines can reliably agree on labels that an external audit would reject.</p>
+<p>The implication for LLM evaluation is direct: a model that perfectly mimics human annotators inherits their biases. High agreement between model and humans is necessary but <strong>not sufficient</strong> for quality. Disagreement audits, stratified error analysis, and external validation remain essential.</p>
+<h3 id="96-what-agreement-coefficients-cannot-fix">9.6 What agreement coefficients cannot fix</h3>
+<p>$\alpha$ is not a silver bullet. It is not a substitute for <strong>clear coding rules</strong>, <strong>training</strong>, or <strong>pilot studies</strong>. Specific limitations:</p>
+<ul>
+<li><strong>Ambiguous items.</strong> If confusion concentrates on a handful of items, the right response is <strong>iterative guideline revision</strong>, not more data.</li>
+<li><strong>Prevalence sensitivity.</strong> $\alpha$ partially addresses this through its chance model, but extreme imbalance can still compress the coefficient's dynamic range. <strong>Gwet's AC1</strong> (Gwet, 2008) was designed specifically to be more stable under the Kappa paradox; it is worth comparing when prevalence is extreme and $\kappa$ behaves erratically.</li>
+<li><strong>Distance function choice.</strong> For non-nominal data, the value of $\alpha$ depends on the chosen $\delta$. Ordinal vs interval assumptions can produce substantially different results — the choice should be justified by the measurement theory, not by which gives a higher number.</li>
+<li><strong>Non-independent raters.</strong> Annotators who discuss labels, copy neighbours, or share model outputs violate the independence assumptions baked into chance models. The fix is <strong>protocol design</strong> (isolation, rotation, blinded conditions), not post-hoc algebra.</li>
+<li><strong>Structured errors.</strong> As noted in Experiment C, $\alpha$ does not distinguish <strong>random</strong> disagreement from <strong>directional</strong> bias. Two annotators who systematically disagree in opposite directions can produce the same $\alpha$ as two annotators who randomly disagree — but the downstream implications are very different.</li>
+</ul>
+<hr />
+<h2 id="10-conclusion">10. Conclusion</h2>
+<p>We opened with a concrete scenario: annotators disagree, an LLM is consistent, and the temptation is to trust the number that looks best. The article's argument is that <strong>high agreement can be misleading</strong> under class imbalance and independent marginals — not that it is always misleading, but that without explicitly modelling chance, there is no way to tell.</p>
+<p>Cohen's and Fleiss' $\kappa$ subtract a prevalence-aware baseline and improve interpretation, yet they buckle under <strong>imbalance paradoxes</strong>, <strong>missing data</strong>, and <strong>inflexible</strong> nominal scaffolding. Krippendorff's $\alpha$ reframes the question around <strong>disagreement</strong> weighted by meaningful distances, with a coincidence construction that absorbs <strong>partial</strong> observation patterns. The four experiments show, in controlled settings under two explicit data generating processes, that $\alpha$ behaves as theory demands: it vanishes under pure random labelling, flags the agreement trap, responds to panel composition, and survives missingness where Fleiss cannot.</p>
+<p>$\alpha$ is not a silver bullet. It does not detect <strong>systematic bias</strong>, does not substitute for clear annotation guidelines, and — like all chance-corrected coefficients — depends on modelling assumptions that real data can violate. Alternatives like Gwet's AC1 address specific failure modes of $\kappa$ under extreme prevalence. The right approach is rarely a single coefficient; it is a <strong>diagnostic toolkit</strong> that includes $A_o$, a chance-corrected measure, and qualitative error analysis.</p>
+<p>For <strong>ML practice</strong>, the actionable message is procedural: never ship a single agreement percentage without stating the <strong>chance benchmark</strong>; prefer coefficients that match your <strong>sampling design</strong> and <strong>measurement scale</strong>; and invest in <strong>disagreement audits</strong> — especially when an LLM's agreement with humans is used as a proxy for safety or quality.</p>
+<p>The opening scenario — humans disagree, the model is consistent — is not an argument against human annotation. It is a reminder that <strong>consistency</strong> and <strong>correctness</strong> are different properties, and that the distance between what you observe and what random pairing would produce is where reliability lives.</p>
+<hr />
+<h2 id="references">References</h2>
+<ol>
+<li>Cohen, J. (1960). A coefficient of agreement for nominal scales. <em>Educational and Psychological Measurement</em>, 20(1), 37–46. <a href="https://doi.org/10.1177/001316446002000104">doi:10.1177/001316446002000104</a></li>
+<li>Fleiss, J. L. (1971). Measuring nominal scale agreement among many raters. <em>Psychological Bulletin</em>, 76(5), 378–382. <a href="https://doi.org/10.1037/h0031619">doi:10.1037/h0031619</a></li>
+<li>Feinstein, A. R., &amp; Cicchetti, D. V. (1990). High agreement but low kappa: I. The problems of two paradoxes. <em>Journal of Clinical Epidemiology</em>, 43(6), 543–549. <a href="https://doi.org/10.1016/0895-4356(90)90158-L">doi:10.1016/0895-4356(90)90158-L</a></li>
+<li>Krippendorff, K. (2004). <em>Content Analysis: An Introduction to Its Methodology</em> (2nd ed.). Sage. ISBN 978-0-7619-1544-7.</li>
+<li>Artstein, R., &amp; Poesio, M. (2008). Inter-coder agreement for computational linguistics. <em>Computational Linguistics</em>, 34(4), 555–596. <a href="https://doi.org/10.1162/coli.07-034-R2">doi:10.1162/coli.07-034-R2</a></li>
+<li>Landis, J. R., &amp; Koch, G. G. (1977). The measurement of observer agreement for categorical data. <em>Biometrics</em>, 33(1), 159–174. <a href="https://doi.org/10.2307/2529310">doi:10.2307/2529310</a></li>
+<li>Krippendorff, K. (2011). Computing Krippendorff’s Alpha-Reliability. <em>Departmental Papers (ASC)</em>, University of Pennsylvania. <a href="https://repository.upenn.edu/asc_papers/43/">Available online</a></li>
+<li>Gwet, K. L. (2008). Computing inter-rater reliability and its variance in the presence of high agreement. <em>British Journal of Mathematical and Statistical Psychology</em>, 61(1), 29–48. <a href="https://doi.org/10.1348/000711006X126600">doi:10.1348/000711006X126600</a></li>
+</ol>
+      </article>
+
+    </div>
+  </main>
+
+  <!-- =========================================================
+       FOOTER
+  ========================================================== -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container container--wide">
+      <span class="footer-copy">© 2026 Bruno Ramos Martins</span>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="https://github.com/brunoramosmartins" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/bruno-ramos-martins-22a6a61a0/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="../about.html">About</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- Nav toggle script -->
+  <script src="../assets/js/navigation.js" defer></script>
+
+</body>
+</html>
