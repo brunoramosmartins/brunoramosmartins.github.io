@@ -61,6 +61,40 @@ export function buildCategoryButtons(filterBar, articles) {
 }
 
 /**
+ * Filters a list of TILs by a given tag.
+ * A TIL matches if its `tags` array contains the tag (case-insensitive).
+ *
+ * @param {Array}  tilList - Full list of TIL objects.
+ * @param {string} tag     - Tag to filter by. 'all' returns the full list.
+ * @returns {Array}
+ */
+export function filterTilsByTag(tilList, tag) {
+  if (!tag || tag === 'all') return tilList;
+  const normalised = tag.toLowerCase();
+  return tilList.filter(t => (t.tags || []).some(x => x.toLowerCase() === normalised));
+}
+
+/**
+ * Builds filter buttons dynamically from the union of all TIL tags.
+ *
+ * @param {HTMLElement} filterBar - Container element for filter buttons.
+ * @param {Array}       tilList   - Full list of TIL objects with .tags.
+ */
+export function buildTagButtons(filterBar, tilList) {
+  if (!filterBar) return;
+
+  const tags = [...new Set(
+    tilList.flatMap(t => t.tags || []).filter(Boolean)
+  )].sort((a, b) => a.localeCompare(b));
+
+  let html = '<button class="tag tag--active" data-filter="all" type="button">All</button>';
+  for (const tag of tags) {
+    html += `<button class="tag" data-filter="${tag}" type="button">${tag}</button>`;
+  }
+  filterBar.innerHTML = html;
+}
+
+/**
  * Initialises filter button UI behaviour for a given filter bar.
  * Marks the clicked button as active and triggers a callback.
  *

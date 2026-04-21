@@ -8,11 +8,12 @@
  *   filters     → renderer → DOM  (on user interaction)
  */
 
-import { fetchProjects, fetchArticles, fetchFeaturedProjects, fetchRecentArticles, fetchResume } from './dataService.js';
+import { fetchProjects, fetchArticles, fetchFeaturedProjects, fetchRecentArticles, fetchResume, fetchTils } from './dataService.js';
 import { renderProjects } from './projectRenderer.js';
 import { renderArticles }  from './articleRenderer.js';
 import { renderResume }    from './resumeRenderer.js';
-import { filterProjectsByTag, filterArticlesByCategory, initFilterBar, buildCategoryButtons } from './filters.js';
+import { renderTils }      from './tilRenderer.js';
+import { filterProjectsByTag, filterArticlesByCategory, filterTilsByTag, initFilterBar, buildCategoryButtons, buildTagButtons } from './filters.js';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function showSpinner(container) {
@@ -31,6 +32,8 @@ function boot() {
     initArticlesPage();
   } else if (page === 'resume') {
     initResumePage();
+  } else if (page === 'til') {
+    initTilPage();
   }
 }
 
@@ -145,5 +148,23 @@ async function initResumePage() {
 
   pdfBtn?.addEventListener('click', () => {
     window.print();
+  });
+}
+
+/**
+ * til.html — loads TIL entries with tag filtering.
+ */
+async function initTilPage() {
+  const container = document.getElementById('til-list');
+  const filterBar = document.getElementById('til-filter');
+
+  showSpinner(container);
+  const allTils = await fetchTils();
+  buildTagButtons(filterBar, allTils);
+  renderTils(allTils, container);
+
+  initFilterBar(filterBar, (tag) => {
+    const filtered = filterTilsByTag(allTils, tag);
+    renderTils(filtered, container);
   });
 }

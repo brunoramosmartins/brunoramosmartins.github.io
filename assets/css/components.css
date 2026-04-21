@@ -555,6 +555,97 @@
   margin-left: var(--space-2);
 }
 
+/* === TIL LIST === */
+.til-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.til-card {
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--color-border);
+  transition: opacity var(--transition-fast);
+}
+
+.til-card:first-child { border-top: 1px solid var(--color-border); }
+.til-card:hover { opacity: 0.7; }
+
+.til-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.til-card__title {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+}
+.til-card__title a { color: inherit; }
+.til-card__title a:hover { color: var(--color-accent); }
+
+.til-card__excerpt {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+.til-card__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-top: var(--space-1);
+}
+
+.til-card__date {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+}
+
+.til-card__tags {
+  gap: var(--space-2);
+}
+
+/* === CROSS-LINK BOX (TIL ↔ Article) === */
+.cross-link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-12);
+  padding: var(--space-5) var(--space-6);
+  background-color: var(--color-surface);
+  border-left: 3px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+}
+
+.cross-link__label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+}
+
+.cross-link__link {
+  font-family: var(--font-serif);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--color-accent);
+  text-decoration: none;
+}
+.cross-link__link:hover { color: var(--color-accent-hover); }
+
+.cross-link__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
 /* === RESPONSIVE === */
 @media (max-width: 768px) {
   .article-item {

@@ -6,7 +6,22 @@
     "category": "machine-learning",
     "date": "2026-04-21",
     "reading_time": "30 min",
+    "tags": [],
     "url": "/posts/krippendorff-alpha.html"
+  },
+  {
+    "id": "pipeline-sanity-check",
+    "title": "Building the TIL pipeline itself",
+    "description": "A meta-TIL that validates the new short-notes build pipeline end-to-end — front matter, tags, and cross-link rendering.",
+    "category": "til",
+    "date": "2026-04-21",
+    "reading_time": "",
+    "tags": [
+      "meta",
+      "site-engineering",
+      "til"
+    ],
+    "url": "/til/pipeline-sanity-check.html"
   },
   {
     "id": "not-all-errors-cost-the-same",
@@ -15,6 +30,7 @@
     "category": "machine-learning",
     "date": "2026-03-19",
     "reading_time": "25 min",
+    "tags": [],
     "url": "/posts/not-all-errors-cost-the-same.html"
   }
 ]

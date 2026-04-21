@@ -49,12 +49,24 @@ export async function fetchProjects() {
 }
 
 /**
- * Fetches all article entries.
- * @returns {Promise<Array>} - Array of article objects.
+ * Fetches all long-form article entries from articles.json.
+ * Excludes TIL entries (category === 'til') — those have their own fetcher.
+ * @returns {Promise<Array>}
  */
 export async function fetchArticles() {
   const data = await fetchJSON(dataFileUrl('articles.json'));
-  return Array.isArray(data) ? data : [];
+  if (!Array.isArray(data)) return [];
+  return data.filter(a => a.category !== 'til');
+}
+
+/**
+ * Fetches all TIL entries from articles.json.
+ * @returns {Promise<Array>}
+ */
+export async function fetchTils() {
+  const data = await fetchJSON(dataFileUrl('articles.json'));
+  if (!Array.isArray(data)) return [];
+  return data.filter(a => a.category === 'til');
 }
 
 /**
