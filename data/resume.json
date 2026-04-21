@@ -1,0 +1,140 @@
+{
+  "lang": "en",
+  "name": "Bruno Ramos Martins",
+  "role": "Data Scientist · Machine Learning · GenAI & Fraud Prevention",
+  "summary": "Data science and AI professional with hands-on experience in fraud prevention, statistical modeling, and data analysis. Mathematics background (USP) supports structured reasoning and turning complex business problems into scalable solutions. Actively working on GenAI and LLMs—including RAG systems, automation (e.g. n8n), and unstructured data analysis—combining analytical rigor with practical delivery.",
+  "contact": {
+    "email": "",
+    "github": "https://github.com/brunoramosmartins",
+    "linkedin": "https://www.linkedin.com/in/bruno-ramos-martins-22a6a61a0/",
+    "location": "São Paulo, Brazil"
+  },
+  "experience": [
+    {
+      "title": "Fraud Prevention Analyst — LATAM",
+      "company": "Mercado Livre",
+      "period": "Jul 2024 — Present",
+      "description": "Full-time · Hybrid · São Paulo, Brazil. Acquirer (POINT) initiatives to improve authorization quality and manage fraud and chargeback risk.",
+      "highlights": [
+        "Design and execute initiatives on the acquirer (POINT) side to optimize transaction approval while reducing chargeback and fraud exposure",
+        "Provide risk guidance and analytical support to the commercial organization"
+      ]
+    },
+    {
+      "title": "Mentor & Tester",
+      "company": "DeepLearning.AI",
+      "period": "Jun 2023 — Present",
+      "description": "Remote. Mentor for the TensorFlow Professional Certificate, supporting learners on computer vision, advanced techniques, transfer learning, NLP, and time-series forecasting.",
+      "highlights": [
+        "Mentor learners across TensorFlow specialization modules (CV, NLP, sequences, deployment-oriented patterns)",
+        "Early access tester for new DeepLearning.AI programs (e.g. agentic AI systems)"
+      ]
+    },
+    {
+      "title": "Data Analyst — Statistical Modeling",
+      "company": "B3",
+      "period": "Sep 2023 — Aug 2024",
+      "description": "Full-time · São Paulo, Brazil. Surveillance and analytics for equities, futures, options, and fixed income.",
+      "highlights": [
+        "Extracted, modeled, and analyzed trading and market data to detect unusual patterns and suspicious activity",
+        "Delivered analyses for client reviews, new product assessment, volatility studies, trading-pattern investigations, and penalty evaluation",
+        "Daily stack: Python, SQL, SAS, Excel, and statistical methods"
+      ]
+    },
+    {
+      "title": "Master's Summer Program — Digital Product",
+      "company": "Itaú Unibanco",
+      "period": "Feb 2023 — May 2023",
+      "description": "Temporary · Remote · São Paulo, Brazil.",
+      "highlights": [
+        "Built indicators and insights for digital product decisions; data prep with Python and Alteryx",
+        "Created Tableau dashboards and reporting for stakeholders"
+      ]
+    },
+    {
+      "title": "Mathematics Teacher",
+      "company": "Curso Guarulhos · Poliedro",
+      "period": "Jan 2014 — Dec 2022",
+      "description": "Part-time · In person · Guarulhos, Brazil. High-school mathematics for university entrance (e.g. ENEM, vestibular).",
+      "highlights": [
+        "Nine years teaching algebra, geometry, and calculus with focus on problem-solving and exam readiness"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "Professional Master's in Mathematics (Stricto Sensu)",
+      "institution": "IFSP — Federal Institute of Education, Science and Technology of São Paulo",
+      "period": "Jan 2022 — Jun 2024",
+      "description": "Graduate program emphasizing advanced mathematics and professional practice."
+    },
+    {
+      "degree": "Bachelor's in Mathematics (Teaching credential)",
+      "institution": "University of São Paulo (USP)",
+      "period": "2013 — 2017",
+      "description": "Mathematics Teacher Education program (Licenciatura em Matemática)."
+    }
+  ],
+  "skills": {
+    "Machine Learning & Statistics": ["Python", "scikit-learn", "XGBoost", "LightGBM", "statistical modeling", "experiment design"],
+    "NLP & GenAI": ["RAG", "sentence-transformers", "Weaviate", "LangGraph", "OpenAI API", "Hugging Face Transformers", "Llama / Ollama"],
+    "Data & Engineering": ["SQL", "pandas", "NumPy", "Polars", "SAS", "Pydantic", "pytest", "Git"],
+    "MLOps & Delivery": ["Docker", "FastAPI", "MLflow", "Streamlit", "GitHub Actions", "Phoenix", "OpenTelemetry"],
+    "Analytics & Automation": ["Tableau", "Alteryx", "Excel", "n8n", "TensorFlow"]
+  },
+  "certifications": [
+    {
+      "name": "Machine Learning in Production",
+      "issuer": "DeepLearning.AI",
+      "date": "Mar 2026"
+    },
+    {
+      "name": "Data I/O and Preprocessing with Python and SQL",
+      "issuer": "DeepLearning.AI",
+      "date": "Dec 2025"
+    },
+    {
+      "name": "Building Agentic AI Systems",
+      "issuer": "DeepLearning.AI",
+      "date": "2025"
+    },
+    {
+      "name": "Retrieval-Augmented Generation (RAG)",
+      "issuer": "DeepLearning.AI",
+      "date": "2025"
+    },
+    {
+      "name": "Natural Language Processing Specialization",
+      "issuer": "DeepLearning.AI · Coursera",
+      "date": "2024"
+    },
+    {
+      "name": "Generative AI for Everyone",
+      "issuer": "DeepLearning.AI",
+      "date": "2024"
+    },
+    {
+      "name": "Neural NLP in Portuguese",
+      "issuer": "IME-USP · Coursera",
+      "date": "2024"
+    },
+    {
+      "name": "CS50's Introduction to Artificial Intelligence with Python",
+      "issuer": "HarvardX",
+      "date": "2024"
+    },
+    {
+      "name": "Applied Data Science with Python Specialization",
+      "issuer": "University of Michigan · Coursera",
+      "date": "2024"
+    }
+  ],
+  "publications": [
+    {
+      "title": "Not All Errors Cost the Same — Bayesian Foundations of Evaluation Metrics for Fraud Detection",
+      "venue": "Portfolio article",
+      "date": "2026-03",
+      "url": "https://brunoramosmartins.github.io/posts/not-all-errors-cost-the-same.html"
+    }
+  ]
+}

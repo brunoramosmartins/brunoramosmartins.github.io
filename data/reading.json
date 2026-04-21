@@ -1,0 +1,68 @@
+[
+  {
+    "id": "attention-is-all-you-need",
+    "title": "Attention Is All You Need",
+    "author": "Vaswani et al.",
+    "type": "paper",
+    "category": "deep-learning",
+    "url": "https://arxiv.org/abs/1706.03762",
+    "status": "read",
+    "date_added": "2026-01-15",
+    "notes": "Foundational transformer architecture paper. Essential for understanding modern NLP."
+  },
+  {
+    "id": "designing-ml-systems",
+    "title": "Designing Machine Learning Systems",
+    "author": "Chip Huyen",
+    "type": "book",
+    "category": "mlops",
+    "url": "https://www.oreilly.com/library/view/designing-machine-learning/9781098107956/",
+    "status": "read",
+    "date_added": "2026-02-10",
+    "notes": "Practical guide to production ML. Covers data engineering, feature stores, monitoring."
+  },
+  {
+    "id": "mlops-specialization",
+    "title": "Machine Learning Engineering for Production (MLOps)",
+    "author": "Andrew Ng — DeepLearning.AI",
+    "type": "course",
+    "category": "mlops",
+    "url": "https://www.coursera.org/specializations/machine-learning-engineering-for-production-mlops",
+    "status": "reading",
+    "date_added": "2026-03-01",
+    "notes": ""
+  },
+  {
+    "id": "rag-survey-2024",
+    "title": "Retrieval-Augmented Generation for Large Language Models: A Survey",
+    "author": "Gao et al.",
+    "type": "paper",
+    "category": "nlp",
+    "url": "https://arxiv.org/abs/2312.10997",
+    "status": "read",
+    "date_added": "2026-02-20",
+    "notes": "Comprehensive survey of RAG techniques, architectures, and evaluation methods."
+  },
+  {
+    "id": "probabilistic-ml",
+    "title": "Probabilistic Machine Learning: An Introduction",
+    "author": "Kevin Murphy",
+    "type": "book",
+    "category": "statistics",
+    "url": "https://probml.github.io/pml-book/book1.html",
+    "status": "reading",
+    "date_added": "2026-03-15",
+    "notes": "Rigorous treatment of probabilistic foundations. Using as reference for Bayesian metrics work."
+  },
+  {
+    "id": "build-llm-from-scratch",
+    "title": "Build a Large Language Model (From Scratch)",
+    "author": "Sebastian Raschka",
+    "type": "book",
+    "category": "deep-learning",
+    "url": "https://www.manning.com/books/build-a-large-language-model-from-scratch",
+    "status": "queued",
+    "date_added": "2026-03-28",
+    "notes": ""
+  }
+]

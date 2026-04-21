@@ -8,32 +8,39 @@
  *   filters     → renderer → DOM  (on user interaction)
  */
 
-import { fetchProjects, fetchArticles, fetchFeaturedProjects, fetchRecentArticles } from './dataService.js';
+import { fetchProjects, fetchArticles, fetchFeaturedProjects, fetchRecentArticles, fetchResume, fetchReading } from './dataService.js';
 import { renderProjects } from './projectRenderer.js';
 import { renderArticles }  from './articleRenderer.js';
-import { filterProjectsByTag, filterArticlesByCategory, initFilterBar, buildCategoryButtons } from './filters.js';
+import { renderResume }    from './resumeRenderer.js';
+import { renderReading }   from './readingRenderer.js';
+import { filterProjectsByTag, filterArticlesByCategory, filterReadingByType, initFilterBar, buildCategoryButtons, buildTypeButtons } from './filters.js';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function showSpinner(container) {
   if (container) container.innerHTML = '<div class="loading-spinner" aria-label="Loading content"></div>';
 }
 
-// ─── Page detection ────────────────────────────────────────────────────────────
-const page = document.body.dataset.page;
+// ─── Page detection (after DOM: avoids rare races with body / data-page) ─────
+function boot() {
+  const page = document.body?.dataset?.page;
 
-// ─── Index page ───────────────────────────────────────────────────────────────
-if (page === 'index') {
-  initIndexPage();
+  if (page === 'index') {
+    initIndexPage();
+  } else if (page === 'projects') {
+    initProjectsPage();
+  } else if (page === 'articles') {
+    initArticlesPage();
+  } else if (page === 'resume') {
+    initResumePage();
+  } else if (page === 'reading') {
+    initReadingPage();
+  }
 }
 
-// ─── Projects page ────────────────────────────────────────────────────────────
-if (page === 'projects') {
-  initProjectsPage();
-}
-
-// ─── Articles page ────────────────────────────────────────────────────────────
-if (page === 'articles') {
-  initArticlesPage();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -93,5 +100,71 @@ async function initArticlesPage() {
   initFilterBar(filterBar, (category) => {
     const filtered = filterArticlesByCategory(allArticles, category);
     renderArticles(filtered, container);
+  });
+}
+
+/**
+ * resume.html — loads resume with EN / PT-BR toggle; PDF button opens print dialog (Save as PDF).
+ */
+async function initResumePage() {
+  const container = document.getElementById('resume-container');
+  const btnEn     = document.getElementById('resume-lang-en');
+  const btnPt     = document.getElementById('resume-lang-pt');
+  const pdfBtn    = document.getElementById('resume-pdf');
+  let currentLang = 'en';
+
+  function setLangUI(lang) {
+    currentLang = lang;
+    const isEn = lang === 'en';
+    if (btnEn) {
+      btnEn.classList.toggle('tag--active', isEn);
+      btnEn.setAttribute('aria-pressed', String(isEn));
+    }
+    if (btnPt) {
+      btnPt.classList.toggle('tag--active', !isEn);
+      btnPt.setAttribute('aria-pressed', String(!isEn));
+    }
+    document.documentElement.lang = isEn ? 'en' : 'pt-BR';
+  }
+
+  async function loadResume(lang) {
+    showSpinner(container);
+    const data = await fetchResume(lang);
+    renderResume(data, container);
+    setLangUI(lang);
+  }
+
+  await loadResume(currentLang);
+
+  btnEn?.addEventListener('click', async () => {
+    if (currentLang === 'en') return;
+    await loadResume('en');
+  });
+
+  btnPt?.addEventListener('click', async () => {
+    if (currentLang === 'pt') return;
+    await loadResume('pt');
+  });
+
+  pdfBtn?.addEventListener('click', () => {
+    window.print();
+  });
+}
+
+/**
+ * reading.html — loads reading list with type filtering.
+ */
+async function initReadingPage() {
+  const container = document.getElementById('reading-list');
+  const filterBar = document.getElementById('reading-filter');
+
+  showSpinner(container);
+  const allItems = await fetchReading();
+  buildTypeButtons(filterBar, allItems);
+  renderReading(allItems, container);
+
+  initFilterBar(filterBar, (type) => {
+    const filtered = filterReadingByType(allItems, type);
+    renderReading(filtered, container);
   });
 }

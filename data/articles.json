@@ -1,11 +1,11 @@
 [
   {
-    "id": "metrics-that-matter",
+    "id": "not-all-errors-cost-the-same",
     "title": "Not All Errors Cost the Same",
     "description": "Bayesian foundations of evaluation metrics for fraud detection: from F1 to Precision@Recall.",
     "category": "machine-learning",
     "date": "2026-03-19",
     "reading_time": "25 min",
-    "url": "/posts/metrics-that-matter.html"
+    "url": "/posts/not-all-errors-cost-the-same.html"
   }
 ]
