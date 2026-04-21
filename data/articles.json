@@ -1,5 +1,14 @@
 [
   {
+    "id": "krippendorff-alpha",
+    "title": "When Agreement Is an Illusion",
+    "description": "Statistical foundations of inter-annotator agreement — from observed agreement to Krippendorff's Alpha.",
+    "category": "machine-learning",
+    "date": "2026-04-21",
+    "reading_time": "30 min",
+    "url": "/posts/krippendorff-alpha.html"
+  },
+  {
     "id": "not-all-errors-cost-the-same",
     "title": "Not All Errors Cost the Same",
     "description": "Bayesian foundations of evaluation metrics for fraud detection: from F1 to Precision@Recall.",
