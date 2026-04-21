@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Resume — Bruno Ramos Martins. ML Engineer and Data Scientist." />
+  <title>Resume — Bruno Ramos Martins</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:title"       content="Resume — Bruno Ramos Martins" />
+  <meta property="og:description" content="ML Engineer and Data Scientist. Professional resume and CV." />
+  <meta property="og:url"         content="https://brunoramosmartins.github.io/resume.html" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+
+  <!-- Print styles -->
+  <style>
+    @media print {
+      .site-header,
+      .site-footer,
+      .skip-link,
+      .resume-controls,
+      .resume-lang,
+      .resume-pdf-btn,
+      .nav-toggle { display: none !important; }
+
+      .site-main { padding-top: 0; }
+
+      .resume-layout {
+        grid-template-columns: 180px 1fr;
+        gap: 1.5rem;
+      }
+
+      .resume-sidebar { position: static; }
+
+      .resume-section__title {
+        font-size: 1.1rem;
+        margin-top: 0.75rem;
+      }
+
+      .resume-timeline__item { gap: 0.75rem; }
+
+      body { font-size: 11pt; }
+
+      a[href]::after { content: none; }
+    }
+  </style>
+</head>
+<body data-page="resume">
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <header class="site-header" role="banner">
+    <div class="container container--wide">
+      <a href="index.html" class="site-logo">Bruno Ramos Martins</a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="site-nav">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="site-nav" class="site-nav" role="navigation" aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="projects.html">Projects</a>
+        <a href="articles.html">Articles</a>
+        <a href="resume.html" class="active" aria-current="page">Resume</a>
+        <a href="about.html">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="site-main" id="main-content">
+    <div class="container container--wide">
+
+      <header class="page-title page-title--resume">
+        <h1>Resume</h1>
+        <div class="resume-controls">
+          <div class="resume-lang" role="group" aria-label="Resume actions">
+            <button type="button" class="tag tag--active resume-lang-btn" data-lang="en" id="resume-lang-en" aria-pressed="true" title="English" aria-label="Show resume in English">EN</button>
+            <button type="button" class="tag resume-lang-btn" data-lang="pt" id="resume-lang-pt" aria-pressed="false" title="Português (Brasil)" aria-label="Mostrar currículo em português (Brasil)">PT-BR</button>
+            <button type="button" class="tag resume-pdf-btn" id="resume-pdf" title="Opens the print dialog — choose Save as PDF to download" aria-label="Save resume as PDF">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Injected by main.js → resumeRenderer.js -->
+      <div id="resume-container" aria-live="polite"></div>
+
+    </div>
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container container--wide">
+      <span class="footer-copy">© 2026 Bruno Ramos Martins</span>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="https://github.com/brunoramosmartins" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/bruno-ramos-martins-22a6a61a0/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="about.html">About</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="assets/js/navigation.js" defer></script>
+  <script type="module" src="assets/js/main.js"></script>
+
+</body>
+</html>

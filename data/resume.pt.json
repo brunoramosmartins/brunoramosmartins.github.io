@@ -1,0 +1,140 @@
+{
+  "lang": "pt",
+  "name": "Bruno Ramos Martins",
+  "role": "Cientista de Dados · Machine Learning · GenAI & Prevenção a Fraudes",
+  "summary": "Profissional de Data Science e Inteligência Artificial com experiência prática em prevenção a fraudes, modelagem estatística e análise de dados. Formação em Matemática (USP) como base para raciocínio estruturado e para transformar desafios de negócio em soluções escaláveis. Atuação contínua em GenAI e LLMs—incluindo sistemas RAG, automações (ex.: n8n) e análise de dados não estruturados—unindo rigor analítico e entrega prática.",
+  "contact": {
+    "email": "",
+    "github": "https://github.com/brunoramosmartins",
+    "linkedin": "https://www.linkedin.com/in/bruno-ramos-martins-22a6a61a0/",
+    "location": "São Paulo, Brasil"
+  },
+  "experience": [
+    {
+      "title": "Analista de Prevenção à Fraude — LATAM",
+      "company": "Mercado Livre",
+      "period": "jul de 2024 — o momento",
+      "description": "Tempo integral · Híbrido · São Paulo, Brasil. Iniciativas na adquirência (POINT) para otimizar aprovação de transações e gestão de risco de chargeback e fraude.",
+      "highlights": [
+        "Desenvolvimento de iniciativas na adquirência (POINT) para otimizar aprovação de transações e reduzir riscos de chargeback e fraudes",
+        "Orientação sobre riscos e suporte analítico ao time comercial"
+      ]
+    },
+    {
+      "title": "Mentor e Tester",
+      "company": "DeepLearning.AI",
+      "period": "jun de 2023 — o momento",
+      "description": "Remoto. Mentor na Especialização em TensorFlow, apoiando alunos em visão computacional, técnicas avançadas, transfer learning, NLP e previsão de séries temporais.",
+      "highlights": [
+        "Mentoria nos módulos da especialização TensorFlow (VC, NLP, sequências, padrões orientados a deploy)",
+        "Tester com acesso antecipado a novos programas (ex.: sistemas de IA agêntica)"
+      ]
+    },
+    {
+      "title": "Analista de Dados — Modelagem Estatística",
+      "company": "B3",
+      "period": "set de 2023 — ago de 2024",
+      "description": "Tempo integral · São Paulo, Brasil. Detecção e análise de padrões incomuns e atividades suspeitas em mercados de ações, futuros, opções e renda fixa.",
+      "highlights": [
+        "Extração, modelagem, processamento e análise de dados para vigilância de mercado",
+        "Entregas: análises de clientes, avaliação de produtos, estudos de volatilidade, padrões de negociação e penalidades",
+        "Stack diária: Python, SQL, SAS, Excel e estatística"
+      ]
+    },
+    {
+      "title": "Mestrado Summer — Produto digital",
+      "company": "Itaú Unibanco",
+      "period": "fev de 2023 — mai de 2023",
+      "description": "Temporário · Remoto · São Paulo, Brasil.",
+      "highlights": [
+        "Indicadores e insights para gestão de produto digital; tratamento de dados com Python e Alteryx",
+        "Visualizações e dashboards em Tableau"
+      ]
+    },
+    {
+      "title": "Professor de matemática",
+      "company": "Curso Guarulhos · Poliedro",
+      "period": "jan de 2014 — dez de 2022",
+      "description": "Meio período · Presencial · Guarulhos, Brasil. Ensino médio e preparação para vestibular/ENEM.",
+      "highlights": [
+        "Nove anos lecionando álgebra, geometria e cálculo com foco em resolução de problemas e provas"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "Mestrado Profissional (Stricto Sensu) em Matemática",
+      "institution": "IFSP — Instituto Federal de Educação, Ciência e Tecnologia de São Paulo",
+      "period": "jan de 2022 — jun de 2024",
+      "description": "Programa de pós-graduação com ênfase em matemática avançada e prática profissional."
+    },
+    {
+      "degree": "Licenciatura em Matemática",
+      "institution": "Universidade de São Paulo (USP)",
+      "period": "2013 — 2017",
+      "description": "Formação em Matemática (Mathematics Teacher Education / Licenciatura)."
+    }
+  ],
+  "skills": {
+    "Machine Learning & Estatística": ["Python", "scikit-learn", "XGBoost", "LightGBM", "modelagem estatística", "desenho de experimentos"],
+    "NLP & GenAI": ["RAG", "sentence-transformers", "Weaviate", "LangGraph", "OpenAI API", "Hugging Face Transformers", "Llama / Ollama"],
+    "Dados & Engenharia": ["SQL", "pandas", "NumPy", "Polars", "SAS", "Pydantic", "pytest", "Git"],
+    "MLOps & Entrega": ["Docker", "FastAPI", "MLflow", "Streamlit", "GitHub Actions", "Phoenix", "OpenTelemetry"],
+    "Analytics & Automação": ["Tableau", "Alteryx", "Excel", "n8n", "TensorFlow"]
+  },
+  "certifications": [
+    {
+      "name": "Machine Learning in Production",
+      "issuer": "DeepLearning.AI",
+      "date": "mar de 2026"
+    },
+    {
+      "name": "Data I/O and Preprocessing with Python and SQL",
+      "issuer": "DeepLearning.AI",
+      "date": "dez de 2025"
+    },
+    {
+      "name": "Building Agentic AI Systems",
+      "issuer": "DeepLearning.AI",
+      "date": "2025"
+    },
+    {
+      "name": "Retrieval-Augmented Generation (RAG)",
+      "issuer": "DeepLearning.AI",
+      "date": "2025"
+    },
+    {
+      "name": "Natural Language Processing Specialization",
+      "issuer": "DeepLearning.AI · Coursera",
+      "date": "2024"
+    },
+    {
+      "name": "Generative AI for Everyone",
+      "issuer": "DeepLearning.AI",
+      "date": "2024"
+    },
+    {
+      "name": "Processamento Neural de Linguagem Natural em Português",
+      "issuer": "IME-USP · Coursera",
+      "date": "2024"
+    },
+    {
+      "name": "CS50's Introduction to Artificial Intelligence with Python",
+      "issuer": "HarvardX",
+      "date": "2024"
+    },
+    {
+      "name": "Applied Data Science with Python Specialization",
+      "issuer": "University of Michigan · Coursera",
+      "date": "2024"
+    }
+  ],
+  "publications": [
+    {
+      "title": "Not All Errors Cost the Same — Fundamentos bayesianos de métricas de avaliação para detecção de fraude",
+      "venue": "Artigo do portfólio",
+      "date": "2026-03",
+      "url": "https://brunoramosmartins.github.io/posts/not-all-errors-cost-the-same.html"
+    }
+  ]
+}

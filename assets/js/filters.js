@@ -64,8 +64,8 @@ export function buildCategoryButtons(filterBar, articles) {
  * Initialises filter button UI behaviour for a given filter bar.
  * Marks the clicked button as active and triggers a callback.
  *
- * @param {HTMLElement}  filterBar  - Container element holding filter buttons.
- * @param {Function}     onFilter   - Callback invoked with the selected filter value.
+ * @param {HTMLElement} filterBar - Container element holding filter buttons.
+ * @param {Function}    onFilter  - Callback invoked with the selected filter value.
  */
 export function initFilterBar(filterBar, onFilter) {
   if (!filterBar) return;

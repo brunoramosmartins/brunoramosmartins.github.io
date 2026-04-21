@@ -37,3 +37,6 @@ htmlcov/
 
 # Local data
 data/raw/
+
+# Claude
+/.claude
