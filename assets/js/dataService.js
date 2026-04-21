@@ -95,11 +95,3 @@ export async function fetchResume(lang = 'en') {
   return raw;
 }
 
-/**
- * Fetches all reading list entries.
- * @returns {Promise<Array>} - Array of reading item objects.
- */
-export async function fetchReading() {
-  const data = await fetchJSON(dataFileUrl('reading.json'));
-  return Array.isArray(data) ? data : [];
-}

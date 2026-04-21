@@ -8,12 +8,11 @@
  *   filters     → renderer → DOM  (on user interaction)
  */
 
-import { fetchProjects, fetchArticles, fetchFeaturedProjects, fetchRecentArticles, fetchResume, fetchReading } from './dataService.js';
+import { fetchProjects, fetchArticles, fetchFeaturedProjects, fetchRecentArticles, fetchResume } from './dataService.js';
 import { renderProjects } from './projectRenderer.js';
 import { renderArticles }  from './articleRenderer.js';
 import { renderResume }    from './resumeRenderer.js';
-import { renderReading }   from './readingRenderer.js';
-import { filterProjectsByTag, filterArticlesByCategory, filterReadingByType, initFilterBar, buildCategoryButtons, buildTypeButtons } from './filters.js';
+import { filterProjectsByTag, filterArticlesByCategory, initFilterBar, buildCategoryButtons } from './filters.js';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function showSpinner(container) {
@@ -32,8 +31,6 @@ function boot() {
     initArticlesPage();
   } else if (page === 'resume') {
     initResumePage();
-  } else if (page === 'reading') {
-    initReadingPage();
   }
 }
 
@@ -148,23 +145,5 @@ async function initResumePage() {
 
   pdfBtn?.addEventListener('click', () => {
     window.print();
-  });
-}
-
-/**
- * reading.html — loads reading list with type filtering.
- */
-async function initReadingPage() {
-  const container = document.getElementById('reading-list');
-  const filterBar = document.getElementById('reading-filter');
-
-  showSpinner(container);
-  const allItems = await fetchReading();
-  buildTypeButtons(filterBar, allItems);
-  renderReading(allItems, container);
-
-  initFilterBar(filterBar, (type) => {
-    const filtered = filterReadingByType(allItems, type);
-    renderReading(filtered, container);
   });
 }

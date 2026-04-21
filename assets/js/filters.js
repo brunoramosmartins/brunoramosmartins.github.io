@@ -61,43 +61,6 @@ export function buildCategoryButtons(filterBar, articles) {
 }
 
 /**
- * Filters a list of reading items by type.
- *
- * @param {Array}  readingList - Full list of reading item objects.
- * @param {string} type        - Type to filter by. 'all' returns full list.
- * @returns {Array}
- */
-export function filterReadingByType(readingList, type) {
-  if (!type || type === 'all') return readingList;
-  return readingList.filter(item => item.type === type);
-}
-
-/**
- * Builds filter buttons dynamically from reading item types.
- *
- * @param {HTMLElement} filterBar   - Container element for filter buttons.
- * @param {Array}       readingList - Full list of reading item objects with .type.
- */
-export function buildTypeButtons(filterBar, readingList) {
-  if (!filterBar) return;
-
-  const types = [...new Set(
-    readingList.map(item => item.type).filter(Boolean)
-  )].sort();
-
-  const pluralise = (t) => {
-    const map = { paper: 'Papers', book: 'Books', course: 'Courses' };
-    return map[t] || t.replace(/\b\w/g, c => c.toUpperCase());
-  };
-
-  let html = '<button class="tag tag--active" data-filter="all" type="button">All</button>';
-  for (const t of types) {
-    html += `<button class="tag" data-filter="${t}" type="button">${pluralise(t)}</button>`;
-  }
-  filterBar.innerHTML = html;
-}
-
-/**
  * Initialises filter button UI behaviour for a given filter bar.
  * Marks the clicked button as active and triggers a callback.
  *
