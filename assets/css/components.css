@@ -259,28 +259,40 @@
   margin-bottom: var(--space-10);
 }
 
-/* === ARTICLE TABLES === */
-.article-prose table {
-  width: 100%;
+/* === ARTICLE / TIL TABLES — booktabs-inspired, centred ===
+   Three horizontal rules (top, mid below header, bottom), no vertical
+   lines, generous horizontal padding. Tables size to their content and
+   centre within the prose column for an academic-paper feel. */
+.article-prose table,
+.til-prose table {
+  margin: var(--space-8) auto;
   border-collapse: collapse;
-  margin: var(--space-6) 0;
+  width: auto;
+  max-width: 100%;
   font-size: 0.9rem;
-}
-
-.article-prose th {
-  background: var(--color-surface);
-  font-weight: var(--weight-semibold);
-  text-align: left;
-  border-bottom: 2px solid var(--color-accent);
+  font-variant-numeric: tabular-nums;
+  border-top:    2px solid var(--color-text-primary);
+  border-bottom: 2px solid var(--color-text-primary);
 }
 
 .article-prose th,
-.article-prose td {
-  padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid var(--color-border);
+.til-prose th {
+  font-weight: var(--weight-semibold);
+  text-align: left;
+  background: transparent;
+  border-bottom: 1px solid var(--color-text-primary);
 }
 
-.article-prose tbody tr:hover {
+.article-prose th,
+.article-prose td,
+.til-prose th,
+.til-prose td {
+  padding: var(--space-3) var(--space-6);
+  vertical-align: top;
+}
+
+.article-prose tbody tr:hover,
+.til-prose tbody tr:hover {
   background: var(--color-surface);
 }
 
@@ -661,7 +673,8 @@
   }
   .about-sidebar { position: static; }
 
-  .article-prose table {
+  .article-prose table,
+  .til-prose table {
     display: block;
     overflow-x: auto;
   }
