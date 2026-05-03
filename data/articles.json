@@ -1,5 +1,20 @@
 [
   {
+    "id": "benfords-law",
+    "title": "Benford's Law: two derivations, four tests, one fraud detector",
+    "description": "Two independent derivations of Benford's leading-digit law, four conformity tests, and a fraud-detection demo on GeoNames city data.",
+    "category": "til",
+    "date": "2026-05-03",
+    "reading_time": "",
+    "tags": [
+      "statistics",
+      "fraud-detection",
+      "mathematics",
+      "audit"
+    ],
+    "url": "/til/benfords-law.html"
+  },
+  {
     "id": "krippendorff-alpha",
     "title": "When Agreement Is an Illusion",
     "description": "Statistical foundations of inter-annotator agreement — from observed agreement to Krippendorff's Alpha.",
@@ -8,20 +23,6 @@
     "reading_time": "30 min",
     "tags": [],
     "url": "/posts/krippendorff-alpha.html"
-  },
-  {
-    "id": "pipeline-sanity-check",
-    "title": "Building the TIL pipeline itself",
-    "description": "A meta-TIL that validates the new short-notes build pipeline end-to-end — front matter, tags, and cross-link rendering.",
-    "category": "til",
-    "date": "2026-04-21",
-    "reading_time": "",
-    "tags": [
-      "meta",
-      "site-engineering",
-      "til"
-    ],
-    "url": "/til/pipeline-sanity-check.html"
   },
   {
     "id": "not-all-errors-cost-the-same",
