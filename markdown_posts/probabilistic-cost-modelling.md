@@ -8,41 +8,13 @@ tags: probability, distributions, heavy-tails, budgeting
 
 # The Shape of What You'll Spend
 
-## Probabilistic Modelling of People Costs — from Distribution Selection to Budget Impact
-
----
-
-## Executive Summary
-
-This article shows that the Normal distribution — the implicit default in most cost models — systematically underestimates tail risk in people-cost forecasting. Using Maximum Likelihood Estimation, information criteria (AIC/BIC), and goodness-of-fit tests, we derive a principled framework for distribution selection. The headline result: assuming Normal instead of Pareto for severance costs underestimates the probability of extreme expenses by a factor of **138x**, with direct implications for budget reserves.
-
----
-
-## What This Article Is
-
-This is a **practical statistical framework** for distribution selection in people-cost modelling. It is not a textbook on probability, nor a tutorial on Python. It assumes you accept that "the wrong distribution = the wrong budget" and want a rigorous, reproducible way to choose the right one.
-
-The article moves from theory (Sections 3–7) to experiments (Section 8) to a five-step decision framework (Section 9). The companion repository contains all code, synthetic data generators, and reproducible figures.
-
----
-
-## What You Need to Know
-
-This article assumes familiarity with:
-
-**Required:**
-- Calculus: derivatives, integrals, basic Taylor expansion
-- Basic probability: PDF, CDF, expectation, variance
-- Linear algebra: matrix inversion (used briefly for Fisher information)
-
-**Helpful but not required:**
-- Prior exposure to Maximum Likelihood Estimation (we derive it from first principles)
-- Familiarity with information criteria (AIC/BIC are derived in Section 5)
-
-**Out of scope (won't be covered):**
-- Bayesian inference and MCMC
-- Time-series and dependence modelling (briefly mentioned in Limitations)
-- Real-world data collection / NDA / privacy concerns
+> **What this is.** A practical framework for choosing probability distributions in people-cost modelling — and for pricing the cost of choosing wrong. The headline result: assuming a Normal instead of the Pareto that actually fits severance data underestimates the probability of extreme expenses by a factor of **138x**, with direct consequences for budget reserves. This is not a probability textbook or a Python tutorial: it assumes you accept that *the wrong distribution = the wrong budget* and want a rigorous, reproducible way to choose the right one.
+>
+> **What you should know before reading.** *Required:* calculus (derivatives, integrals, a basic Taylor expansion), basic probability (PDF, CDF, expectation, variance), and a little linear algebra (matrix inversion appears briefly for Fisher information). *Helpful but not required:* prior exposure to Maximum Likelihood Estimation and to information criteria — both are derived from first principles here. *Out of scope:* Bayesian inference and MCMC, time-series and dependence modelling, and real-world data collection concerns (NDA, privacy).
+>
+> **What you will take away.** A five-step decision procedure — visualise, fit, compare, validate, quantify — that you can apply to your own cost data, plus the vocabulary to defend the choice in front of a finance audience.
+>
+> **Code.** Every figure and number is reproduced by versioned scripts with fixed seeds in the [companion repository](https://github.com/brunoramosmartins/probabilistic-cost-modelling-article).
 
 ---
 
@@ -65,7 +37,7 @@ This article assumes familiarity with:
 
 ---
 
-## 1. Introduction: Why Distributions Matter
+## Why Distributions Matter
 
 A budget is a probability statement disguised as a spreadsheet. When an analyst projects people costs, they are implicitly assuming a probability distribution for each component — salaries, overtime, severance, hiring. In most organizations, that assumption is the Normal distribution: symmetric, light-tailed, well-behaved.
 
@@ -77,11 +49,11 @@ The problem is that people costs are not Normal. Salaries are right-skewed: most
 
 $$\text{Wrong distribution} \rightarrow \text{wrong parameters} \rightarrow \text{wrong budget} \rightarrow \text{wrong decisions}$$
 
-This article presents a rigorous framework for distribution selection in cost modelling. We derive Maximum Likelihood Estimation (MLE) from first principles, fit five candidate distribution families to synthetic cost data, and use information-theoretic criteria (AIC, BIC) and goodness-of-fit tests to select the best model. The companion article (Monte Carlo) shows how to use these distributions to simulate total team cost.
+This article presents a rigorous framework for distribution selection in cost modelling. We derive Maximum Likelihood Estimation (MLE) from first principles, fit five candidate distribution families to synthetic cost data, and use information-theoretic criteria (AIC, BIC) and goodness-of-fit tests to select the best model. The companion article [Why Your Budget Never Hits the Exact Number](monte-carlo-budget.html) shows how to use these distributions to simulate total team cost.
 
 ---
 
-## 2. What's at Stake
+## What's at Stake
 
 Before diving into the formalism, three numbers frame why the choice matters. The figure below previews the central comparison: under a Normal model, the budget reserve looks comfortable — until reality follows a Pareto.
 
@@ -99,7 +71,7 @@ The rest of the article shows how to detect, quantify, and correct each of these
 
 ---
 
-## 3. The Cost Components
+## The Cost Components
 
 To make the framework concrete, we need a model of what we're estimating. We represent each cost component as a random variable with distinct distributional properties. The model is generic, minimal, and expandable.
 
@@ -128,7 +100,7 @@ The expected total annual cost is approximately R\$ 6.0–6.5 million. The cruci
 
 ---
 
-## 4. Distribution Families
+## Distribution Families
 
 Now that we know which components we need to model, we need a vocabulary of candidate distributions that can capture their distinct shapes. For each component, we consider five distribution families. The Normal is included as the baseline to beat — not as a serious candidate.
 
@@ -159,9 +131,9 @@ Now that we know which components we need to model, we need a vocabulary of cand
 
 ---
 
-## 5. Maximum Likelihood Estimation
+## Maximum Likelihood Estimation
 
-We have candidate families. We now need a principled way to choose the *parameters* of each family from observed data. Maximum Likelihood Estimation (MLE) is the workhorse: it gives us optimal point estimates, automatic standard errors via Fisher information, and a foundation for the model comparison framework in Section 6.
+We have candidate families. We now need a principled way to choose the *parameters* of each family from observed data. Maximum Likelihood Estimation (MLE) is the workhorse: it gives us optimal point estimates, automatic standard errors via Fisher information, and a foundation for the [model comparison framework](#model-comparison) that comes next.
 
 ### The Estimation Problem
 
@@ -219,7 +191,7 @@ In practice: we report not just the parameter estimate but also its uncertainty 
 
 ---
 
-## 6. Model Comparison
+## Model Comparison
 
 We can now fit any candidate to data. But fitting alone doesn't tell us which family is the right one — and a model with more parameters will always fit training data better. The question becomes: how do we select between fitted models without rewarding complexity for its own sake?
 
@@ -276,7 +248,7 @@ Reject the restricted model if $\Lambda$ exceeds the critical value.
 
 ---
 
-## 7. Mixture Models and Multimodality
+## Mixture Models and Multimodality
 
 So far each component has been treated as a single distribution. But real salary data violates this assumption immediately: a single fit to a junior/senior team mixes two populations and produces a model that represents neither. Mixture models extend the framework to handle this directly.
 
@@ -316,7 +288,7 @@ We use BIC to select the number of components: fit GMMs with $K = 1, 2, 3, \ldot
 
 ### The Budget Cost of Ignoring Bimodality
 
-In Experiment D, ignoring bimodality and forcing a single Normal on a 60% junior / 40% senior mixture:
+In [Experiment D](#experiment-d-mixture-detection), ignoring bimodality and forcing a single Normal on a 60% junior / 40% senior mixture:
 - Inflates the estimated standard deviation by ~40%
 - Distorts VaR(95%) by R\$ 1,500–2,500 per employee
 - For a 50-person team, this is R\$ 75K–125K of misallocated reserve
@@ -327,7 +299,7 @@ In Experiment D, ignoring bimodality and forcing a single Normal on a 60% junior
 
 ---
 
-## 8. Heavy Tails and Extreme Costs
+## Heavy Tails and Extreme Costs
 
 Mixture models address the *center* of the distribution. But the most consequential modelling errors live in the *tails* — the rare-but-catastrophic events where budgets actually break. This section is the core of the article.
 
@@ -387,7 +359,7 @@ For the Pareto: $\text{ES}_p = \frac{\alpha}{\alpha - 1} \cdot \text{VaR}_p$ —
 
 ---
 
-## 9. Experiments and Results
+## Experiments and Results
 
 The theory above predicts specific consequences. This section tests those predictions through controlled experiments. Each experiment isolates one claim, runs it on synthetic data with known ground truth, and measures the gap between correct and incorrect modelling.
 
@@ -401,62 +373,83 @@ Every experiment in this article uses synthetic data generated from known distri
 
 This trades external validity (will it work on *your* HR system data?) for internal validity (does the framework do what it claims?). The companion repository documents how to apply the same pipeline to real data.
 
-### Experiment A: The Distribution Zoo
+### Experiment A — The Distribution Zoo
 
-- **Objective:** show how five candidate families adapt to the same right-skewed data.
-- **Setup:** $n = 2{,}000$ samples from LogNormal($\mu = 9.1$, $\sigma = 0.4$); fit Normal, LogNormal, Gamma, and Weibull via MLE.
-- **Metric:** visual overlay of fitted PDFs against the empirical histogram.
-- **Result:** LogNormal captures skewness perfectly; Normal misfits both peak and tail; Gamma and Weibull approximate but underestimate the right tail.
+**Claim.** Distribution families fitted to the same right-skewed data disagree most where it matters: the tail.
 
-### Experiment B: MLE Convergence
+**Setup.** $n = 2{,}000$ samples from LogNormal($\mu = 9.1$, $\sigma = 0.4$); Normal, LogNormal, Gamma, and Weibull fitted via MLE; fitted PDFs overlaid on the empirical histogram.
 
-- **Objective:** verify MLE consistency and asymptotic normality empirically.
-- **Setup:** 200 replications at each $n \in \{20, 50, 100, \ldots, 10{,}000\}$, fitting LogNormal($9.1, 0.4$).
-- **Metric:** mean and standard deviation of $\hat{\mu}$ across replications; comparison with theoretical SE = $\sigma / \sqrt{n}$.
-- **Result:** estimates converge to the true parameter; empirical SD matches theoretical $1/\sqrt{n}$ decay across three orders of magnitude.
+**Result.** LogNormal captures the skewness; Normal misfits both peak and tail; Gamma and Weibull approximate the bulk but underestimate the right tail.
 
-### Experiment C: The Cost of the Wrong Distribution
+**Connection.** Confirms the shape vocabulary of [Distribution Families](#distribution-families): support and tail behaviour, not the mean, are what separate the candidates.
 
-- **Objective:** quantify the budget error from fitting Normal to LogNormal data.
-- **Setup:** generate $n = 1{,}000$ from LogNormal; fit Normal and LogNormal; simulate 200K samples from each fitted model.
-- **Metric:** $P(\text{cost} > \text{ceiling})$ at multiples of the mean; VaR(99%) and ES(99%) gap.
-- **Result:** Normal underestimates $P(X > 2 \cdot \text{mean})$ by ~3x and $P(X > 3 \cdot \text{mean})$ by ~8x. For a 50-person team, this translates to R\$ 100K–150K of insufficient reserve.
+### Experiment B — MLE Convergence
+
+**Claim.** MLE is consistent and its error decays as $1/\sqrt{n}$, exactly as the asymptotic theory predicts.
+
+**Setup.** 200 replications at each $n \in \{20, 50, 100, \ldots, 10{,}000\}$, fitting LogNormal($9.1, 0.4$); empirical mean and standard deviation of $\hat{\mu}$ compared with the theoretical SE $= \sigma / \sqrt{n}$.
+
+**Result.** Estimates converge to the true parameter; the empirical SD matches the theoretical $1/\sqrt{n}$ decay across three orders of magnitude.
+
+**Connection.** Empirical confirmation of the asymptotic normality result in [Maximum Likelihood Estimation](#maximum-likelihood-estimation).
+
+### Experiment C — The Cost of the Wrong Distribution
+
+**Claim.** Fitting a Normal to LogNormal cost data systematically underestimates tail probabilities — and therefore the reserve.
+
+**Setup.** $n = 1{,}000$ generated from LogNormal; Normal and LogNormal fitted; 200K samples simulated from each fitted model; $P(\text{cost} > \text{ceiling})$ at multiples of the mean, plus VaR(99%) and ES(99%), compared.
+
+**Result.** Normal underestimates $P(X > 2 \cdot \text{mean})$ by ~3x and $P(X > 3 \cdot \text{mean})$ by ~8x. For a 50-person team, this translates to R\$ 100K–150K of insufficient reserve.
+
+**Connection.** Puts numbers on the salary-component gap promised in [What's at Stake](#whats-at-stake).
 
 ![Impact of the wrong distribution on budget](../figures/probabilistic-cost-modelling/wrong_distribution_impact.png)
 
-### Experiment D: Mixture Detection
+### Experiment D — Mixture Detection
 
-- **Objective:** show that GMM with BIC selection recovers hidden bimodal structure.
-- **Setup:** 60% sampled from $N(8000, 1500^2)$, 40% from $N(18000, 2500^2)$; fit GMMs with $K \in \{1, 2, 3, 4\}$.
-- **Metric:** BIC across $K$; recovered weights, means, and standard deviations.
-- **Result:** BIC strongly favors $K = 2$. Recovered parameters are within 5% of true values. Single-Normal fit produces a mean that represents no actual employee.
+**Claim.** GMM with BIC selection recovers hidden bimodal structure that any single-family fit misses.
 
-### Experiment E: Heavy Tail Risk
+**Setup.** 60% sampled from $N(8000, 1500^2)$, 40% from $N(18000, 2500^2)$; GMMs fitted with $K \in \{1, 2, 3, 4\}$; BIC compared across $K$; recovered weights, means, and standard deviations inspected.
 
-- **Objective:** measure the tail-probability gap between Pareto and Normal at the same first two moments.
-- **Setup:** Pareto($\alpha = 2.5$, $x_m = 10{,}000$) vs moment-matched Normal at $\mu = 16{,}667$, $\sigma = 14{,}907$.
-- **Metric:** $P(X > x)$ at thresholds R\$ 30K to R\$ 200K; analytical VaR and ES at 90%, 95%, 99%.
-- **Result:** Normal underestimates $P(X > 50K)$ by 138x, and ES(99%) by ~1.9x. The "rare event" under Normal is a routine one under Pareto.
+**Result.** BIC strongly favors $K = 2$. Recovered parameters are within 5% of true values. The single-Normal fit produces a mean that represents no actual employee.
 
-### Experiment F: Model Comparison
+**Connection.** Validates the EM + BIC procedure of [Mixture Models and Multimodality](#mixture-models-and-multimodality).
 
-- **Objective:** validate that AIC, BIC, and KS jointly identify the true distribution.
-- **Setup:** $n = 500$ from LogNormal; fit all five candidates; compute information criteria and goodness-of-fit tests.
-- **Metric:** Akaike weights, BIC ranking, KS p-values.
-- **Result:** LogNormal wins with Akaike weight > 96%. Normal is decisively rejected. KS test confirms LogNormal is the only candidate that passes goodness-of-fit.
+### Experiment E — Heavy Tail Risk
 
-### Experiment G: End-to-End Pipeline
+**Claim.** At matched mean and variance, Pareto and Normal disagree by orders of magnitude in the tail.
 
-- **Objective:** demonstrate the full workflow on a synthetic 50-person team.
-- **Setup:** generate salary, overtime, severance, and hiring data; fit all candidates to each component; rank via AIC/BIC; compute budget impact.
-- **Metric:** automatic best-model selection per component; resulting VaR and reserve.
-- **Result:** pipeline correctly identifies LogNormal for salary and Pareto for severance. Total reserve at 99% differs by R\$ 100K–150K from the Normal-baseline estimate.
+**Setup.** Pareto($\alpha = 2.5$, $x_m = 10{,}000$) vs moment-matched Normal at $\mu = 16{,}667$, $\sigma = 14{,}907$; $P(X > x)$ at thresholds R\$ 30K to R\$ 200K; analytical VaR and ES at 90%, 95%, 99%.
+
+**Result.** Normal underestimates $P(X > 50K)$ by 138x, and ES(99%) by ~1.9x. The "rare event" under Normal is a routine one under Pareto — the headline gap of this article.
+
+**Connection.** The polynomial-vs-exponential tail decay derived in [Heavy Tails and Extreme Costs](#heavy-tails-and-extreme-costs), made numerical.
+
+### Experiment F — Model Comparison
+
+**Claim.** AIC, BIC, and goodness-of-fit tests jointly identify the true distribution.
+
+**Setup.** $n = 500$ from LogNormal; all five candidates fitted; Akaike weights, BIC ranking, and KS p-values computed.
+
+**Result.** LogNormal wins with Akaike weight > 96%. Normal is decisively rejected. The KS test confirms LogNormal is the only candidate that passes goodness-of-fit.
+
+**Connection.** The selection machinery of [Model Comparison](#model-comparison) working end to end on data with known ground truth.
+
+### Experiment G — End-to-End Pipeline
+
+**Claim.** The full workflow selects the right family per component and prices the budget impact automatically.
+
+**Setup.** Synthetic 50-person team (salary, overtime, severance, and hiring data); all candidates fitted to each component; ranking via AIC/BIC; resulting VaR and reserve computed.
+
+**Result.** The pipeline correctly identifies LogNormal for salary and Pareto for severance. The total reserve at 99% differs by R\$ 100K–150K from the Normal-baseline estimate.
+
+**Connection.** A dry run of the five-step procedure condensed in [A Practical Framework](#a-practical-framework).
 
 ![End-to-end pipeline: data → fit → select → budget impact](../figures/probabilistic-cost-modelling/full_pipeline.png)
 
 ---
 
-## 10. Practical Framework
+## A Practical Framework
 
 The theory and experiments above point to a concrete decision procedure. This section condenses everything into a five-step workflow that any analyst can apply to their own data.
 
@@ -507,7 +500,7 @@ This five-step path covers most real cost-modelling decisions. The full framewor
 
 ---
 
-## 11. Limitations
+## Limitations
 
 The framework above is deliberately scoped. The following limitations are not failures of the method — they are boundaries within which it operates.
 
@@ -515,7 +508,7 @@ The framework above is deliberately scoped. The following limitations are not fa
 
 **Model risk persists.** Choosing the best of five candidates does not guarantee any of them is correct. Goodness-of-fit tests guard against gross misspecification but cannot detect a sixth, unconsidered family. The framework reduces model risk; it does not eliminate it.
 
-**Independence assumption.** Each cost component is modelled independently. In reality, components are correlated: a wave of layoffs simultaneously reduces hiring costs and inflates severance. Modelling these dependencies requires multivariate methods (copulas, joint distributions) covered in the companion Monte Carlo article.
+**Independence assumption.** Each cost component is modelled independently. In reality, components are correlated: a wave of layoffs simultaneously reduces hiring costs and inflates severance. Modelling these dependencies requires multivariate methods (copulas, joint distributions) covered in the companion article [Why Your Budget Never Hits the Exact Number](monte-carlo-budget.html).
 
 **Static distributions.** This article assumes distributions are stable over time. Salary distributions drift with inflation, market shifts, and organizational changes. Time-series methods (state-space models, regime-switching) are out of scope.
 
@@ -525,7 +518,7 @@ The framework above is deliberately scoped. The following limitations are not fa
 
 ---
 
-## 12. Conclusion
+## Conclusion
 
 ### The Distribution Is the Model
 
@@ -541,9 +534,7 @@ The distributional assumption is not a technical detail — it is the most impor
 
 ### Next Steps
 
-This article establishes the distributional selection framework. The companion article (Monte Carlo) shows how to use these distributions to simulate total team cost, including correlations between components and scenario analysis.
-
-The complete code is available in the associated repository, with reproducible synthetic data and publication-quality figures.
+This article establishes the distributional selection framework. The companion article [Why Your Budget Never Hits the Exact Number](monte-carlo-budget.html) shows how to use these distributions to simulate total team cost, including correlations between components and scenario analysis.
 
 ---
 
@@ -554,3 +545,7 @@ The complete code is available in the associated repository, with reproducible s
 - Bishop, C. (2006). *Pattern Recognition and Machine Learning*. Springer.
 - Embrechts, P., Klüppelberg, C. & Mikosch, T. (1997). *Modelling Extremal Events*. Springer.
 - McLachlan, G. & Peel, D. (2000). *Finite Mixture Models*. Wiley.
+
+---
+
+*All figures and numbers in this article are reproduced by versioned scripts with fixed seeds in the [companion repository](https://github.com/brunoramosmartins/probabilistic-cost-modelling-article). See the repository README for how to run them.*

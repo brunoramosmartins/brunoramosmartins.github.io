@@ -14,6 +14,36 @@
     "url": "/til/linearity-of-expectation-til.html"
   },
   {
+    "id": "monte-carlo-budget",
+    "title": "Why Your Budget Never Hits the Exact Number",
+    "description": "Monte Carlo simulation for budget planning — from point estimates to probability distributions.",
+    "category": "statistics",
+    "date": "2026-07-11",
+    "reading_time": "35 min",
+    "tags": [
+      "monte-carlo",
+      "simulation",
+      "probability",
+      "budgeting"
+    ],
+    "url": "/posts/monte-carlo-budget.html"
+  },
+  {
+    "id": "probabilistic-cost-modelling",
+    "title": "The Shape of What You'll Spend",
+    "description": "Probabilistic modelling of people costs — from distribution selection to budget impact.",
+    "category": "statistics",
+    "date": "2026-07-11",
+    "reading_time": "23 min",
+    "tags": [
+      "probability",
+      "distributions",
+      "heavy-tails",
+      "budgeting"
+    ],
+    "url": "/posts/probabilistic-cost-modelling.html"
+  },
+  {
     "id": "benfords-law",
     "title": "Benford's Law: two derivations, four tests, one fraud detector",
     "description": "Two independent derivations of Benford's leading-digit law, four conformity tests, and a fraud-detection demo on GeoNames city data.",

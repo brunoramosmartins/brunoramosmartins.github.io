@@ -8,45 +8,42 @@ tags: monte-carlo, simulation, probability, budgeting
 
 # Why Your Budget Never Hits the Exact Number
 
-## Monte Carlo Simulation for Budget Planning — from Point Estimates to Probability Distributions
+> **What this is.** The mathematical machinery to replace a single budget number with a probability distribution: "we expect to spend R\$ 11.5M" becomes "we are 90% confident spending will fall between R\$ 10.7M and R\$ 12.4M, with a 3% probability of exceeding the ceiling." The approach applies to any budget that decomposes into stochastic components — headcount, projects, procurement, infrastructure; an IT headcount budget is the running case study.
+>
+> **What you should know before reading.** *Required:* basic calculus (derivatives, integrals, a Taylor expansion) and basic probability (random variables, PDF/PMF, CDF, expectation, variance). *Helpful but not required:* prior exposure to the Law of Large Numbers, the Central Limit Theorem, and confidence intervals — all derived from first principles here — and working knowledge of NumPy. *Out of scope:* how to choose distributions for heavy-tailed data — that is the companion article [The Shape of What You'll Spend](probabilistic-cost-modelling.html) — plus Bayesian inference beyond a conceptual example, real-world data quality issues, and time-series forecasting.
+>
+> **What you will take away.** A working Monte Carlo budget you can build in a day, the proofs that justify trusting it, and the language to present a distribution to leadership as a reserve policy (P90 / P95 / P99) instead of a target.
+>
+> **Code.** Every figure and number is reproduced by versioned scripts with fixed seeds in the [companion repository](https://github.com/brunoramosmartins/monte-carlo-budget-article).
 
 ---
 
-## 0. What You Need to Know
+## Notation
 
-This article assumes familiarity with:
+| Symbol | Meaning |
+|--------|---------|
+| $X_{\text{total}}$ | Total budget cost (random variable) |
+| $X_k$ | Cost of component $k$ |
+| $n$ | Number of units (headcount, items, etc.) |
+| $\bar{X}_N$ | Sample mean of $N$ simulations |
+| $\hat{\theta}_N$ | Monte Carlo estimator |
+| $\sigma$ | Standard deviation of the cost distribution |
+| $z_{\alpha/2}$ | Normal quantile for confidence level $1-\alpha$ |
 
-**Required:**
-- Basic calculus: derivatives, integrals, Taylor expansion (used in §4–§5)
-- Basic probability: random variables, PDF / PMF, CDF, expectation, variance
-- Reading mathematical notation comfortably
+**Case study notation** (IT headcount):
 
-**Helpful but not required:**
-- Prior exposure to the Law of Large Numbers and the Central Limit Theorem (both are derived from first principles in §4 and §5)
-- Familiarity with confidence intervals (derived in §5)
-- Working knowledge of NumPy (used in the implementation, but the article is readable without it)
-
-**Out of scope (won't be covered):**
-- Heavy-tailed distributions and how to choose them — see the companion article on distribution selection
-- Bayesian inference beyond a conceptual update example (§8)
-- Real-world data quality issues (NDA, censoring, reporting noise)
-- Time-series forecasting (rolling regimes, ARIMA, state-space models)
-
-### Reading Guide
-
-The article works at three levels of depth. Pick what suits you.
-
-| If you are… | Read | Skip / skim |
-|------------|------|--------------|
-| A budget owner / executive | §1, §2, §9 (results), §10 (framework), §11 | The proofs in §4 and §5 — read only the takeaway notes |
-| An analyst applying the method | §1–§3, §6, §7, §9, §10 | The MGF proof in §5 |
-| A reader auditing the math | All sections in order | Nothing |
-
-The figures and the "How to Present Results" passage in §10 are the highest-value pieces for a quick read.
+| Symbol | Meaning |
+|--------|---------|
+| $S_i$ | Monthly salary of employee $i$ |
+| $\beta$ | Benefits multiplier |
+| $H_i$ | Overtime hours per employee per month |
+| $r_{ot}$ | Overtime hourly rate |
+| $I$ | Number of severe incidents per year |
+| $C_j$ | Cost of incident $j$ |
 
 ---
 
-## 1. Introduction
+## Introduction
 
 Someone asks for next year's budget. You open a spreadsheet, multiply quantities by unit costs, add contingencies, round up a little — and deliver a number. A single number.
 
@@ -72,34 +69,11 @@ This article replaces the single number with a **probability distribution**. Usi
 
 The approach is **general**: it applies to any budget that can be decomposed into stochastic components — headcount, projects, procurement, licensing, infrastructure. We illustrate with an IT headcount budget (salaries, benefits, overtime, incidents) as a concrete case study, but the mathematical framework transfers directly to any domain.
 
-The journey proceeds in four stages: we formalise budget components as random variables (Section 3), prove that averaging simulations converges to the true answer (Section 4), quantify the simulation error (Section 5), and implement the estimator with variance reduction techniques (Sections 6–7). Section 9 validates everything experimentally; Section 10 turns the math into a decision framework you can hand to a budget owner on Monday morning.
-
-### Notation
-
-| Symbol | Meaning |
-|--------|---------|
-| $X_{\text{total}}$ | Total budget cost (random variable) |
-| $X_k$ | Cost of component $k$ |
-| $n$ | Number of units (headcount, items, etc.) |
-| $\bar{X}_N$ | Sample mean of $N$ simulations |
-| $\hat{\theta}_N$ | Monte Carlo estimator |
-| $\sigma$ | Standard deviation of the cost distribution |
-| $z_{\alpha/2}$ | Normal quantile for confidence level $1-\alpha$ |
-
-**Case study notation** (IT headcount):
-
-| Symbol | Meaning |
-|--------|---------|
-| $S_i$ | Monthly salary of employee $i$ |
-| $\beta$ | Benefits multiplier |
-| $H_i$ | Overtime hours per employee per month |
-| $r_{ot}$ | Overtime hourly rate |
-| $I$ | Number of severe incidents per year |
-| $C_j$ | Cost of incident $j$ |
+The journey proceeds in stages: we formalise [budget components as random variables](#budget-components-as-random-variables), prove that averaging simulations converges to the true answer with [the Law of Large Numbers](#the-law-of-large-numbers), quantify the simulation error with [the Central Limit Theorem](#the-central-limit-theorem), and make the estimator efficient with [variance reduction](#variance-reduction). The [experiments](#experiments-and-results) validate everything; [the practical framework](#a-practical-framework) turns the math into a decision workflow you can hand to a budget owner on Monday morning.
 
 ---
 
-## 2. The Point Estimate Problem
+## The Point Estimate Problem
 
 A point estimate is a single value used to approximate an unknown parameter. In budget planning, it takes the form:
 
@@ -148,7 +122,7 @@ where $g_k$ is a cost function for component $k$ and $\mathbf{Z}_k$ is a vector 
 
 ---
 
-## 3. Budget Components as Random Variables
+## Budget Components as Random Variables
 
 Every component of a budget is potentially a random variable. Treating them as constants is a modelling choice that discards information. The key insight: **identify which components carry meaningful uncertainty, model them probabilistically, and keep the rest deterministic.**
 
@@ -258,13 +232,13 @@ The same structure applies to:
 
 In each case: identify the random components, choose distributions, and simulate.
 
-A short caveat before moving on. Everything that follows assumes the distributions chosen for each component are *correct*. Monte Carlo will faithfully simulate from whatever you feed it — including a bad model. A LogNormal salary fit to data that is actually heavy-tailed will produce a CI that looks tight and is wrong. The companion article on distribution selection and heavy tails treats this question directly — how to pick a distribution from data, when to suspect a heavier tail than your eye says, and what happens to risk estimates when you get it wrong. If you only have time to read one, read this one first; the companion is what stops you from being precisely wrong.
+A short caveat before moving on. Everything that follows assumes the distributions chosen for each component are *correct*. Monte Carlo will faithfully simulate from whatever you feed it — including a bad model. A LogNormal salary fit to data that is actually heavy-tailed will produce a CI that looks tight and is wrong. The companion article [The Shape of What You'll Spend](probabilistic-cost-modelling.html) treats this question directly — how to pick a distribution from data, when to suspect a heavier tail than your eye says, and what happens to risk estimates when you get it wrong. If you only have time to read one, read this one first; the companion is what stops you from being precisely wrong.
 
-With the model defined, the next two sections answer the two questions any practitioner asks before trusting a simulation: *will the average converge?* (Section 4, the Law of Large Numbers) and *how confident can I be after $N$ runs?* (Section 5, the Central Limit Theorem).
+With the model defined, the next two sections answer the two questions any practitioner asks before trusting a simulation: *will the average converge?* (the Law of Large Numbers) and *how confident can I be after $N$ runs?* (the Central Limit Theorem).
 
 ---
 
-## 4. Will the Mean Converge? The Law of Large Numbers
+## The Law of Large Numbers
 
 If we simulate the budget 10,000 times and average the results, will the average converge to the true $E[X_{\text{total}}]$? The Law of Large Numbers says yes.
 
@@ -292,14 +266,13 @@ The Strong Law provides an even stronger guarantee: $\bar{X}_N \to \mu$ almost s
 
 **For Monte Carlo:** each simulation $X_i$ is one "possible year." The LLN guarantees that averaging $N$ simulated scenarios converges to the true expected cost.
 
-![LLN Convergence](../figures/monte-carlo-budget/lln_convergence.png)
-*Figure 1: Ten independent runs of the sample mean converging to $E[X]$, with Chebyshev 95% confidence band.*
+![Ten independent runs of the sample mean converging to E[X], with the Chebyshev 95% confidence band.](../figures/lln_convergence.png)
 
 The LLN guarantees we get the right answer eventually. It does not tell us how close we are after, say, $N = 1{,}000$ runs — Chebyshev's bound is a worst case across all distributions, not a sharp estimate. To answer "how confident can I be?" we need the *shape* of the error, not just its decay. That is what the Central Limit Theorem provides.
 
 ---
 
-## 5. How Wrong Can We Be? The Central Limit Theorem
+## The Central Limit Theorem
 
 The LLN tells us the estimate converges. The CLT tells us **how fast** — and gives us confidence intervals.
 
@@ -353,14 +326,13 @@ $$
 
 For our case study ($\sigma \approx 493K$, $\epsilon = 100K$, 95%): $N \geq 94$. Remarkably few simulations are needed.
 
-![CLT Normality Emergence](../figures/monte-carlo-budget/clt_normality_emergence.png)
-*Figure 2: As $n$ increases, the standardised sample mean converges to $N(0,1)$.*
+![As N increases, the standardised sample mean converges to the standard Normal distribution.](../figures/monte-carlo-budget/clt_normality_emergence.png)
 
-With the LLN giving convergence and the CLT giving the error rate, the Monte Carlo estimator is fully specified. We can finally state its formal properties — and address the quiet question of when, despite all this, the estimator can still produce confidently wrong answers.
+With the LLN giving convergence and the CLT giving the error rate, the Monte Carlo estimator is fully specified. We can now state its formal properties.
 
 ---
 
-## 6. The Monte Carlo Estimator
+## The Monte Carlo Estimator
 
 ### Definition
 
@@ -392,27 +364,11 @@ Halving the CI width requires 4× more simulations. This fundamental trade-off m
 
 Since the estimator is unbiased: $\text{MSE}(\hat{\theta}_N) = \sigma_g^2 / N$.
 
-### When Monte Carlo Fails
-
-Monte Carlo is a faithful estimator of $E[g(X)]$ given a model. It is *not* a check that the model is right. The estimator can be unbiased, consistent, and asymptotically normal — and still produce conclusions that are confidently wrong. The most common failure modes:
-
-1. **Misspecified distribution.** You picked Normal where the truth is heavy-tailed, or used a Poisson rate calibrated on a quiet year. The simulated CI shrinks around a centre that is wrong; everything downstream inherits the bias. *Mitigation:* fit distributions on multi-year data when possible, plot Q-Q against the proposed distribution, and run a sensitivity to alternative families (LogNormal vs Gamma vs heavy-tailed Pareto).
-
-2. **Ignored correlation.** Treating components as independent when they covary positively under-estimates variance. The CI looks tight — and breaks at the first joint shock. *Mitigation:* when in doubt, re-run with a Gaussian copula at the maximum plausible correlation. If the P95 moves materially, model it; if not, document the assumption.
-
-3. **Heavy tails the model does not capture.** Heavy-tailed phenomena (incident severities, FX shocks, project overruns) can violate the variance-finite assumption that underpins the CLT. The sample mean still converges, but the CI based on $z_{\alpha/2} \sigma / \sqrt{N}$ is over-confident. *Mitigation:* check the empirical tail decay; if it looks polynomial rather than exponential, switch to a heavy-tailed family (Pareto, Student-$t$). The companion article on distribution selection covers this directly.
-
-4. **Pilot variance under-estimates true variance.** The minimum-$N$ formula $N \geq (z \sigma / \epsilon)^2$ uses a sample $\sigma$ from the pilot run. If the pilot was small or unlucky, $\sigma$ is low-biased — and the actual CI is wider than promised. *Mitigation:* always re-check the CI half-width *after* the full run. If it overshoots the target, run more.
-
-5. **The decision is not in the bulk.** Monte Carlo gives best precision at the centre of the distribution and worst at the tails. Decisions framed around the median or mean (e.g., "expected cost") are reliable; decisions framed around extreme percentiles (e.g., "1-in-1000-year shortfall") need much larger $N$ to estimate the same percentile with the same precision. *Mitigation:* if you care about extreme tails, switch to importance sampling or extreme-value theory — naive MC is not the right tool.
-
-The honest claim is narrower than "Monte Carlo gives the answer". It is: *Monte Carlo gives the answer that the model implies*. Failures upstream of the simulation — wrong distribution, wrong dependencies, wrong tail — are not detected by the simulation itself. Validate them separately.
-
-With those caveats acknowledged, the estimator does work — but the $O(1/\sqrt{N})$ rate is harsh. Every halving of the CI requires quadrupling the simulations, and at the precision needed for serious budget decisions that gets expensive fast. The next section shows how to break that ceiling without changing $N$.
+The estimator is unbiased, consistent, and asymptotically Normal — everything the theory can promise. What the theory cannot promise is that the *model being simulated* is right; [Limitations](#limitations) catalogues the ways that assumption fails in practice. Before that, there is a performance ceiling to break: the $O(1/\sqrt{N})$ rate is harsh — every halving of the CI requires quadrupling the simulations, and at the precision needed for serious budget decisions that gets expensive fast. The next section shows how to break that ceiling without changing $N$.
 
 ---
 
-## 7. Making It Faster: Variance Reduction
+## Variance Reduction
 
 The $O(1/\sqrt{N})$ rate means brute-force precision is expensive. Variance reduction techniques achieve tighter confidence intervals **for the same computational budget**.
 
@@ -458,8 +414,7 @@ $$
 
 Always. Stratification removes between-strata variance.
 
-![Variance Reduction Comparison](../figures/monte-carlo-budget/variance_reduction_comparison.png)
-*Figure 3: CI width vs N for naive MC, antithetic variates, and control variates.*
+![95% CI width versus N for naive Monte Carlo, antithetic variates, and control variates.](../figures/monte-carlo-budget/variance_reduction_comparison.png)
 
 ### Why This Matters Beyond the Math: Compute ROI
 
@@ -477,18 +432,18 @@ Suppose the naive simulation needs $N = 30{,}000$ runs to deliver a ±R$ 50K con
 The ROI is not the variance number; it is what the variance number *enables*:
 
 - **Live dashboards.** A CFO sliding a headcount parameter and watching the P95 update in milliseconds is a different product from one that takes a coffee break to recompute.
-- **Sensitivity at scale.** Section 9's sensitivity analysis runs the simulation many times, once per parameter variation. Cutting each run by 50× turns an overnight batch into a few-second screen.
+- **Sensitivity at scale.** The [sensitivity analysis in the experiments](#experiments-and-results) runs the simulation many times, once per parameter variation. Cutting each run by 50× turns an overnight batch into a few-second screen.
 - **Cheap A/B of model assumptions.** Want to compare LogNormal vs Gamma for salaries? Naive MC makes that a meeting; control variates make it a parameter toggle.
 
 The math justifies the technique. The compute economics is what gets it shipped.
 
-So far, the simulation is built once, before the year starts — a static distribution that anchors a one-shot decision. But budgets are not one-shot artefacts; they are revisited every month as real spending data arrives. The next section reframes the same machinery as the *first version* of a budget that gets updated continuously, a Bayesian extension that turns the one-shot script into a living forecast.
+So far, the simulation is built once, before the year starts — a static distribution that anchors a one-shot decision. But budgets are not one-shot artefacts; they are revisited every month as real spending data arrives. The next section reframes the same machinery as the *first version* of a budget that gets updated continuously — a Bayesian extension that turns the one-shot script into a living forecast.
 
 ---
 
-## 8. Phase 2 Maturity: Continuous Budget Updating
+## Continuous Budget Updating
 
-Everything so far built the **first version** of the budget: a probability distribution computed *before* the year starts, from a fixed model. Sections 4–7 made that estimate convergent, calibrated, and efficient.
+Everything so far built the **first version** of the budget: a probability distribution computed *before* the year starts, from a fixed model. The previous sections made that estimate convergent, calibrated, and efficient.
 
 But a budget is not a one-shot artefact. Each month produces actual spending data. Each quarter brings forecast revisions. The static distribution from January is *not* the right belief in July — by then we have evidence.
 
@@ -504,7 +459,7 @@ $$
 
 Read in budget terms:
 
-- **Prior $P(\theta)$** — the distribution from January. The output of the Monte Carlo simulation in Section 9, *re-cast as a belief about the world*.
+- **Prior $P(\theta)$** — the distribution from January. The output of the full simulation in [Experiments and Results](#experiments-and-results), *re-cast as a belief about the world*.
 - **Likelihood $P(\text{data} \mid \theta)$** — how plausible the spending observed so far is, under each candidate value of $\theta$.
 - **Posterior $P(\theta \mid \text{data})$** — the updated distribution after the data arrives. This becomes the prior for the next month.
 
@@ -522,10 +477,10 @@ The posterior mean is a **precision-weighted average** of the prior mean and the
 
 By month 6, the posterior is much narrower than the original prior. By month 12, the year is over and the posterior collapses around the realised cost. The trajectory of posteriors *is* the forecast.
 
-### Frequentist (Phase 1) vs Bayesian (Phase 2): When Each Fits
+### Static Simulation vs Bayesian Updating: When Each Fits
 
-| Aspect | Phase 1: Frequentist MC (Sections 1–7) | Phase 2: Bayesian update (this section) |
-|--------|----------------------------------------|------------------------------------------|
+| Aspect | Static simulation (this article's core) | Bayesian update layer (this section) |
+|--------|------------------------------------------|------------------------------------------|
 | Parameters | Fixed constants of the model | Random variables with their own distributions |
 | Prior information | Encoded implicitly in distribution choice | Explicit, auditable, can incorporate history |
 | Output | Confidence interval | Credible interval (direct probability of $\theta$) |
@@ -533,68 +488,75 @@ By month 6, the posterior is much narrower than the original prior. By month 12,
 | Best when | Building the *first* budget; no usable history | Updating an *existing* budget with monthly data |
 | Cost | A single Monte Carlo run | A simulation engine **plus** a data pipeline |
 
-### Why This Matters for the Portfolio Reader
+### Why This Matters
 
-A team that ships only the Phase 1 simulation has built a script. A team that ships Phase 1 *and* Phase 2 has built a **data product** — a model that lives across the fiscal year, gets better with data, and produces decisions, not just numbers.
+A team that ships only the static simulation has built a script. A team that ships the simulation *and* the updating layer has built a **data product** — a model that lives across the fiscal year, gets better with data, and produces decisions, not just numbers.
 
-This article focuses on Phase 1 because Phase 2 inherits its rigour: a Bayesian update on top of a badly-calibrated prior is just a slow way to be wrong. Get the simulation right first; the lifecycle layer is then a small addition. Section 10 returns to this lifecycle view in the practical framework.
+This article focuses on the static simulation because the updating layer inherits its rigour: a Bayesian update on top of a badly-calibrated prior is just a slow way to be wrong. Get the simulation right first; the lifecycle layer is then a small addition. [A Practical Framework](#a-practical-framework) returns to this lifecycle view.
 
-Theory and reframing aside, the question that decides whether any of this matters is: *does the engine actually work?* The next section answers it experimentally — five controlled studies covering convergence, normality emergence, full simulation, variance reduction, and sensitivity, each with explicit setup, metric, and result.
+Theory and reframing aside, the question that decides whether any of this matters is: *does the engine actually work?* The next section answers it experimentally — five controlled studies covering convergence, normality emergence, full simulation, variance reduction, and sensitivity.
 
 ---
 
-## 9. Experiments and Results
+## Experiments and Results
 
-Each experiment follows the same template — **Objective**, **Setup**, **Metric**, **Result** — so the validation reads as a study, not a demo. All runs use fixed seeds; the corresponding scripts in `scripts/` reproduce every figure exactly.
+Each experiment follows the same template — **Claim**, **Setup**, **Result**, **Connection** — so the validation reads as a study, not a demo. All runs use fixed seeds; the corresponding scripts in `scripts/` reproduce every figure exactly.
 
 ### Experiment A — LLN Convergence
 
-- **Objective:** show that the sample mean converges to the analytical $E[X]$ as $N$ grows, with variance shrinking at rate $O(1/\sqrt{N})$.
-- **Setup:** 10 independent runs of LogNormal salary draws, $N$ from 1 to 10,000 each. Chebyshev 95% band overlaid.
-- **Metric:** absolute deviation $|\bar{X}_n - E[X]|$ across runs.
-- **Result:** at small $N$, runs spread widely; by $N = 5{,}000$, all 10 runs cluster within R$ 200 of the analytical mean. The empirical decay matches $\sigma/\sqrt{n}$ on a log-log plot.
+**Claim.** The sample mean converges to the analytical $E[X]$ as $N$ grows, with variance shrinking at rate $O(1/\sqrt{N})$.
 
-*See Figure 1.*
+**Setup.** 10 independent runs of LogNormal salary draws, $N$ from 1 to 10,000 each; absolute deviation $|\bar{X}_n - E[X]|$ tracked across runs, with the Chebyshev 95% band overlaid.
+
+**Result.** At small $N$, runs spread widely; by $N = 5{,}000$, all 10 runs cluster within R$ 200 of the analytical mean. The empirical decay matches $\sigma/\sqrt{n}$ on a log-log plot.
+
+**Connection.** The Weak Law proved in [The Law of Large Numbers](#the-law-of-large-numbers), observed at finite $N$ (the figure lives in that section).
 
 ### Experiment B — CLT Normality
 
-- **Objective:** verify that the standardised sample mean of LogNormal draws converges in distribution to $N(0, 1)$.
-- **Setup:** 10,000 repetitions of "draw $n$ LogNormals, standardise the mean", for $n \in \{1, 5, 10, 30, 100\}$. Histogram + QQ-plot per $n$.
-- **Metric:** linearity of the QQ-plot (regression $R^2$) and visual fit to the standard Normal density.
-- **Result:** visibly non-Normal at $n = 1$; by $n = 30$, the histogram closely tracks $N(0,1)$; at $n = 100$, $R^2 \gt 0.999$.
+**Claim.** The standardised sample mean of LogNormal draws converges in distribution to $N(0, 1)$ — right-skewed costs in, bell curve out.
 
-*See Figure 2.*
+**Setup.** 10,000 repetitions of "draw $n$ LogNormals, standardise the mean", for $n \in \{1, 5, 10, 30, 100\}$; histogram and QQ-plot per $n$, with QQ linearity ($R^2$) as the fit metric.
+
+**Result.** Visibly non-Normal at $n = 1$; by $n = 30$, the histogram closely tracks $N(0,1)$; at $n = 100$, $R^2 \gt 0.999$.
+
+**Connection.** The MGF proof in [The Central Limit Theorem](#the-central-limit-theorem), watched happening (the figure lives in that section).
 
 ### Experiment C — Full Budget Simulation
 
-- **Objective:** estimate the full distribution of $X_{\text{total}}$, not just its mean — and quantify the probability of exceeding a ceiling.
-- **Setup:** $N = 50{,}000$ iterations of the IT headcount budget model with default parameters, seed 42. Ceiling at R$ 12.5M.
-- **Metric:** relative error of MC mean vs analytical $E[X]$, 95% CI half-width, P5–P95 range, $P(X \gt \text{ceiling})$.
-- **Result:** MC mean within 0.1% of analytical. 95% CI half-width approximately R$ 4K. P5–P95 spans ~R$ 1.6M. The probability of exceeding R$ 12.5M is approximately 3%. The distribution is right-skewed.
+**Claim.** Monte Carlo recovers the full distribution of $X_{\text{total}}$ — not just its mean — including the ceiling-breach probability no point estimate can produce.
 
-![Budget Simulation](../figures/monte-carlo-budget/budget_simulation.png)
-*Figure 4: Budget cost distribution (histogram + CDF) with mean, P5/P95, and budget ceiling annotated.*
+**Setup.** $N = 50{,}000$ iterations of the IT headcount budget model with default parameters, seed 42; ceiling at R$ 12.5M; metrics: relative error of the MC mean vs analytical $E[X]$, 95% CI half-width, P5–P95 range, $P(X \gt \text{ceiling})$.
+
+**Result.** MC mean within 0.1% of analytical. 95% CI half-width approximately R$ 4K. P5–P95 spans ~R$ 1.6M. The probability of exceeding R$ 12.5M is approximately 3%. The distribution is right-skewed.
+
+**Connection.** Instantiates the full model of [Budget Components as Random Variables](#budget-components-as-random-variables) and delivers the risk profile promised in [The Point Estimate Problem](#the-point-estimate-problem).
+
+![Budget cost distribution (histogram and CDF) with mean, P5/P95, and the budget ceiling annotated.](../figures/monte-carlo-budget/budget_simulation.png)
 
 ### Experiment D — Variance Reduction
 
-- **Objective:** measure the speedup from control variates and antithetic variates against naive MC at matched $N$.
-- **Setup:** all three methods at $N \in \{500, 1{,}000, 2{,}000, 5{,}000, 10{,}000\}$. Control variate: total raw salary sum (analytical mean known).
-- **Metric:** 95% CI half-width per method, plotted against $N$ on log-log axes.
-- **Result:** control variates reduce CI width by approximately **5–6×** at every $N$ tested (corresponding to a ~30× variance reduction; effective $\rho \approx 0.99$). The antithetic implementation overlaps closely with naive MC — its modest gain reflects that the budget model's compound Poisson structure is hard to "mirror" cleanly with seed-based pairing. The slope on log-log is $-1/2$ for all methods, confirming the $O(1/\sqrt{N})$ rate — variance reduction shifts the *intercept*, not the rate.
+**Claim.** Control variates deliver an order-of-magnitude variance reduction at matched $N$; the $O(1/\sqrt{N})$ rate itself does not change.
 
-*See Figure 3.*
+**Setup.** Naive MC, antithetic variates, and control variates at $N \in \{500, 1{,}000, 2{,}000, 5{,}000, 10{,}000\}$; control variate: total raw salary sum (analytical mean known); metric: 95% CI half-width per method on log-log axes.
+
+**Result.** Control variates reduce CI width by approximately **5–6×** at every $N$ tested (corresponding to a ~30× variance reduction; effective $\rho \approx 0.99$). The antithetic implementation overlaps closely with naive MC — its modest gain reflects that the budget model's compound Poisson structure is hard to "mirror" cleanly with seed-based pairing. The slope on log-log is $-1/2$ for all methods, confirming the $O(1/\sqrt{N})$ rate — variance reduction shifts the *intercept*, not the rate.
+
+**Connection.** The control-variate formula of [Variance Reduction](#variance-reduction) at work (the figure lives in that section); the dominant-component pattern from the case study is exactly why the salary control works so well.
 
 ### Experiment E — Sensitivity Analysis
 
-- **Objective:** rank model parameters by their impact on $E[X_{\text{total}}]$ to guide where to spend modelling effort.
-- **Setup:** vary the **effective contribution** of each of 8 parameters by ±20% (for log-mean parameters, this is an additive shift of $\ln(1.2)$; for linear parameters, a multiplicative scale). Hold all others fixed. Run $N = 10{,}000$ per variation.
-- **Metric:** percentage change in $E[X_{\text{total}}]$ relative to the base case.
-- **Result:** three parameters dominate, each producing roughly the same ±19–20% swing in $E[X_{\text{total}}]$: the salary mean ($\mu_s$ via $E[S]$), the benefits multiplier ($\beta$), and the headcount ($n$). All three act linearly on the salary component, which is ~97% of the budget. Overtime and incident parameters change the total by less than 1%. **Practical implication:** invest modelling effort in the three salary-cost levers; refining the overtime or incident model is rounding error.
+**Claim.** A small number of parameters dominates the total budget; sensitivity analysis tells the analyst where modelling effort pays.
+
+**Setup.** The **effective contribution** of each of 8 parameters varied by ±20% (for log-mean parameters, an additive shift of $\ln(1.2)$; for linear parameters, a multiplicative scale), all others held fixed; $N = 10{,}000$ per variation; metric: percentage change in $E[X_{\text{total}}]$ vs the base case.
+
+**Result.** Three parameters dominate, each producing roughly the same ±19–20% swing in $E[X_{\text{total}}]$: the salary mean ($\mu_s$ via $E[S]$), the benefits multiplier ($\beta$), and the headcount ($n$). All three act linearly on the salary component, which is ~97% of the budget. Overtime and incident parameters change the total by less than 1%. **Practical implication:** invest modelling effort in the three salary-cost levers; refining the overtime or incident model is rounding error.
+
+**Connection.** Feeds directly into step 1 of [A Practical Framework](#a-practical-framework) — decompose and find what matters — and is only computationally feasible because of [Variance Reduction](#variance-reduction).
 
 > **Why "effective ±20%" and not raw ±20%?** The salary log-mean $\mu_s$ enters $E[S] = e^{\mu_s + \sigma_s^2/2}$ exponentially. Varying $\mu_s$ by ±20% additively would multiply $E[S]$ by $\approx 6.3\times$ — making the chart visually dominated by $\mu_s$ for a non-business reason. The corrected setup varies the *effective expected value* of each component, so the ranking reflects business sensitivity, not parameter scale.
 
-![Sensitivity Tornado](../figures/monte-carlo-budget/sensitivity_tornado.png)
-*Figure 5: Tornado chart showing parameter impact on $E[X_{\text{total}}]$.*
+![Tornado chart ranking each parameter's impact on the expected total budget.](../figures/monte-carlo-budget/sensitivity_tornado.png)
 
 ### Key Findings
 
@@ -612,7 +574,7 @@ The experiments confirm the engine works. The remaining gap is operational: turn
 
 ---
 
-## 10. A Practical Framework for Budget Analysts
+## A Practical Framework
 
 ### When to Use Monte Carlo
 
@@ -702,7 +664,25 @@ If those numbers are useful, you have just earned the right to invest in v2 — 
 
 ---
 
-## 11. Conclusion
+## Limitations
+
+Monte Carlo is a faithful estimator of $E[g(X)]$ *given a model*. It is **not** a check that the model is right. The estimator can be unbiased, consistent, and asymptotically normal — and still produce conclusions that are confidently wrong. The most common failure modes:
+
+1. **Misspecified distribution.** You picked Normal where the truth is heavy-tailed, or used a Poisson rate calibrated on a quiet year. The simulated CI shrinks around a centre that is wrong; everything downstream inherits the bias. *Mitigation:* fit distributions on multi-year data when possible, plot Q-Q against the proposed distribution, and run a sensitivity to alternative families (LogNormal vs Gamma vs heavy-tailed Pareto).
+
+2. **Ignored correlation.** Treating components as independent when they covary positively under-estimates variance. The CI looks tight — and breaks at the first joint shock. *Mitigation:* when in doubt, re-run with a Gaussian copula at the maximum plausible correlation. If the P95 moves materially, model it; if not, document the assumption.
+
+3. **Heavy tails the model does not capture.** Heavy-tailed phenomena (incident severities, FX shocks, project overruns) can violate the variance-finite assumption that underpins the CLT. The sample mean still converges, but the CI based on $z_{\alpha/2} \sigma / \sqrt{N}$ is over-confident. *Mitigation:* check the empirical tail decay; if it looks polynomial rather than exponential, switch to a heavy-tailed family (Pareto, Student-$t$). The companion article [The Shape of What You'll Spend](probabilistic-cost-modelling.html) covers this directly.
+
+4. **Pilot variance under-estimates true variance.** The minimum-$N$ formula $N \geq (z \sigma / \epsilon)^2$ uses a sample $\sigma$ from the pilot run. If the pilot was small or unlucky, $\sigma$ is low-biased — and the actual CI is wider than promised. *Mitigation:* always re-check the CI half-width *after* the full run. If it overshoots the target, run more.
+
+5. **The decision is not in the bulk.** Monte Carlo gives best precision at the centre of the distribution and worst at the tails. Decisions framed around the median or mean (e.g., "expected cost") are reliable; decisions framed around extreme percentiles (e.g., "1-in-1000-year shortfall") need much larger $N$ to estimate the same percentile with the same precision. *Mitigation:* if you care about extreme tails, switch to importance sampling or extreme-value theory — naive MC is not the right tool.
+
+The honest claim is narrower than "Monte Carlo gives the answer". It is: *Monte Carlo gives the answer that the model implies*. Failures upstream of the simulation — wrong distribution, wrong dependencies, wrong tail — are not detected by the simulation itself. Validate them separately.
+
+---
+
+## Conclusion
 
 A single-number budget is an **incomplete model**. It compresses a distribution into its centre, throws away every tail, and asks the organisation to make capital allocation decisions on what is left.
 
@@ -718,29 +698,17 @@ Three sentences. Print them above the spreadsheet.
 
 Any serious budget should be expressed as a distribution. Any serious budget review should ask "where in the distribution did we land?", not "by how much did we miss?". And any serious team building a budget today should be running the kind of simulation this article describes — by Monday, on a laptop, in a hundred lines of Python.
 
-The next time someone asks for a budget number, give them a distribution.
+The next time someone asks for a budget number, give them a distribution. And when you are ready to choose *which* distributions to feed the simulation, the companion article [The Shape of What You'll Spend](probabilistic-cost-modelling.html) is the natural next read.
 
 ---
 
 ## References
 
-1. Casella, G. & Berger, R. (2002). *Statistical Inference*. Duxbury.
-2. Robert, C. & Casella, G. (2004). *Monte Carlo Statistical Methods*. Springer.
-3. Glasserman, P. (2003). *Monte Carlo Methods in Financial Engineering*. Springer.
-4. Gelman, A. et al. (2013). *Bayesian Data Analysis*. CRC Press.
+- Casella, G. & Berger, R. (2002). *Statistical Inference*. Duxbury.
+- Gelman, A. et al. (2013). *Bayesian Data Analysis*. CRC Press.
+- Glasserman, P. (2003). *Monte Carlo Methods in Financial Engineering*. Springer.
+- Robert, C. & Casella, G. (2004). *Monte Carlo Statistical Methods*. Springer.
 
 ---
 
-## How to Reproduce
-
-```bash
-git clone https://github.com/brunoramosmartins/monte-carlo-budget-article.git
-cd monte-carlo-budget-article
-python -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev,notebook]"
-python scripts/exp_budget_simulation.py
-python scripts/exp_sensitivity.py
-pytest tests/
-```
-
-All figures are generated with fixed seeds for exact reproducibility.
+*All figures and numbers in this article are reproduced by versioned scripts with fixed seeds in the [companion repository](https://github.com/brunoramosmartins/monte-carlo-budget-article). See the repository README for how to run them.*
