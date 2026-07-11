@@ -5,14 +5,12 @@
     {
       "slug": "probabilistic-cost-modelling",
       "repo": "probabilistic-cost-modelling-article",
-      "path": "article/probabilistic-cost-modelling.md",
-      "draft": true
+      "path": "article/probabilistic-cost-modelling.md"
     },
     {
       "slug": "monte-carlo-budget",
       "repo": "monte-carlo-budget-article",
-      "path": "article/monte-carlo-budget.md",
-      "draft": true
+      "path": "article/monte-carlo-budget.md"
     },
     {
       "slug": "headcount-dynamics",

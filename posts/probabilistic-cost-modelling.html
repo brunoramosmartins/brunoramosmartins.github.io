@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Probabilistic modelling of people costs — from distribution selection to budget impact." />
+  <title>The Shape of What You'll Spend — Bruno Ramos Martins</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="article" />
+  <meta property="og:title"       content="The Shape of What You'll Spend — Bruno Ramos Martins" />
+  <meta property="og:description" content="Probabilistic modelling of people costs — from distribution selection to budget impact." />
+  <meta property="og:url"         content="https://brunoramosmartins.github.io/posts/probabilistic-cost-modelling.html" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet" />
+
+  <!-- MathJax — renders LaTeX math ($...$, $$...$$) -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath:  [['$', '$']],
+        displayMath: [['$$', '$$']],
+      },
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/layout.css" />
+  <link rel="stylesheet" href="../assets/css/components.css" />
+  <link rel="stylesheet" href="../assets/css/highlight.css" />
+
+  <style>
+    /* === Article-specific prose styles === */
+    .article-prose {
+      max-width: var(--container-max);
+      margin: 0 auto;
+    }
+
+    .article-prose h2 {
+      font-size: var(--text-3xl);
+      font-weight: var(--weight-bold);
+      letter-spacing: -0.02em;
+      margin-top: var(--space-16);
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-3);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .article-prose h3 {
+      font-size: var(--text-2xl);
+      font-weight: var(--weight-semibold);
+      letter-spacing: -0.01em;
+      margin-top: var(--space-10);
+      margin-bottom: var(--space-3);
+    }
+
+    .article-prose h4 {
+      font-size: var(--text-xl);
+      font-weight: var(--weight-medium);
+      margin-top: var(--space-8);
+      margin-bottom: var(--space-2);
+    }
+
+    .article-prose p {
+      font-size: var(--text-base);
+      line-height: var(--leading-relaxed);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-5);
+    }
+
+    .article-prose ul,
+    .article-prose ol {
+      list-style: revert;
+      padding-left: var(--space-6);
+      margin-bottom: var(--space-5);
+      color: var(--color-text-secondary);
+      line-height: var(--leading-relaxed);
+    }
+
+    .article-prose li { margin-bottom: var(--space-2); }
+
+    .article-prose img {
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      margin: var(--space-8) 0;
+    }
+
+    .article-header {
+      padding: var(--space-16) 0 var(--space-10);
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: var(--space-12);
+    }
+
+    .article-header__back {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+      display: inline-block;
+      margin-bottom: var(--space-6);
+      transition: color var(--transition-fast);
+    }
+    .article-header__back:hover { color: var(--color-accent); }
+
+    .article-header__title {
+      font-size: var(--text-4xl);
+      font-weight: var(--weight-bold);
+      letter-spacing: -0.03em;
+      line-height: var(--leading-tight);
+      margin-bottom: var(--space-4);
+    }
+
+    .article-header__meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .article-header__date {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      letter-spacing: 0.06em;
+    }
+
+    /* === Orientation block (first blockquote after the title) === */
+    .article-prose > blockquote:first-child {
+      border-left: 3px solid var(--color-accent);
+      background: var(--color-surface);
+      border-radius: var(--radius-md);
+      padding: var(--space-5) var(--space-6);
+      margin: 0 0 var(--space-10);
+    }
+    .article-prose > blockquote:first-child p {
+      margin-bottom: var(--space-3);
+    }
+    .article-prose > blockquote:first-child p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* === Heading anchor links === */
+    .heading-anchor {
+      margin-left: var(--space-2);
+      color: var(--color-text-muted);
+      font-size: 0.7em;
+      opacity: 0;
+      text-decoration: none;
+      transition: opacity var(--transition-fast);
+    }
+    h2:hover .heading-anchor,
+    h3:hover .heading-anchor { opacity: 1; }
+    .heading-anchor:hover { color: var(--color-accent); }
+
+    /* === Two-column layout with "On this page" panel === */
+    .article-layout { display: block; }
+    .article-toc { display: none; }
+
+    @media (min-width: 1200px) {
+      .article-layout {
+        display: grid;
+        grid-template-columns: minmax(0, var(--container-max)) 220px;
+        gap: var(--space-16);
+        justify-content: center;
+        /* grid items stretch by default: the aside spans the full article
+           height, giving the sticky inner panel room to travel */
+      }
+      .article-toc { display: block; }
+    }
+
+    .article-toc__inner {
+      position: sticky;
+      /* clear the fixed site header, plus breathing room */
+      top: calc(var(--header-height) + var(--space-6));
+      max-height: calc(100vh - var(--header-height) - var(--space-12));
+      overflow-y: auto;
+      padding-left: var(--space-4);
+      border-left: 1px solid var(--color-border);
+    }
+
+    .article-toc__title {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-4);
+    }
+
+    .article-toc__list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .article-toc__item { margin-bottom: var(--space-2); }
+    .article-toc__item--h3 { padding-left: var(--space-4); }
+
+    .article-toc__list a {
+      display: block;
+      font-size: var(--text-sm);
+      line-height: var(--leading-snug, 1.4);
+      color: var(--color-text-muted);
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+    .article-toc__list a:hover { color: var(--color-text-primary); }
+    .article-toc__list a.active {
+      color: var(--color-accent);
+      font-weight: var(--weight-medium);
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <!-- =========================================================
+       HEADER
+  ========================================================== -->
+  <header class="site-header" role="banner">
+    <div class="container container--wide">
+      <a href="../index.html" class="site-logo">Bruno Ramos Martins</a>
+
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="site-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav id="site-nav" class="site-nav" role="navigation" aria-label="Main navigation">
+        <a href="../index.html">Home</a>
+        <a href="../projects.html">Projects</a>
+        <a href="../articles.html" class="active" aria-current="page">Articles</a>
+        <a href="../til.html">TIL</a>
+        <a href="../resume.html">Resume</a>
+        <a href="../about.html">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       MAIN CONTENT
+  ========================================================== -->
+  <main class="site-main" id="main-content">
+    <div class="container container--wide">
+
+      <!-- Article Header -->
+      <header class="article-header">
+        <a href="../articles.html" class="article-header__back">← Articles</a>
+        <h1 class="article-header__title">The Shape of What You'll Spend</h1>
+        <div class="article-header__meta">
+          <time class="article-header__date" datetime="2026-07-11">Jul 2026</time>
+          <span class="article-header__date">23 min read</span>
+          <div class="tags">
+            <span class="tag" data-category="statistics">statistics</span><span class="tag">probability</span><span class="tag">distributions</span><span class="tag">heavy-tails</span><span class="tag">budgeting</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="article-layout">
+
+        <!-- Article Body — injected by build_blog.py -->
+        <article class="article-prose" aria-label="Article content">
+          <h1 id="the-shape-of-what-youll-spend">The Shape of What You'll Spend</h1>
+<blockquote>
+<p><strong>What this is.</strong> A practical framework for choosing probability distributions in people-cost modelling — and for pricing the cost of choosing wrong. The headline result: assuming a Normal instead of the Pareto that actually fits severance data underestimates the probability of extreme expenses by a factor of <strong>138x</strong>, with direct consequences for budget reserves. This is not a probability textbook or a Python tutorial: it assumes you accept that <em>the wrong distribution = the wrong budget</em> and want a rigorous, reproducible way to choose the right one.</p>
+<p><strong>What you should know before reading.</strong> <em>Required:</em> calculus (derivatives, integrals, a basic Taylor expansion), basic probability (PDF, CDF, expectation, variance), and a little linear algebra (matrix inversion appears briefly for Fisher information). <em>Helpful but not required:</em> prior exposure to Maximum Likelihood Estimation and to information criteria — both are derived from first principles here. <em>Out of scope:</em> Bayesian inference and MCMC, time-series and dependence modelling, and real-world data collection concerns (NDA, privacy).</p>
+<p><strong>What you will take away.</strong> A five-step decision procedure — visualise, fit, compare, validate, quantify — that you can apply to your own cost data, plus the vocabulary to defend the choice in front of a finance audience.</p>
+<p><strong>Code.</strong> Every figure and number is reproduced by versioned scripts with fixed seeds in the <a href="https://github.com/brunoramosmartins/probabilistic-cost-modelling-article">companion repository</a>.</p>
+</blockquote>
+<hr />
+<h2 id="notation">Notation</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$X$</td>
+<td>Random variable (a cost component)</td>
+</tr>
+<tr>
+<td>$f(x \mid \theta)$</td>
+<td>Probability density function with parameter $\theta$</td>
+</tr>
+<tr>
+<td>$F(x)$</td>
+<td>Cumulative distribution function</td>
+</tr>
+<tr>
+<td>$\hat{\theta}$</td>
+<td>Maximum Likelihood Estimate of $\theta$</td>
+</tr>
+<tr>
+<td>$\ell(\theta)$</td>
+<td>Log-likelihood function</td>
+</tr>
+<tr>
+<td>$S(\theta)$</td>
+<td>Score function (gradient of $\ell$)</td>
+</tr>
+<tr>
+<td>$I(\theta)$</td>
+<td>Fisher information</td>
+</tr>
+<tr>
+<td>$n$</td>
+<td>Sample size</td>
+</tr>
+<tr>
+<td>$k$</td>
+<td>Number of estimated parameters</td>
+</tr>
+<tr>
+<td>$D_{KL}(p \| q)$</td>
+<td>Kullback-Leibler divergence from $p$ to $q$</td>
+</tr>
+<tr>
+<td>$\text{VaR}_p$</td>
+<td>Value at Risk at confidence level $p$</td>
+</tr>
+<tr>
+<td>$\text{ES}_p$</td>
+<td>Expected Shortfall at level $p$</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="why-distributions-matter">Why Distributions Matter</h2>
+<p>A budget is a probability statement disguised as a spreadsheet. When an analyst projects people costs, they are implicitly assuming a probability distribution for each component — salaries, overtime, severance, hiring. In most organizations, that assumption is the Normal distribution: symmetric, light-tailed, well-behaved.</p>
+<p><strong>That assumption can break a quarter's budget.</strong> Under a Normal distribution, the probability of a severance event exceeding R\$ 50,000 is about 0.013% — once in 77,000 cases. Under the Pareto distribution that actually fits this kind of data, the same probability is 1.79% — once in 56 cases. <strong>A 138x gap.</strong> When that gap shows up in real layoffs, the cash reserve calibrated to the Normal assumption is no longer a safety margin; it is a fiction.</p>
+<p>The problem is that people costs are not Normal. Salaries are right-skewed: most employees earn moderate wages while a few executives pull the mean upward. Severance costs are heavy-tailed: most are moderate, but a few extreme cases dominate the total. Salary data is often multimodal: clusters of juniors, mid-levels, and seniors form distinct peaks that no unimodal distribution can capture.</p>
+<p><strong>The distribution you assume is your model.</strong> Everything else — mean, variance, confidence intervals, risk estimates — flows from that choice. A wrong distribution is not a modelling nuance; it is a systematic bias that propagates through every downstream calculation.</p>
+<p>$$\text{Wrong distribution} \rightarrow \text{wrong parameters} \rightarrow \text{wrong budget} \rightarrow \text{wrong decisions}$$</p>
+<p>This article presents a rigorous framework for distribution selection in cost modelling. We derive Maximum Likelihood Estimation (MLE) from first principles, fit five candidate distribution families to synthetic cost data, and use information-theoretic criteria (AIC, BIC) and goodness-of-fit tests to select the best model. The companion article <a href="monte-carlo-budget.html">Why Your Budget Never Hits the Exact Number</a> shows how to use these distributions to simulate total team cost.</p>
+<hr />
+<h2 id="whats-at-stake">What's at Stake</h2>
+<p>Before diving into the formalism, three numbers frame why the choice matters. The figure below previews the central comparison: under a Normal model, the budget reserve looks comfortable — until reality follows a Pareto.</p>
+<figure><img src="../figures/probabilistic-cost-modelling/wrong_distribution_impact.png" alt="What's at stake: budget reserve under correct vs wrong distributional assumption" loading="lazy"><figcaption>What's at stake: budget reserve under correct vs wrong distributional assumption</figcaption></figure>
+<p><strong>Three concrete impacts on a 50-person team:</strong></p>
+<ol>
+<li>
+<p><strong>Tail probability gap (severance):</strong> $P(X > 50{,}000)$ — i.e., the probability of a severance event exceeding R\$ 50,000 — is <strong>138x higher</strong> under Pareto than under Normal. The "rare event" that the Normal predicts becomes a routine occurrence under the correct model.</p>
+</li>
+<li>
+<p><strong>Hidden bimodality (salary):</strong> A single Normal fit to a juniors/seniors mixture inflates the variance estimate by ~40% while the mean represents no actual employee. The 95% VaR ends up wrong in both directions.</p>
+</li>
+<li>
+<p><strong>Reserve underfunding (annual budget):</strong> For a 50-person team where salaries are LogNormal and severance is Pareto, defaulting to Normal underestimates the 99% VaR reserve by <strong>R\$ 100,000–R\$ 150,000 per year</strong>. That is the gap between "we have a buffer" and "we are exposed."</p>
+</li>
+</ol>
+<p>The rest of the article shows how to detect, quantify, and correct each of these gaps.</p>
+<hr />
+<h2 id="the-cost-components">The Cost Components</h2>
+<p>To make the framework concrete, we need a model of what we're estimating. We represent each cost component as a random variable with distinct distributional properties. The model is generic, minimal, and expandable.</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Symbol</th>
+<th>Candidates</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Base salary</td>
+<td>$S_i$</td>
+<td>LogNormal, Gamma, Mixture(Normal)</td>
+<td>Right-skewed; multimodal if clusters exist</td>
+</tr>
+<tr>
+<td>Overtime cost</td>
+<td>$C_{ot}$</td>
+<td>LogNormal, Gamma</td>
+<td>Right-skewed, always positive</td>
+</tr>
+<tr>
+<td>Severance cost</td>
+<td>$C_{sev}$</td>
+<td><strong>Pareto</strong>, LogNormal</td>
+<td>Heavy-tailed: a few extremely expensive cases</td>
+</tr>
+<tr>
+<td>Hiring cost</td>
+<td>$C_h$</td>
+<td>LogNormal, Gamma</td>
+<td>Variable (recruiter fees, relocation)</td>
+</tr>
+<tr>
+<td>Benefits multiplier</td>
+<td>$\beta_i$</td>
+<td>Uniform, Beta</td>
+<td>Bounded: typically 1.3x–2.2x of salary</td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-spreadsheet-baseline">The Spreadsheet Baseline</h3>
+<p>Before introducing better models, it helps to name the one being replaced. The typical FP&amp;A spreadsheet treats each cost component as $\bar{x} \pm k \cdot s$ — a mean and a standard deviation, often with $k = 2$ or $k = 3$. This is implicitly a Normal model: it assumes symmetric, light-tailed behaviour around the mean. For salaries it underestimates the right tail; for severance it underestimates catastrophically. The framework below is a structured replacement for this implicit baseline.</p>
+<h3 id="concrete-example-50-person-team">Concrete Example: 50-Person Team</h3>
+<p>Consider an IT team with 50 employees. Using parameters calibrated to the Brazilian market:</p>
+<ul>
+<li><strong>Salaries</strong>: LogNormal($\mu = 9.1$, $\sigma = 0.4$), median ~ R\$ 9,000/month</li>
+<li><strong>Overtime</strong>: Gamma($\alpha = 4$, $\beta = 1/30$), mean ~ R\$ 120/hour</li>
+<li><strong>Severance</strong>: Pareto($\alpha = 2.5$, $x_m = 10,000$), ~3 events/year</li>
+<li><strong>Hiring</strong>: LogNormal($\mu = 9.5$, $\sigma = 0.7$), ~5 hires/year</li>
+</ul>
+<p>The expected total annual cost is approximately R\$ 6.0–6.5 million. The crucial question: the <em>variance</em> of this total depends critically on which distributions you assume. Normal assumptions produce a narrow confidence interval; correct heavy-tailed assumptions produce a much wider one.</p>
+<hr />
+<h2 id="distribution-families">Distribution Families</h2>
+<p>Now that we know which components we need to model, we need a vocabulary of candidate distributions that can capture their distinct shapes. For each component, we consider five distribution families. The Normal is included as the baseline to beat — not as a serious candidate.</p>
+<h3 id="the-five-candidates">The Five Candidates</h3>
+<p><strong>Normal</strong> $N(\mu, \sigma^2)$: The default assumption — and frequently wrong. Symmetric, light-tailed, support on $(-\infty, \infty)$. Assigns positive probability to negative costs, which is physically impossible for salaries.</p>
+<p><strong>LogNormal</strong> $\text{LogNormal}(\mu, \sigma^2)$: If $Y \sim N(\mu, \sigma^2)$, then $X = e^Y$ is LogNormal. Always positive, right-skewed, arises naturally from multiplicative processes (salary = base $\times$ promotions $\times$ adjustments). Median $= e^\mu$.</p>
+<p><strong>Gamma</strong> $\text{Gamma}(\alpha, \beta)$: Always positive, flexible shape controlled by $\alpha$. For $\alpha < 1$, highly skewed; for $\alpha \gg 1$, nearly symmetric. Natural for "accumulation" costs (overtime across a month).</p>
+<p><strong>Pareto</strong> $\text{Pareto}(\alpha, x_m)$: The power-law distribution. Heavy-tailed: $P(X > x) = (x_m/x)^\alpha$ decays polynomially, not exponentially. Models extreme costs (million-dollar severance packages). For $\alpha \leq 2$, infinite variance.</p>
+<p><strong>Weibull</strong> $\text{Weibull}(k, \lambda)$: Flexible shape, closed-form CDF. The hazard function can be increasing ($k > 1$), constant ($k = 1$, = Exponential), or decreasing ($k < 1$). Useful for "time to event" costs.</p>
+<h3 id="comparison-table">Comparison Table</h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Normal</th>
+<th>LogNormal</th>
+<th>Gamma</th>
+<th>Pareto</th>
+<th>Weibull</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Support</td>
+<td>$(-\infty, \infty)$</td>
+<td>$(0, \infty)$</td>
+<td>$(0, \infty)$</td>
+<td>$[x_m, \infty)$</td>
+<td>$[0, \infty)$</td>
+</tr>
+<tr>
+<td>Skewness</td>
+<td>0</td>
+<td>$> 0$ always</td>
+<td>$2/\sqrt{\alpha}$</td>
+<td>heavy</td>
+<td>depends on $k$</td>
+</tr>
+<tr>
+<td>Tail</td>
+<td>Light</td>
+<td>Sub-exponential</td>
+<td>Light</td>
+<td><strong>Heavy</strong></td>
+<td>Light</td>
+</tr>
+<tr>
+<td>MGF exists?</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+<td>Series only</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Mental hook:</strong> <em>Normal assumes symmetry; cost reality is asymmetric.</em> The Normal distribution is <strong>not</strong> a primary candidate for any individual cost component. It may be appropriate for the <em>total</em> budget (by CLT), but not for individual cost shapes.</p>
+<figure><img src="../figures/probabilistic-cost-modelling/distribution_zoo.png" alt="Candidate distributions fitted to the same salary data" loading="lazy"><figcaption>Candidate distributions fitted to the same salary data</figcaption></figure>
+<hr />
+<h2 id="maximum-likelihood-estimation">Maximum Likelihood Estimation</h2>
+<p>We have candidate families. We now need a principled way to choose the <em>parameters</em> of each family from observed data. Maximum Likelihood Estimation (MLE) is the workhorse: it gives us optimal point estimates, automatic standard errors via Fisher information, and a foundation for the <a href="#model-comparison">model comparison framework</a> that comes next.</p>
+<h3 id="the-estimation-problem">The Estimation Problem</h3>
+<p>Given a dataset $x_1, \ldots, x_n$ and a distribution family $f(x \mid \theta)$, we want to find the parameter $\theta$ that best explains the observed data.</p>
+<h3 id="the-likelihood-function">The Likelihood Function</h3>
+<p>$$L(\theta \mid \mathbf{x}) = \prod_{i=1}^n f(x_i \mid \theta)$$</p>
+<p>The log-likelihood (numerically stable):</p>
+<p>$$\ell(\theta) = \sum_{i=1}^n \log f(x_i \mid \theta)$$</p>
+<p>The <strong>maximum likelihood estimator</strong> (MLE) maximizes $\ell(\theta)$:</p>
+<p>$$\hat{\theta}_{MLE} = \arg\max_\theta \ell(\theta)$$</p>
+<blockquote>
+<p><strong>Intuition.</strong> The likelihood asks: <em>"how plausible is this parameter, given the data I observed?"</em> The MLE picks the parameter that makes the observed data most plausible. For a Normal, this turns out to be the sample mean and variance — confirming that everyday statistics is implicitly MLE under a Normal assumption.</p>
+</blockquote>
+<h3 id="score-function-and-fisher-information">Score Function and Fisher Information</h3>
+<p>The <strong>score function</strong> is the gradient of the log-likelihood:</p>
+<p>$$S(\theta) = \frac{\partial \ell}{\partial \theta}$$</p>
+<p><strong>Fundamental property</strong>: $E[S(\theta_0)] = 0$ at the true parameter. Proof: differentiate $\int f(x|\theta) dx = 1$ under the integral sign.</p>
+<p><strong>Fisher information</strong> measures the curvature of the log-likelihood:</p>
+<p>$$I(\theta) = \text{Var}[S(\theta)] = -E\left[\frac{\partial^2 \ell}{\partial \theta^2}\right]$$</p>
+<blockquote>
+<p><strong>Intuition.</strong> <em>Curvature equals precision.</em> A sharp, narrow log-likelihood peak means the data strongly identifies the parameter; a flat peak means many parameters are roughly equally plausible. Fisher information formalizes this.</p>
+</blockquote>
+<h3 id="asymptotic-normality">Asymptotic Normality</h3>
+<p>For large $n$, the MLE is approximately Normal:</p>
+<p>$$\hat{\theta}_{MLE} \dot{\sim} N\left(\theta_0, \frac{1}{n \cdot I_1(\theta_0)}\right)$$</p>
+<p>This gives us automatic confidence intervals:</p>
+<p>$$\hat{\theta} \pm z_{\alpha/2} \cdot \frac{1}{\sqrt{n \cdot I_1(\hat{\theta})}}$$</p>
+<p>In practice: we report not just the parameter estimate but also its uncertainty — and that uncertainty shrinks as $1/\sqrt{n}$ as more data comes in.</p>
+<h3 id="mle-for-our-distributions">MLE for Our Distributions</h3>
+<ul>
+<li><strong>Normal</strong>: $\hat{\mu} = \bar{x}$, $\hat{\sigma}^2 = \frac{1}{n}\sum(x_i - \bar{x})^2$ (closed form)</li>
+<li><strong>LogNormal</strong>: $\hat{\mu} = \overline{\log x}$, $\hat{\sigma}^2 = \text{Var}(\log x)$ (closed form, via log-transform)</li>
+<li><strong>Gamma</strong>: $\hat{\beta} = \hat{\alpha}/\bar{x}$, $\hat{\alpha}$ via numerical solution (digamma equation)</li>
+<li><strong>Pareto</strong> ($x_m$ known): $\hat{\alpha} = n / \sum \log(x_i/x_m)$ (closed form)</li>
+<li><strong>Weibull</strong>: both parameters via numerical optimization</li>
+</ul>
+<figure><img src="../figures/probabilistic-cost-modelling/mle_convergence.png" alt="MLE Convergence: estimates converge to true parameters as n grows" loading="lazy"><figcaption>MLE Convergence: estimates converge to true parameters as n grows</figcaption></figure>
+<hr />
+<h2 id="model-comparison">Model Comparison</h2>
+<p>We can now fit any candidate to data. But fitting alone doesn't tell us which family is the right one — and a model with more parameters will always fit training data better. The question becomes: how do we select between fitted models without rewarding complexity for its own sake?</p>
+<h3 id="the-selection-problem">The Selection Problem</h3>
+<p>We fit several distributions to the same data. Each produces a maximized log-likelihood $\ell(\hat{\theta})$. Which model to choose?</p>
+<p>We cannot simply choose the largest $\ell(\hat{\theta})$ — more complex models always fit training data better (overfitting).</p>
+<h3 id="kl-divergence-measuring-distance-between-distributions">KL Divergence: Measuring Distance Between Distributions</h3>
+<p>The Kullback-Leibler divergence measures the "information loss" when using $q$ to approximate $p$:</p>
+<p>$$D_{KL}(p \| q) = \int p(x) \log\frac{p(x)}{q(x)} dx \geq 0$$</p>
+<p>with equality if and only if $p = q$ almost surely (proved via Jensen's inequality).</p>
+<blockquote>
+<p><strong>Intuition.</strong> <em>KL divergence is the expected surprise penalty of using the wrong model.</em> If $q$ is close to $p$, predictions are barely worse; if $q$ is far from $p$, surprise compounds across observations. AIC is, essentially, an estimator of this penalty.</p>
+</blockquote>
+<h3 id="aic-akaike-information-criterion">AIC: Akaike Information Criterion</h3>
+<p>AIC estimates the expected KL divergence, correcting the optimistic bias of training log-likelihood:</p>
+<p>$$\text{AIC} = -2\ell(\hat{\theta}) + 2k$$</p>
+<p>where $k$ is the number of parameters. Lower AIC = better model.</p>
+<p><strong>Akaike weights</strong>: $w_i = e^{-\Delta_i/2} / \sum_j e^{-\Delta_j/2}$ — the approximate probability that model $i$ is the best among candidates.</p>
+<h3 id="bic-bayesian-information-criterion">BIC: Bayesian Information Criterion</h3>
+<p>Derived from the Laplace approximation to Bayesian marginal evidence:</p>
+<p>$$\text{BIC} = -2\ell(\hat{\theta}) + k\log n$$</p>
+<p>Penalizes complexity more strongly than AIC for $n > 7$. BIC is consistent: selects the true model as $n \to \infty$.</p>
+<p><strong>Mental hook:</strong> <em>AIC for prediction, BIC for identification.</em> When they disagree, the right choice depends on the question you're answering.</p>
+<h3 id="goodness-of-fit-tests">Goodness-of-Fit Tests</h3>
+<ul>
+<li><strong>Kolmogorov-Smirnov (KS)</strong>: compares empirical CDF with theoretical. Sensitive to differences in the center.</li>
+<li><strong>Anderson-Darling (AD)</strong>: like KS, but with more weight on tails. Crucial for cost modelling where tails matter.</li>
+</ul>
+<h3 id="likelihood-ratio-test">Likelihood Ratio Test</h3>
+<p>For nested models ($M_0 \subset M_1$):</p>
+<p>$$\Lambda = -2[\ell(\hat{\theta}_0) - \ell(\hat{\theta}_1)] \xrightarrow{d} \chi^2(\Delta k)$$</p>
+<p>Reject the restricted model if $\Lambda$ exceeds the critical value.</p>
+<figure><img src="../figures/probabilistic-cost-modelling/model_comparison.png" alt="Model comparison: AIC, BIC, and Akaike weights" loading="lazy"><figcaption>Model comparison: AIC, BIC, and Akaike weights</figcaption></figure>
+<hr />
+<h2 id="mixture-models-and-multimodality">Mixture Models and Multimodality</h2>
+<p>So far each component has been treated as a single distribution. But real salary data violates this assumption immediately: a single fit to a junior/senior team mixes two populations and produces a model that represents neither. Mixture models extend the framework to handle this directly.</p>
+<h3 id="the-problem">The Problem</h3>
+<p>Salary data is often bimodal: juniors (~ R\$ 8,000) and seniors (~ R\$ 18,000) form distinct clusters. No unimodal distribution captures this structure.</p>
+<p>If we fit a single Normal, we get mean ~ R\$ 12,200 with inflated variance. **The "average employee" at R\$ 12,200 doesn't exist in either cluster — the mean is a mathematical artifact.**</p>
+<h3 id="gaussian-mixture-model-gmm">Gaussian Mixture Model (GMM)</h3>
+<p>$$f(x) = \sum_{k=1}^K \pi_k \cdot \mathcal{N}(x \mid \mu_k, \sigma_k^2)$$</p>
+<p>where $\pi_k \geq 0$, $\sum_k \pi_k = 1$ are the mixing weights.</p>
+<h3 id="the-em-algorithm">The EM Algorithm</h3>
+<p>Direct MLE fails because the log of a sum doesn't decompose. The Expectation-Maximization algorithm solves this iteratively:</p>
+<p><strong>E-step</strong>: Compute responsibilities (probability of each observation belonging to each component):</p>
+<p>$$\gamma_{ik} = \frac{\pi_k \cdot \mathcal{N}(x_i \mid \mu_k, \sigma_k^2)}{\sum_j \pi_j \cdot \mathcal{N}(x_i \mid \mu_j, \sigma_j^2)}$$</p>
+<p><strong>M-step</strong>: Update parameters using responsibilities as weights:</p>
+<p>$$\pi_k^{new} = \frac{N_k}{n}, \quad \mu_k^{new} = \frac{\sum_i \gamma_{ik} x_i}{N_k}, \quad \sigma_k^{2,new} = \frac{\sum_i \gamma_{ik}(x_i - \mu_k)^2}{N_k}$$</p>
+<p>where $N_k = \sum_i \gamma_{ik}$.</p>
+<h3 id="monotone-convergence">Monotone Convergence</h3>
+<p>EM guarantees $\ell(\theta^{(t+1)}) \geq \ell(\theta^{(t)})$ (proved via Jensen's inequality and the ELBO). Converges to a local maximum — we use multiple random restarts to mitigate.</p>
+<h3 id="choosing-k">Choosing K</h3>
+<p>We use BIC to select the number of components: fit GMMs with $K = 1, 2, 3, \ldots$ and choose the $K$ that minimizes BIC.</p>
+<h3 id="the-budget-cost-of-ignoring-bimodality">The Budget Cost of Ignoring Bimodality</h3>
+<p>In <a href="#experiment-d-mixture-detection">Experiment D</a>, ignoring bimodality and forcing a single Normal on a 60% junior / 40% senior mixture:<br />
+- Inflates the estimated standard deviation by ~40%<br />
+- Distorts VaR(95%) by R\$ 1,500–2,500 per employee<br />
+- For a 50-person team, this is R\$ 75K–125K of misallocated reserve</p>
+<p><strong>Mental hook:</strong> <em>In bimodal distributions, the average represents no one.</em></p>
+<figure><img src="../figures/probabilistic-cost-modelling/mixture_detection.png" alt="Mixture detection: GMM identifies bimodal structure" loading="lazy"><figcaption>Mixture detection: GMM identifies bimodal structure</figcaption></figure>
+<hr />
+<h2 id="heavy-tails-and-extreme-costs">Heavy Tails and Extreme Costs</h2>
+<p>Mixture models address the <em>center</em> of the distribution. But the most consequential modelling errors live in the <em>tails</em> — the rare-but-catastrophic events where budgets actually break. This section is the core of the article.</p>
+<h3 id="the-practical-climax">The Practical Climax</h3>
+<p><strong>If you use a Normal distribution for severance costs, you are systematically under-reserving. This is not an opinion. It is a mathematical fact.</strong></p>
+<h3 id="light-vs-heavy-formal-definition">Light vs Heavy: Formal Definition</h3>
+<p>A distribution is <strong>light-tailed</strong> if its moment generating function exists for some $t > 0$: $M_X(t) = E[e^{tX}] < \infty$. Equivalently, $P(X > x)$ decays at least exponentially.</p>
+<p>A distribution is <strong>heavy-tailed</strong> if $M_X(t) = \infty$ for all $t > 0$. The survival function decays slower than any exponential.</p>
+<h3 id="pareto-tail-behaviour">Pareto Tail Behaviour</h3>
+<p>For $X \sim \text{Pareto}(\alpha, x_m)$:</p>
+<p>$$P(X > x) = \left(\frac{x_m}{x}\right)^\alpha$$</p>
+<p>This decays <strong>polynomially</strong>. Compare with the Normal, which decays as $e^{-x^2/2}$ (super-exponentially).</p>
+<p><strong>Tail thinning ratio:</strong><br />
+- Pareto: $P(X > 2c) / P(X > c) = 2^{-\alpha}$ (constant!)<br />
+- Normal: the same ratio decays exponentially</p>
+<blockquote>
+<p><strong>Mental hook.</strong> <em>Tail risk is where budgets fail, not where averages live.</em> In a Normal world, doubling the threshold makes the event astronomically rarer. In a Pareto world, doubling the threshold reduces the probability by a fixed factor — independent of where you started.</p>
+</blockquote>
+<h3 id="hill-estimator">Hill Estimator</h3>
+<p>To estimate the tail index $\alpha$ from data:</p>
+<p>$$\hat{\alpha}_{Hill} = \left[\frac{1}{k}\sum_{i=1}^k \log\frac{X_{(n-i+1)}}{X_{(n-k)}}\right]^{-1}$$</p>
+<p>Based on the $k$ largest observed values. Plot $\hat{\alpha}$ vs $k$ and look for a stable region.</p>
+<h3 id="budget-impact-the-catastrophic-underestimation">Budget Impact: The Catastrophic Underestimation</h3>
+<p>Severance costs: Pareto($\alpha = 2.5$, $x_m = 10,000$) vs moment-matched Normal:</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Pareto</th>
+<th>Normal</th>
+<th>Ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$P(X > 50,000)$</td>
+<td>1.79%</td>
+<td>0.013%</td>
+<td><strong>138x</strong></td>
+</tr>
+<tr>
+<td>$P(X > 100,000)$</td>
+<td>0.032%</td>
+<td>$\approx 0$</td>
+<td><strong>&gt;1000x</strong></td>
+</tr>
+<tr>
+<td>ES(99%)</td>
+<td>R\$ 105,160 | R\$ 55,297</td>
+<td><strong>1.9x</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>The executive translation:</strong> the Normal model says a R\$ 50,000 severance event happens once in 77,000 cases. The Pareto says it happens once in 56 cases. <em>This is why a single layoff round can blow up a quarter's budget.</em></p>
+<h3 id="value-at-risk-var-and-expected-shortfall-es">Value at Risk (VaR) and Expected Shortfall (ES)</h3>
+<p><strong>VaR</strong> at level $p$: the $p$-th quantile. "We are $p$% confident cost won't exceed VaR."</p>
+<p><strong>ES</strong> (CVaR): the average loss given it exceeded VaR. "If costs exceed VaR, how bad is it on average?"</p>
+<p>For the Pareto: $\text{ES}_p = \frac{\alpha}{\alpha - 1} \cdot \text{VaR}_p$ — always a fixed multiple of VaR.</p>
+<figure><img src="../figures/probabilistic-cost-modelling/tail_risk_comparison.png" alt="Tail risk comparison: Normal vs Pareto" loading="lazy"><figcaption>Tail risk comparison: Normal vs Pareto</figcaption></figure>
+<hr />
+<h2 id="experiments-and-results">Experiments and Results</h2>
+<p>The theory above predicts specific consequences. This section tests those predictions through controlled experiments. Each experiment isolates one claim, runs it on synthetic data with known ground truth, and measures the gap between correct and incorrect modelling.</p>
+<h3 id="why-synthetic-data">Why Synthetic Data?</h3>
+<p>Every experiment in this article uses synthetic data generated from known distributions. This is a deliberate choice, not a limitation:</p>
+<ul>
+<li><strong>Ground truth control:</strong> we know exactly which distribution generated the data, so we can measure how well each candidate model recovers it. With real data, the "true" model is unknown.</li>
+<li><strong>Reproducibility:</strong> every experiment uses fixed random seeds. Anyone can re-run the code and obtain identical figures and numbers.</li>
+<li><strong>Effect isolation:</strong> by changing one parameter at a time (sample size, true distribution, mixture composition), we attribute observed effects to specific causes — not to data quality, NDA-induced noise, or sampling artifacts.</li>
+</ul>
+<p>This trades external validity (will it work on <em>your</em> HR system data?) for internal validity (does the framework do what it claims?). The companion repository documents how to apply the same pipeline to real data.</p>
+<h3 id="experiment-a-the-distribution-zoo">Experiment A — The Distribution Zoo</h3>
+<p><strong>Claim.</strong> Distribution families fitted to the same right-skewed data disagree most where it matters: the tail.</p>
+<p><strong>Setup.</strong> $n = 2{,}000$ samples from LogNormal($\mu = 9.1$, $\sigma = 0.4$); Normal, LogNormal, Gamma, and Weibull fitted via MLE; fitted PDFs overlaid on the empirical histogram.</p>
+<p><strong>Result.</strong> LogNormal captures the skewness; Normal misfits both peak and tail; Gamma and Weibull approximate the bulk but underestimate the right tail.</p>
+<p><strong>Connection.</strong> Confirms the shape vocabulary of <a href="#distribution-families">Distribution Families</a>: support and tail behaviour, not the mean, are what separate the candidates.</p>
+<h3 id="experiment-b-mle-convergence">Experiment B — MLE Convergence</h3>
+<p><strong>Claim.</strong> MLE is consistent and its error decays as $1/\sqrt{n}$, exactly as the asymptotic theory predicts.</p>
+<p><strong>Setup.</strong> 200 replications at each $n \in \{20, 50, 100, \ldots, 10{,}000\}$, fitting LogNormal($9.1, 0.4$); empirical mean and standard deviation of $\hat{\mu}$ compared with the theoretical SE $= \sigma / \sqrt{n}$.</p>
+<p><strong>Result.</strong> Estimates converge to the true parameter; the empirical SD matches the theoretical $1/\sqrt{n}$ decay across three orders of magnitude.</p>
+<p><strong>Connection.</strong> Empirical confirmation of the asymptotic normality result in <a href="#maximum-likelihood-estimation">Maximum Likelihood Estimation</a>.</p>
+<h3 id="experiment-c-the-cost-of-the-wrong-distribution">Experiment C — The Cost of the Wrong Distribution</h3>
+<p><strong>Claim.</strong> Fitting a Normal to LogNormal cost data systematically underestimates tail probabilities — and therefore the reserve.</p>
+<p><strong>Setup.</strong> $n = 1{,}000$ generated from LogNormal; Normal and LogNormal fitted; 200K samples simulated from each fitted model; $P(\text{cost} > \text{ceiling})$ at multiples of the mean, plus VaR(99%) and ES(99%), compared.</p>
+<p><strong>Result.</strong> Normal underestimates $P(X > 2 \cdot \text{mean})$ by ~3x and $P(X > 3 \cdot \text{mean})$ by ~8x. For a 50-person team, this translates to R\$ 100K–150K of insufficient reserve.</p>
+<p><strong>Connection.</strong> Puts numbers on the salary-component gap promised in <a href="#whats-at-stake">What's at Stake</a>.</p>
+<figure><img src="../figures/probabilistic-cost-modelling/wrong_distribution_impact.png" alt="Impact of the wrong distribution on budget" loading="lazy"><figcaption>Impact of the wrong distribution on budget</figcaption></figure>
+<h3 id="experiment-d-mixture-detection">Experiment D — Mixture Detection</h3>
+<p><strong>Claim.</strong> GMM with BIC selection recovers hidden bimodal structure that any single-family fit misses.</p>
+<p><strong>Setup.</strong> 60% sampled from $N(8000, 1500^2)$, 40% from $N(18000, 2500^2)$; GMMs fitted with $K \in \{1, 2, 3, 4\}$; BIC compared across $K$; recovered weights, means, and standard deviations inspected.</p>
+<p><strong>Result.</strong> BIC strongly favors $K = 2$. Recovered parameters are within 5% of true values. The single-Normal fit produces a mean that represents no actual employee.</p>
+<p><strong>Connection.</strong> Validates the EM + BIC procedure of <a href="#mixture-models-and-multimodality">Mixture Models and Multimodality</a>.</p>
+<h3 id="experiment-e-heavy-tail-risk">Experiment E — Heavy Tail Risk</h3>
+<p><strong>Claim.</strong> At matched mean and variance, Pareto and Normal disagree by orders of magnitude in the tail.</p>
+<p><strong>Setup.</strong> Pareto($\alpha = 2.5$, $x_m = 10{,}000$) vs moment-matched Normal at $\mu = 16{,}667$, $\sigma = 14{,}907$; $P(X > x)$ at thresholds R\$ 30K to R\$ 200K; analytical VaR and ES at 90%, 95%, 99%.</p>
+<p><strong>Result.</strong> Normal underestimates $P(X > 50K)$ by 138x, and ES(99%) by ~1.9x. The "rare event" under Normal is a routine one under Pareto — the headline gap of this article.</p>
+<p><strong>Connection.</strong> The polynomial-vs-exponential tail decay derived in <a href="#heavy-tails-and-extreme-costs">Heavy Tails and Extreme Costs</a>, made numerical.</p>
+<h3 id="experiment-f-model-comparison">Experiment F — Model Comparison</h3>
+<p><strong>Claim.</strong> AIC, BIC, and goodness-of-fit tests jointly identify the true distribution.</p>
+<p><strong>Setup.</strong> $n = 500$ from LogNormal; all five candidates fitted; Akaike weights, BIC ranking, and KS p-values computed.</p>
+<p><strong>Result.</strong> LogNormal wins with Akaike weight &gt; 96%. Normal is decisively rejected. The KS test confirms LogNormal is the only candidate that passes goodness-of-fit.</p>
+<p><strong>Connection.</strong> The selection machinery of <a href="#model-comparison">Model Comparison</a> working end to end on data with known ground truth.</p>
+<h3 id="experiment-g-end-to-end-pipeline">Experiment G — End-to-End Pipeline</h3>
+<p><strong>Claim.</strong> The full workflow selects the right family per component and prices the budget impact automatically.</p>
+<p><strong>Setup.</strong> Synthetic 50-person team (salary, overtime, severance, and hiring data); all candidates fitted to each component; ranking via AIC/BIC; resulting VaR and reserve computed.</p>
+<p><strong>Result.</strong> The pipeline correctly identifies LogNormal for salary and Pareto for severance. The total reserve at 99% differs by R\$ 100K–150K from the Normal-baseline estimate.</p>
+<p><strong>Connection.</strong> A dry run of the five-step procedure condensed in <a href="#a-practical-framework">A Practical Framework</a>.</p>
+<figure><img src="../figures/probabilistic-cost-modelling/full_pipeline.png" alt="End-to-end pipeline: data → fit → select → budget impact" loading="lazy"><figcaption>End-to-end pipeline: data → fit → select → budget impact</figcaption></figure>
+<hr />
+<h2 id="a-practical-framework">A Practical Framework</h2>
+<p>The theory and experiments above point to a concrete decision procedure. This section condenses everything into a five-step workflow that any analyst can apply to their own data.</p>
+<h3 id="decision-tree-for-distribution-selection">Decision Tree for Distribution Selection</h3>
+<p><strong>Step 1: Visualize</strong><br />
+- Histogram + Q-Q plot<br />
+- Is the data skewed? Multimodal? Are there extreme values?</p>
+<p><strong>Step 2: Fit candidates</strong><br />
+- Use MLE to fit 3-5 distribution families<br />
+- Check convergence and parameter reasonableness</p>
+<p><strong>Step 3: Compare</strong><br />
+- Compute AIC and BIC for all candidates<br />
+- Compute Akaike weights — is there a clear winner?<br />
+- Use AIC for prediction, BIC for identifying the "true" model</p>
+<p><strong>Step 4: Validate</strong><br />
+- Goodness-of-fit test (Anderson-Darling for tails)<br />
+- Q-Q plot of the winning model<br />
+- Does the winning model actually fit well?</p>
+<p><strong>Step 5: Quantify impact</strong><br />
+- Compute VaR and ES under the selected model<br />
+- Compare with what Normal would have predicted<br />
+- Translate the difference into R\$ of budget reserve</p>
+<h3 id="common-pitfalls">Common Pitfalls</h3>
+<ol>
+<li><strong>Using Normal by default</strong> → systematically underestimates tails</li>
+<li><strong>Ignoring multimodality</strong> → inflated variance, meaningless mean</li>
+<li><strong>Looking only at the mean</strong> → ignores all shape information</li>
+<li><strong>Small sample</strong> → use AICc, not AIC</li>
+<li><strong>Not validating</strong> → the model with best AIC may still not fit well</li>
+</ol>
+<h3 id="minimum-viable-implementation">Minimum Viable Implementation</h3>
+<p>If you have one afternoon and one dataset, here is the shortest path to value:</p>
+<ol>
+<li><strong>Fit two models:</strong> LogNormal (for skewed positive data) and Pareto (for tail-heavy data).</li>
+<li><strong>Compare via AIC:</strong> the lower wins. If close, pick LogNormal for simplicity.</li>
+<li><strong>Compute VaR(95%) and VaR(99%)</strong> under the winner.</li>
+<li><strong>Compute the same under a Normal fit.</strong></li>
+<li><strong>Report the delta.</strong> That number is the under-reservation if Normal had been your default.</li>
+</ol>
+<p>This five-step path covers most real cost-modelling decisions. The full framework only adds rigor where the data demands it.</p>
+<hr />
+<h2 id="limitations">Limitations</h2>
+<p>The framework above is deliberately scoped. The following limitations are not failures of the method — they are boundaries within which it operates.</p>
+<p><strong>Sample size sensitivity.</strong> With $n < 50$, MLE estimates are noisy and AIC can pick the wrong model with non-trivial probability. AICc helps but doesn't eliminate the issue. For small teams or short-history data, parametric bootstrap is recommended over asymptotic confidence intervals.</p>
+<p><strong>Model risk persists.</strong> Choosing the best of five candidates does not guarantee any of them is correct. Goodness-of-fit tests guard against gross misspecification but cannot detect a sixth, unconsidered family. The framework reduces model risk; it does not eliminate it.</p>
+<p><strong>Independence assumption.</strong> Each cost component is modelled independently. In reality, components are correlated: a wave of layoffs simultaneously reduces hiring costs and inflates severance. Modelling these dependencies requires multivariate methods (copulas, joint distributions) covered in the companion article <a href="monte-carlo-budget.html">Why Your Budget Never Hits the Exact Number</a>.</p>
+<p><strong>Static distributions.</strong> This article assumes distributions are stable over time. Salary distributions drift with inflation, market shifts, and organizational changes. Time-series methods (state-space models, regime-switching) are out of scope.</p>
+<p><strong>Real-world data complications.</strong> Synthetic data is clean. Real HR data has censoring (employees still active when measured), truncation (only severance above a legal minimum is recorded), missing data, and reporting noise. The framework applies, but pre-processing matters.</p>
+<p><strong>Decision context omitted.</strong> A "better model" by AIC is not always a better business decision. Risk appetite, regulatory capital, and stakeholder conservatism may push toward the Normal even when it fits worse — because its outputs are more familiar. The framework informs the decision; it does not replace it.</p>
+<hr />
+<h2 id="conclusion">Conclusion</h2>
+<h3 id="the-distribution-is-the-model">The Distribution Is the Model</h3>
+<p>The distributional assumption is not a technical detail — it is the most important modelling decision a cost analyst makes. Every downstream calculation (mean, variance, confidence intervals, reserves) inherits this choice.</p>
+<h3 id="key-takeaways">Key Takeaways</h3>
+<ol>
+<li>
+<p><strong>People costs are structurally non-Normal</strong>: right-skewed (LogNormal), heavy-tailed (Pareto), and often multimodal (GMM). The Normal is the exception, not the rule.</p>
+</li>
+<li>
+<p><strong>MLE provides the principled framework</strong> for fitting: optimal parameters, automatic standard errors, and a solid theoretical basis for comparison via AIC/BIC.</p>
+</li>
+<li>
+<p><strong>The impact of getting it wrong is measurable and substantial</strong>: the Normal underestimates the probability of extreme costs by factors of 100x or more. For a 50-person team, this can represent hundreds of thousands of R\$ in insufficient reserves.</p>
+</li>
+</ol>
+<h3 id="next-steps">Next Steps</h3>
+<p>This article establishes the distributional selection framework. The companion article <a href="monte-carlo-budget.html">Why Your Budget Never Hits the Exact Number</a> shows how to use these distributions to simulate total team cost, including correlations between components and scenario analysis.</p>
+<hr />
+<h2 id="references">References</h2>
+<ul>
+<li>Casella, G. &amp; Berger, R. (2002). <em>Statistical Inference</em>. Duxbury.</li>
+<li>Burnham, K. &amp; Anderson, D. (2002). <em>Model Selection and Multimodel Inference</em>. Springer.</li>
+<li>Bishop, C. (2006). <em>Pattern Recognition and Machine Learning</em>. Springer.</li>
+<li>Embrechts, P., Klüppelberg, C. &amp; Mikosch, T. (1997). <em>Modelling Extremal Events</em>. Springer.</li>
+<li>McLachlan, G. &amp; Peel, D. (2000). <em>Finite Mixture Models</em>. Wiley.</li>
+</ul>
+<hr />
+<p><em>All figures and numbers in this article are reproduced by versioned scripts with fixed seeds in the <a href="https://github.com/brunoramosmartins/probabilistic-cost-modelling-article">companion repository</a>. See the repository README for how to run them.</em></p>
+          
+        </article>
+
+        <!-- On This Page — populated by articleToc.js from heading ids -->
+        <aside class="article-toc" aria-label="On this page">
+          <nav class="article-toc__inner">
+            <p class="article-toc__title">On this page</p>
+            <ul class="article-toc__list" id="article-toc-list"></ul>
+          </nav>
+        </aside>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- =========================================================
+       FOOTER
+  ========================================================== -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container container--wide">
+      <span class="footer-copy">© 2026 Bruno Ramos Martins</span>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="https://github.com/brunoramosmartins" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/bruno-ramos-martins-22a6a61a0/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="../about.html">About</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- Nav toggle script -->
+  <script src="../assets/js/navigation.js" defer></script>
+  <!-- On This Page panel + heading anchors + scroll spy -->
+  <script src="../assets/js/articleToc.js" defer></script>
+
+</body>
+</html>
