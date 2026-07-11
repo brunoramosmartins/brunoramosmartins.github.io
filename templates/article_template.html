@@ -171,7 +171,8 @@
         grid-template-columns: minmax(0, var(--container-max)) 220px;
         gap: var(--space-16);
         justify-content: center;
-        align-items: start;
+        /* grid items stretch by default: the aside spans the full article
+           height, giving the sticky inner panel room to travel */
       }
       .article-toc { display: block; }
     }
