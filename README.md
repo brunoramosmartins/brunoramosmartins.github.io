@@ -81,7 +81,10 @@ The system is divided into four logical layers, each with a single responsibilit
 ### Content Flow
 
 ```
-markdown_posts/*.md
+<article-repo>/article/<name>.md     (single source of truth — one repo per article)
+        │
+        ▼  scripts/sync_articles.py  (manifest: data/sources.json)
+markdown_posts/*.md  +  figures/<slug>/*.png
         │
         ▼  build_blog.py
 posts/*.html  +  data/articles.json
@@ -127,11 +130,15 @@ Public URL
 │
 ├── data/
 │   ├── projects.json           # Project metadata — source of truth for projects
+│   ├── sources.json            # Manifest of article source repos (sync_articles.py)
 │   └── articles.json           # Article metadata — auto-updated by build_blog.py
 │
-├── markdown_posts/             # Source articles authored in Markdown
+├── markdown_posts/             # Synced article copies (generated — edit in the article repo)
 ├── posts/                      # Generated HTML articles (output of build_blog.py)
-├── figures/                    # Article figures (PNG charts, diagrams)
+├── figures/                    # Article figures, namespaced per article (figures/<slug>/)
+│
+├── scripts/
+│   └── sync_articles.py        # Pulls articles + figures from their source repos
 │
 ├── templates/
 │   └── article_template.html   # HTML template with MathJax support
@@ -177,20 +184,31 @@ The blog engine (`build_blog.py`) converts Markdown articles into static HTML pa
 
 ### Publishing a New Article
 
+Every article lives in its own repository (`<article-repo>/article/<name>.md`,
+figures in `<article-repo>/figures/`). This repo only holds synced copies —
+never edit `markdown_posts/` by hand. Editorial rules live in
+[WRITING-GUIDE.md](WRITING-GUIDE.md).
+
 ```bash
-# 1. Create the Markdown file with YAML front matter
-#    File: markdown_posts/my-article.md
+# 1. Write the article in its own repo, WITH front matter, and merge to main
 
-# 2. Copy any figures to figures/
+# 2. Register it once in data/sources.json
+#    {"slug": "my-article", "repo": "my-article-repo", "path": "article/my-article.md"}
 
-# 3. Build
+# 3. Sync (downloads markdown + figures, rewrites image paths)
+python scripts/sync_articles.py --only my-article
+
+# 4. Build
 python build_blog.py
 
-# 4. Commit generated files
-git add markdown_posts/my-article.md posts/my-article.html data/articles.json figures/
+# 5. Commit generated files
+git add data/sources.json markdown_posts/ posts/ data/articles.json figures/
 git commit -m "feat(blog): add article — My Article Title"
 git push
 ```
+
+To pick up upstream edits later, re-run `python scripts/sync_articles.py`
+(all articles) and rebuild.
 
 ### Front Matter Format
 
@@ -241,17 +259,17 @@ python -m http.server 8000
 **Publish a new article:**
 
 ```bash
-# 1. Write article in Markdown with front matter
-vim markdown_posts/my-article.md
+# 1. Write the article in its own repo (with front matter), merge to main,
+#    and register it in data/sources.json
 
-# 2. Add figures if needed
-cp path/to/figure.png figures/
+# 2. Sync article + figures from the source repo
+python scripts/sync_articles.py --only my-article
 
 # 3. Run content engine
 python build_blog.py
 
 # 4. Commit and push — GitHub Pages deploys automatically
-git add markdown_posts/ posts/ data/articles.json figures/
+git add data/sources.json markdown_posts/ posts/ data/articles.json figures/
 git commit -m "feat(blog): add article — Title"
 git push
 ```
