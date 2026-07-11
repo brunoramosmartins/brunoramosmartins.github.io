@@ -132,6 +132,90 @@
       color: var(--color-text-muted);
       letter-spacing: 0.06em;
     }
+
+    /* === Orientation block (first blockquote after the title) === */
+    .article-prose > blockquote:first-child {
+      border-left: 3px solid var(--color-accent);
+      background: var(--color-surface);
+      border-radius: var(--radius-md);
+      padding: var(--space-5) var(--space-6);
+      margin: 0 0 var(--space-10);
+    }
+    .article-prose > blockquote:first-child p {
+      margin-bottom: var(--space-3);
+    }
+    .article-prose > blockquote:first-child p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* === Heading anchor links === */
+    .heading-anchor {
+      margin-left: var(--space-2);
+      color: var(--color-text-muted);
+      font-size: 0.7em;
+      opacity: 0;
+      text-decoration: none;
+      transition: opacity var(--transition-fast);
+    }
+    h2:hover .heading-anchor,
+    h3:hover .heading-anchor { opacity: 1; }
+    .heading-anchor:hover { color: var(--color-accent); }
+
+    /* === Two-column layout with "On this page" panel === */
+    .article-layout { display: block; }
+    .article-toc { display: none; }
+
+    @media (min-width: 1200px) {
+      .article-layout {
+        display: grid;
+        grid-template-columns: minmax(0, var(--container-max)) 220px;
+        gap: var(--space-16);
+        justify-content: center;
+        align-items: start;
+      }
+      .article-toc { display: block; }
+    }
+
+    .article-toc__inner {
+      position: sticky;
+      top: var(--space-8);
+      max-height: calc(100vh - var(--space-16));
+      overflow-y: auto;
+      padding-left: var(--space-4);
+      border-left: 1px solid var(--color-border);
+    }
+
+    .article-toc__title {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-4);
+    }
+
+    .article-toc__list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .article-toc__item { margin-bottom: var(--space-2); }
+    .article-toc__item--h3 { padding-left: var(--space-4); }
+
+    .article-toc__list a {
+      display: block;
+      font-size: var(--text-sm);
+      line-height: var(--leading-snug, 1.4);
+      color: var(--color-text-muted);
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+    .article-toc__list a:hover { color: var(--color-text-primary); }
+    .article-toc__list a.active {
+      color: var(--color-accent);
+      font-weight: var(--weight-medium);
+    }
   </style>
 </head>
 <body>
@@ -173,17 +257,30 @@
         <h1 class="article-header__title">{{article_title}}</h1>
         <div class="article-header__meta">
           <time class="article-header__date" datetime="{{article_date_iso}}">{{article_date}}</time>
+          <span class="article-header__date">{{article_reading_time}} read</span>
           <div class="tags">
             {{article_tags}}
           </div>
         </div>
       </header>
 
-      <!-- Article Body — injected by build_blog.py -->
-      <article class="article-prose" aria-label="Article content">
-        {{article_content}}
-        {{cross_link_box}}
-      </article>
+      <div class="article-layout">
+
+        <!-- Article Body — injected by build_blog.py -->
+        <article class="article-prose" aria-label="Article content">
+          {{article_content}}
+          {{cross_link_box}}
+        </article>
+
+        <!-- On This Page — populated by articleToc.js from heading ids -->
+        <aside class="article-toc" aria-label="On this page">
+          <nav class="article-toc__inner">
+            <p class="article-toc__title">On this page</p>
+            <ul class="article-toc__list" id="article-toc-list"></ul>
+          </nav>
+        </aside>
+
+      </div>
 
     </div>
   </main>
@@ -204,6 +301,8 @@
 
   <!-- Nav toggle script -->
   <script src="../assets/js/navigation.js" defer></script>
+  <!-- On This Page panel + heading anchors + scroll spy -->
+  <script src="../assets/js/articleToc.js" defer></script>
 
 </body>
 </html>

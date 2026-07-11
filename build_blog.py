@@ -129,6 +129,20 @@ def format_date_display(date_str: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Reading time estimation
+# ---------------------------------------------------------------------------
+
+READING_WPM = 200  # words per minute for technical prose
+
+
+def estimate_reading_time(body: str) -> str:
+    """Estimates reading time from the Markdown body word count."""
+    words = len(re.findall(r"\S+", body))
+    minutes = max(1, round(words / READING_WPM))
+    return f"{minutes} min"
+
+
+# ---------------------------------------------------------------------------
 # LaTeX math protection (pre/post-processing)
 # ---------------------------------------------------------------------------
 
@@ -261,6 +275,7 @@ def render_template(template: str, meta: dict, html_body: str) -> str:
         "{{article_description}}": meta["description"],
         "{{article_date_iso}}":    meta["date"],
         "{{article_date}}":        format_date_display(meta["date"]),
+        "{{article_reading_time}}": meta.get("reading_time", ""),
         "{{article_tags}}":        tags_html,
         "{{article_content}}":     html_body,
         "{{cross_link_box}}":      _render_cross_link_box(meta),
@@ -343,6 +358,10 @@ def build_article(md_path: Path, templates: dict[str, str], dry_run: bool = Fals
 
     # Derive article id from filename if not provided in front matter
     meta.setdefault("id", md_path.stem)
+
+    # Compute reading time from word count when not set manually
+    if not meta.get("reading_time"):
+        meta["reading_time"] = estimate_reading_time(body)
 
     is_til      = meta.get("category") == TIL_CATEGORY
     template    = templates["til"] if is_til else templates["article"]

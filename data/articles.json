@@ -5,7 +5,7 @@
     "description": "Two independent derivations of Benford's leading-digit law, four conformity tests, and a fraud-detection demo on GeoNames city data.",
     "category": "til",
     "date": "2026-05-03",
-    "reading_time": "",
+    "reading_time": "23 min",
     "tags": [
       "statistics",
       "fraud-detection",
