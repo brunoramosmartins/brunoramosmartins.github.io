@@ -15,14 +15,12 @@
     {
       "slug": "headcount-dynamics",
       "repo": "headcount-dynamics-article",
-      "path": "article/headcount-dynamics.md",
-      "draft": true
+      "path": "article/headcount-dynamics.md"
     },
     {
       "slug": "bayesian-fyf",
       "repo": "bayesian-fyf-article",
-      "path": "article/bayesian-fyf.md",
-      "draft": true
+      "path": "article/bayesian-fyf.md"
     },
     {
       "slug": "krippendorff-alpha",
