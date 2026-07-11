@@ -5,22 +5,26 @@
     {
       "slug": "probabilistic-cost-modelling",
       "repo": "probabilistic-cost-modelling-article",
-      "path": "article/probabilistic-cost-modelling.md"
+      "path": "article/probabilistic-cost-modelling.md",
+      "draft": true
     },
     {
       "slug": "monte-carlo-budget",
       "repo": "monte-carlo-budget-article",
-      "path": "article/monte-carlo-budget.md"
+      "path": "article/monte-carlo-budget.md",
+      "draft": true
     },
     {
       "slug": "headcount-dynamics",
       "repo": "headcount-dynamics-article",
-      "path": "article/headcount-dynamics.md"
+      "path": "article/headcount-dynamics.md",
+      "draft": true
     },
     {
       "slug": "bayesian-fyf",
       "repo": "bayesian-fyf-article",
-      "path": "article/bayesian-fyf.md"
+      "path": "article/bayesian-fyf.md",
+      "draft": true
     },
     {
       "slug": "krippendorff-alpha",
@@ -40,7 +44,8 @@
     {
       "slug": "linearity-of-expectation-til",
       "repo": "linearity-of-expectation-til",
-      "path": "article/linearity-of-expectation-til.md"
+      "path": "article/linearity-of-expectation-til.md",
+      "draft": true
     }
   ]
 }
