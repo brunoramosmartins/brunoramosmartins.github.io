@@ -1,5 +1,19 @@
 [
   {
+    "id": "linearity-of-expectation-til",
+    "title": "The Most Useful Theorem in Probability Has No Independence Hypothesis",
+    "description": "Linearity of expectation holds under any dependence — correlation never touches the first moment, only the variance.",
+    "category": "til",
+    "date": "2026-07-11",
+    "reading_time": "3 min",
+    "tags": [
+      "probability",
+      "expectation",
+      "correlation"
+    ],
+    "url": "/til/linearity-of-expectation-til.html"
+  },
+  {
     "id": "benfords-law",
     "title": "Benford's Law: two derivations, four tests, one fraud detector",
     "description": "Two independent derivations of Benford's leading-digit law, four conformity tests, and a fraud-detection demo on GeoNames city data.",
