@@ -71,8 +71,18 @@ MD_DIR            = ROOT / "markdown_posts"
 TEMPLATE_PATH     = ROOT / "templates" / "article_template.html"
 TIL_TEMPLATE_PATH = ROOT / "templates" / "til_template.html"
 ARTICLES_JSON     = ROOT / "data" / "articles.json"
+SOURCES_JSON      = ROOT / "data" / "sources.json"
 
 TIL_CATEGORY = "til"
+
+
+def load_draft_slugs() -> set[str]:
+    """Slugs marked "draft": true in data/sources.json — synced but not built."""
+    if not SOURCES_JSON.exists():
+        return set()
+    with SOURCES_JSON.open(encoding="utf-8") as f:
+        manifest = json.load(f)
+    return {a["slug"] for a in manifest.get("articles", []) if a.get("draft")}
 
 # ---------------------------------------------------------------------------
 # Front matter parser
@@ -499,6 +509,16 @@ def main() -> int:
         if not md_files:
             print("No Markdown files found in markdown_posts/. Nothing to build.")
             return 0
+
+    # Drafts are synced but not published (flip "draft" in data/sources.json)
+    drafts = load_draft_slugs()
+    skipped = [p for p in md_files if p.stem in drafts]
+    md_files = [p for p in md_files if p.stem not in drafts]
+    for path in skipped:
+        print(f"[skip] {path.name} — marked as draft in data/sources.json")
+    if not md_files:
+        print("All targets are drafts. Nothing to build.")
+        return 0
 
     print(f"Building {len(md_files)} article(s)...")
 
