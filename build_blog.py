@@ -71,8 +71,18 @@ MD_DIR            = ROOT / "markdown_posts"
 TEMPLATE_PATH     = ROOT / "templates" / "article_template.html"
 TIL_TEMPLATE_PATH = ROOT / "templates" / "til_template.html"
 ARTICLES_JSON     = ROOT / "data" / "articles.json"
+SOURCES_JSON      = ROOT / "data" / "sources.json"
 
 TIL_CATEGORY = "til"
+
+
+def load_draft_slugs() -> set[str]:
+    """Slugs marked "draft": true in data/sources.json — synced but not built."""
+    if not SOURCES_JSON.exists():
+        return set()
+    with SOURCES_JSON.open(encoding="utf-8") as f:
+        manifest = json.load(f)
+    return {a["slug"] for a in manifest.get("articles", []) if a.get("draft")}
 
 # ---------------------------------------------------------------------------
 # Front matter parser
@@ -126,6 +136,20 @@ def format_date_display(date_str: str) -> str:
         return dt.strftime("%b %Y")
     except ValueError:
         return date_str
+
+
+# ---------------------------------------------------------------------------
+# Reading time estimation
+# ---------------------------------------------------------------------------
+
+READING_WPM = 200  # words per minute for technical prose
+
+
+def estimate_reading_time(body: str) -> str:
+    """Estimates reading time from the Markdown body word count."""
+    words = len(re.findall(r"\S+", body))
+    minutes = max(1, round(words / READING_WPM))
+    return f"{minutes} min"
 
 
 # ---------------------------------------------------------------------------
@@ -261,6 +285,7 @@ def render_template(template: str, meta: dict, html_body: str) -> str:
         "{{article_description}}": meta["description"],
         "{{article_date_iso}}":    meta["date"],
         "{{article_date}}":        format_date_display(meta["date"]),
+        "{{article_reading_time}}": meta.get("reading_time", ""),
         "{{article_tags}}":        tags_html,
         "{{article_content}}":     html_body,
         "{{cross_link_box}}":      _render_cross_link_box(meta),
@@ -343,6 +368,10 @@ def build_article(md_path: Path, templates: dict[str, str], dry_run: bool = Fals
 
     # Derive article id from filename if not provided in front matter
     meta.setdefault("id", md_path.stem)
+
+    # Compute reading time from word count when not set manually
+    if not meta.get("reading_time"):
+        meta["reading_time"] = estimate_reading_time(body)
 
     is_til      = meta.get("category") == TIL_CATEGORY
     template    = templates["til"] if is_til else templates["article"]
@@ -480,6 +509,16 @@ def main() -> int:
         if not md_files:
             print("No Markdown files found in markdown_posts/. Nothing to build.")
             return 0
+
+    # Drafts are synced but not published (flip "draft" in data/sources.json)
+    drafts = load_draft_slugs()
+    skipped = [p for p in md_files if p.stem in drafts]
+    md_files = [p for p in md_files if p.stem not in drafts]
+    for path in skipped:
+        print(f"[skip] {path.name} — marked as draft in data/sources.json")
+    if not md_files:
+        print("All targets are drafts. Nothing to build.")
+        return 0
 
     print(f"Building {len(md_files)} article(s)...")
 

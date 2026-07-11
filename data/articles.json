@@ -5,7 +5,7 @@
     "description": "Two independent derivations of Benford's leading-digit law, four conformity tests, and a fraud-detection demo on GeoNames city data.",
     "category": "til",
     "date": "2026-05-03",
-    "reading_time": "",
+    "reading_time": "23 min",
     "tags": [
       "statistics",
       "fraud-detection",
@@ -21,7 +21,12 @@
     "category": "machine-learning",
     "date": "2026-04-21",
     "reading_time": "30 min",
-    "tags": [],
+    "tags": [
+      "statistics",
+      "annotation",
+      "inter-rater-agreement",
+      "nlp-evaluation"
+    ],
     "url": "/posts/krippendorff-alpha.html"
   },
   {

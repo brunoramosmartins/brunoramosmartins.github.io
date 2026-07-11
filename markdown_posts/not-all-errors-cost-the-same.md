@@ -335,7 +335,7 @@ All experiments use the same dataset split: 80% training, 20% test, stratified b
 
 **Figure**:
 
-![Experiment A: The Accuracy Trap — comparing DummyClassifier vs LogisticRegression across six evaluation metrics.](../figures/exp_a_accuracy_trap.png)
+![Experiment A: The Accuracy Trap — comparing DummyClassifier vs LogisticRegression across six evaluation metrics.](../figures/not-all-errors-cost-the-same/exp_a_accuracy_trap.png)
 
 *Figure 1. Bar chart comparing a DummyClassifier (always predicts the majority class) with a LogisticRegression model on six metrics. The DummyClassifier achieves Accuracy = 0.999 but Precision, Recall, and F1 are all zero (highlighted with labelled annotations). Its AUC-ROC is 0.500 (random chance) and its AUC-PR matches the base rate (0.001). LogisticRegression sacrifices accuracy (0.926) in exchange for meaningful Recall (0.850) and AUC-PR (0.142).*
 
@@ -355,13 +355,13 @@ Having established that accuracy is unreliable, the next question is whether the
 
 **Figure**:
 
-![Experiment B — Part 1: ROC curves for three models.](../figures/exp_b_roc_curves.png)
+![Experiment B — Part 1: ROC curves for three models.](../figures/not-all-errors-cost-the-same/exp_b_roc_curves.png)
 
 *Figure 2. ROC curves for three classifiers. AUC-ROC values are compressed: Logistic Regression (0.951), Random Forest (0.917), Weak Classifier (0.876). All models appear competitive in ROC space. The ranking suggests Logistic Regression is the best model.*
 
 **Figure**:
 
-![Experiment B — Part 2: Precision-Recall curves for three models.](../figures/exp_b_pr_curves.png)
+![Experiment B — Part 2: Precision-Recall curves for three models.](../figures/not-all-errors-cost-the-same/exp_b_pr_curves.png)
 
 *Figure 3. Precision-Recall curves for the same three classifiers. The horizontal baseline marks the base rate (annotated with arrow). AUC-PR values are far more spread: Random Forest (0.426), Weak Classifier (0.409), Logistic Regression (0.122). The ranking is reversed: the model that appeared best in ROC space is worst in PR space. Vertical lines mark the recall targets used in Experiments D and E.*
 
@@ -381,13 +381,13 @@ The ranking inversion shows that *which* metric we use matters. But even within 
 
 **Figure**:
 
-![Experiment C — Part 1: Threshold sweep showing Precision, Recall, and F1 as a function of threshold.](../figures/exp_c_threshold_sweep.png)
+![Experiment C — Part 1: Threshold sweep showing Precision, Recall, and F1 as a function of threshold.](../figures/not-all-errors-cost-the-same/exp_c_threshold_sweep.png)
 
 *Figure 4. Threshold sweep for a LogisticRegression model. Precision, Recall, and F1 are plotted as functions of the decision threshold. Vertical lines mark three operating points: the default threshold ($\tau = 0.5$), the F1-optimal threshold ($\tau = 0.990$), and the cost-optimal threshold ($\tau^* = 0.024$). Precision and F1 remain near zero for most of the threshold range and only rise steeply above $\tau = 0.9$, indicating that on this highly imbalanced problem, the model's score distribution is concentrated near 1.0 for fraud cases.*
 
 **Figure**:
 
-![Experiment C — Part 2: Confusion matrices at three different thresholds.](../figures/exp_c_confusion_matrices.png)
+![Experiment C — Part 2: Confusion matrices at three different thresholds.](../figures/not-all-errors-cost-the-same/exp_c_confusion_matrices.png)
 
 *Figure 5. Confusion matrices (row-normalised) at the three operating points. At $\tau = 0.5$ (left): Recall = 0.850 but Precision = 0.011 (1,470 false positives). At $\tau = 0.990$ / F1-optimal (centre): Recall drops to 0.400 and Precision rises to 0.078 (94 false positives). At $\tau^* = 0.024$ / cost-optimal (right): Recall increases to 0.900 with Precision = 0.003 (5,824 false positives). Each matrix shows both raw counts and row-normalised rates.*
 
@@ -409,7 +409,7 @@ The threshold experiment shows that the operating point matters enormously. In p
 
 **Figure**:
 
-![Experiment D: Precision@Recall at five business-defined recall targets with cost annotations.](../figures/exp_d_precision_at_recall.png)
+![Experiment D: Precision@Recall at five business-defined recall targets with cost annotations.](../figures/not-all-errors-cost-the-same/exp_d_precision_at_recall.png)
 
 *Figure 6. Left panel: Precision at each recall target. Precision declines from 0.072 at r = 0.75 to 0.011 at r = 0.95. Right panel: False positive and false negative counts, with expected cost annotations above each group. At r = 0.75, the model generates 193 false positives and 5 false negatives (total cost: \$1,965). At r = 0.90, false positives jump to 1,480 and the cost quadruples to \$8,000. The transition between r = 0.85 and r = 0.90 marks a sharp inflection point in the cost curve.*
 
@@ -429,7 +429,7 @@ Experiment D evaluated a single model at multiple recall targets. The final expe
 
 **Figure**:
 
-![Experiment E: Model ranking comparison across seven evaluation metrics.](../figures/exp_e_ranking_comparison.png)
+![Experiment E: Model ranking comparison across seven evaluation metrics.](../figures/not-all-errors-cost-the-same/exp_e_ranking_comparison.png)
 
 *Figure 7. Heatmap of model scores across seven metrics. Each cell shows the metric value and ordinal rank (e.g., #1, #2). Orange-bordered cells highlight where the top-1 model differs from the F1 ranking. RF (depth = 15) ranks #1 by F1 (0.519); RF (depth = 5) ranks #1 by P@75R (0.146). The divergence is concentrated at the P@75R column — the models that achieve the best F1 trade-off are not the same models that deliver the highest precision at a fixed recall floor.*
 

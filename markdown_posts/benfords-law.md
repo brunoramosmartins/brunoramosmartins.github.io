@@ -42,7 +42,7 @@ The rest is detail.
 
 Before any derivation it is worth pausing on the data. Benford lined up twenty heterogeneous datasets to show the logarithmic curve was empirical rather than invented; I will repeat the gesture at smaller scale with three datasets chosen to cover three distinct regimes. The first is a messy real-world case — world city populations — where the generating process is multiplicative and spans several orders of magnitude. The second is a clean analytic sequence — Fibonacci — where Benford appears as a theorem rather than as luck. The third is a deliberate negative control — adult heights — where the law *should not* appear, and the corresponding panel pins down what fails when the multiplicative regime is dropped. The figure below overlays, in each panel, the empirical first-digit frequency (blue) and the theoretical Benford PMF (orange); the reader should look for the two series tracking each other in the first and second panels, and for the glaring discrepancy in the third.
 
-![Empirical first-digit distributions vs the Benford PMF, across three datasets in distinct regimes.](../figures/empirical_match.png)
+![Empirical first-digit distributions vs the Benford PMF, across three datasets in distinct regimes.](../figures/benfords-law/empirical_match.png)
 
 **World city populations.** The bundled GeoNames `cities5000` snapshot lists about 68,000 cities with at least 5,000 inhabitants. The empirical $\hat P(1) \approx 0.31$, $\hat P(9) \approx 0.06$, monotonically decreasing apart from a small spike at $d = 5$ (an artefact of the 5,000-population cutoff — every city *just* over the threshold has a leading 5). This is the canonical example: real geographic data spanning many orders of magnitude (from $10^3$ to $10^7$), drawn from the same multiplicative growth process across continents.
 
@@ -94,7 +94,7 @@ That is the entire derivation. What looks like a sleight of hand is structural: 
 
 The figure below makes the argument tangible in two movements. In the top row, the histogram of the log-mantissa $Y$ for synthetic samples $X = 10^U$ with $U \sim \mathrm{Uniform}(0, k)$ is shown for $k = 0.5,\, 1.5,\, 3.5,\, 8.5$ — deliberately non-integer values, so that the convergence is visible. At $k = 0.5$, $Y$ does not even cover $[0, 1)$ (all mass sits on $[0, 0.5)$); at $k = 1.5$, a clear step at $Y = 0.5$ remains (density $\approx 1.33$ on the first half against $\approx 0.67$ on the second); at $k = 3.5$ the step is gentler; at $k = 8.5$ the histogram is visually flat. The deviation from uniform decays as $1/k$. In the bottom row, the first-digit frequencies of the synthetic $k = 8.5$ sample (left) and of world city populations (right) sit on top of the Benford PMF: the premise implies the curve, and real multi-scale data satisfies the premise.
 
-![Top row: the log-mantissa Y converges to the uniform density as X covers more decades (k = 0.5, 1.5, 3.5, 8.5). Bottom row: the first digit follows Benford, on synthetic data on the left and real data on the right.](../figures/log_uniform_intuition.png)
+![Top row: the log-mantissa Y converges to the uniform density as X covers more decades (k = 0.5, 1.5, 3.5, 8.5). Bottom row: the first digit follows Benford, on synthetic data on the left and real data on the right.](../figures/benfords-law/log_uniform_intuition.png)
 
 The substantive question is *why* the premise should hold. Three arguments:
 
@@ -146,7 +146,7 @@ $$
 
 The factor $10^k$ cancels. That cancellation *is* the scale invariance, made arithmetic: the leading-digit probability does not depend on which decade we restrict to.
 
-![Multiplying world city populations by various constants. The first-digit distribution does not move.](../figures/scale_invariance.png)
+![Multiplying world city populations by various constants. The first-digit distribution does not move.](../figures/benfords-law/scale_invariance.png)
 
 Two corollaries worth flagging:
 
@@ -162,7 +162,7 @@ The next question is operational: given a real dataset, how do we *test* whether
 
 The law is structural, but real data only approximately satisfies the premise — a finite sample never sits exactly on the Benford curve, and even multi-decade datasets carry a residual ripple. So an empirical question always remains: how close is close enough to call the data conforming, and what kind of deviation are we worried about? Different audiences want different gaps — a hypothesis tester wants a p-value, an auditor wants a verdict scale that does not collapse at industrial sample sizes, a detective wants to know *which* digit is off. No single statistic answers all three, so the standard practice is to run a small bundle. Four tests, four sensitivities. Take an empirical first-digit distribution $\hat P(1), \ldots, \hat P(9)$ on a sample of size $n$ and ask: how close is it to the Benford PMF (the probability mass function $P(d) = \log_{10}(1 + 1/d)$, $d = 1, \ldots, 9$)?
 
-![Three reference datasets — world cities, Fibonacci, adult heights — with all four test verdicts reported in each panel's title.](../figures/conformity_test_demo.png)
+![Three reference datasets — world cities, Fibonacci, adult heights — with all four test verdicts reported in each panel's title.](../figures/benfords-law/conformity_test_demo.png)
 
 The figure is the catalog: three reference datasets (one real-and-conforming, one synthetic-and-conforming, one synthetic-and-failing), each panel carrying *all four* test outcomes in its title. There are three panels, not four — one per dataset; the four tests are reported per panel. The layout mirrors how the bundle is used in practice: one dataset, four numbers, one verdict.
 
@@ -197,7 +197,7 @@ In practice, run all four — they cost almost nothing on top of computing $\hat
 
 §5 set up the conformity bundle on clean data; §6 puts it to work in an adversarial setting. Take a clean Benford-conforming dataset, replace a fraction of its entries with fabricated values, and watch the four-test bundle cross from *accept* to *reject*. The setup is deliberately stylised — there is no real fraudster on the other side, and we control everything — but it is the cleanest way to see what kind of contamination the bundle catches and what it lets through. The point is not to prove that the bundle works; it is to read off where its threshold sits.
 
-![Clean vs 30%-contaminated city populations.](../figures/fraud_before_after.png)
+![Clean vs 30%-contaminated city populations.](../figures/benfords-law/fraud_before_after.png)
 
 The before-and-after figure shows the same GeoNames `cities5000` dataset ($n \approx 68{,}000$) before contamination, on the left, and after replacing 30 % of its entries with fabricated values, on the right. The Benford curve does not move; what moves are the empirical bars, and the bundle reads off the gap.
 
@@ -209,7 +209,7 @@ The fabricated batch is calibrated to look superficially plausible: drawn over t
 
 Each strategy is a different attack on the curve, so each gives the bundle a different stress test. To turn that into a single picture of detection power, sweep the contamination fraction from 0 % to 100 % and run the four-test bundle 30 times at each level. The result is the **detection-power curve**:
 
-![Detection power across three fabrication strategies on the GeoNames cities5000 dataset.](../figures/fraud_detection_power.png)
+![Detection power across three fabrication strategies on the GeoNames cities5000 dataset.](../figures/benfords-law/fraud_detection_power.png)
 
 The MAD curve climbs through Nigrini's verdict tiers (acceptable → marginally acceptable → non-conformity) within the first 5–10 % of contamination. The Pearson $\chi^2$ statistic — log-scale — climbs steeply through its $\alpha = 0.05$ critical value of 15.51 at roughly the same point. The empirical rejection rate at $\alpha = 0.05$ saturates near 1 for all three fabrication kinds by 10–15 % contamination.
 

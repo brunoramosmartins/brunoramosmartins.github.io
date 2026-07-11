@@ -4,6 +4,7 @@ description: "Statistical foundations of inter-annotator agreement — from obse
 date: 2026-04-21
 category: machine-learning
 reading_time: "30 min"
+tags: statistics, annotation, inter-rater-agreement, nlp-evaluation
 ---
 
 # When Agreement Is an Illusion
@@ -142,7 +143,7 @@ So **"random" does not mean "zero agreement"**; it means agreement at the **chan
 
 The companion codebase simulates Model 1 annotators and tracks $A_o$ as item count grows. The simulation matches theory: empirical agreement concentrates on $\sum_k \pi_k^2$. If real data looked like this, the annotation process would carry no item-specific signal. Real studies usually violate that assumption — which is why we need coefficients that separate structured agreement from prevalence-driven overlap.
 
-![Simulated convergence of observed agreement to the independence baseline under i.i.d. random labelling.](../figures/random_agreement_convergence.png)
+![Simulated convergence of observed agreement to the independence baseline under i.i.d. random labelling.](../figures/krippendorff-alpha/random_agreement_convergence.png)
 
 **Figure 1.** Random i.i.d. annotators: empirical observed agreement approaches the theoretical expected agreement $A_e = \sum_k \pi_k^2$ as sample size increases.
 
@@ -228,7 +229,7 @@ Clinicians have long documented **"high agreement but low kappa"** scenarios (Fe
 
 The companion codebase sweeps imbalance at fixed noise; Fleiss' $\kappa$ can sit far below raw agreement while $A_o$ stays in the "excellent" band on naive scales. The figure is not a proof; it is a **visual reminder** that **ranking models** by raw agreement can invert a ranking by $\kappa_F$ when class balance differs across conditions.
 
-![Fleiss' kappa versus class imbalance at fixed annotation noise (Kappa paradox).](../figures/kappa_paradox.png)
+![Fleiss' kappa versus class imbalance at fixed annotation noise (Kappa paradox).](../figures/krippendorff-alpha/kappa_paradox.png)
 
 **Figure 2.** As the majority-class mass grows, expected agreement under independence grows with it; $\kappa_F$ can fall sharply even when naive overlap remains high. Note the narrower y-axis scale in the right panel.
 
@@ -398,7 +399,7 @@ They are **synthetic** on purpose: closed-form targets exist for random labellin
 
 **Result.** Empirical curves match theory within tight tolerance. This is a **sanity check**, not a finding: chance-corrected coefficients vanish when there is no shared structure. The near-perfect overlap between the $A_o$ curve and $1/K$ is a property of the model, not a bug — we simulated exactly the analytic scenario.
 
-![Experiment A: $A_o$, Fleiss' $\kappa_F$, and Krippendorff's $\alpha$ across $K$ for random i.i.d. raters.](../figures/exp_a_random_metrics.png)
+![Experiment A: $A_o$, Fleiss' $\kappa_F$, and Krippendorff's $\alpha$ across $K$ for random i.i.d. raters.](../figures/krippendorff-alpha/exp_a_random_metrics.png)
 
 **Figure 3.** Random annotators: observed agreement tracks $1/K$; $\kappa_F$ and $\alpha$ track zero.
 
@@ -416,7 +417,7 @@ This region exists because $A_e = \sum_k \pi_k^2$ grows with class imbalance. Wh
 
 **Result.** Heatmaps of $A_o$ and $\alpha$ show a visible wedge occupying $\mathcal{T}$. A concrete example: with $\pi = (0.85, 0.10, 0.05)$ and $\varepsilon = 0.05$, one obtains $A_o \approx 0.84$ while $\alpha \approx 0.35$. Stakeholders see a comfortable raw percentage; the chance-corrected coefficient reveals the panel is only modestly better than a prevalence-aware random benchmark. The operational lesson: put **both** views in the same table by default.
 
-![Experiment B: heatmaps of $\alpha$ and $A_o$ over imbalance and noise; red boxes mark the trap region.](../figures/exp_b_agreement_trap_heatmap.png)
+![Experiment B: heatmaps of $\alpha$ and $A_o$ over imbalance and noise; red boxes mark the trap region.](../figures/krippendorff-alpha/exp_b_agreement_trap_heatmap.png)
 
 **Figure 4.** Agreement trap: high raw overlap coexists with low chance-corrected reliability under skew + low noise.
 
@@ -428,7 +429,7 @@ This region exists because $A_e = \sum_k \pi_k^2$ grows with class imbalance. Wh
 
 **Important caveat.** This experiment models LLM error as **symmetric i.i.d. noise** (Model 2). In practice, LLM errors are **structured**: a model may systematically over-predict the majority class, exhibit prompt-dependent bias, or fail on specific semantic patterns. Symmetric noise is a useful baseline, but real LLM evaluation requires additional diagnostics — confusion matrices stratified by class, adversarial probes, and analysis of **where** (not just how often) disagreements occur. A scenario with **directional bias** (e.g. the LLM always predicts the majority class when uncertain) would likely show $\alpha$ degrading faster than the symmetric case predicts.
 
-![Experiment C: sensitivity of $\alpha$ to synthetic LLM noise; humans-only vs full panel.](../figures/exp_c_llm_vs_humans.png)
+![Experiment C: sensitivity of $\alpha$ to synthetic LLM noise; humans-only vs full panel.](../figures/krippendorff-alpha/exp_c_llm_vs_humans.png)
 
 **Figure 5.** Synthetic LLM vs humans: $\alpha$ responds to injected LLM noise; compare humans-only to full panel.
 
@@ -442,7 +443,7 @@ This region exists because $A_e = \sum_k \pi_k^2$ grows with class imbalance. Wh
 
 Real annotators quit mid-batch, merge requests split reviewer pools, and LLM calls time out. $\alpha$'s coincidence logic is not magic — if missingness is **informative** (harder items are more often skipped), no coefficient is safe — but it avoids the **structural** failure mode of requiring imputation or row deletion just to return a number.
 
-![Experiment D: $\alpha$ vs Fleiss' $\kappa$ as missing rate increases.](../figures/exp_d_missing_robustness.png)
+![Experiment D: $\alpha$ vs Fleiss' $\kappa$ as missing rate increases.](../figures/krippendorff-alpha/exp_d_missing_robustness.png)
 
 **Figure 6.** Missing data: $\alpha$ stays informative (mean $\pm$ 1 SD over 10 seeds); Fleiss requires a complete matrix.
 

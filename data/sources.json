@@ -1,0 +1,51 @@
+{
+  "owner": "brunoramosmartins",
+  "branch": "main",
+  "articles": [
+    {
+      "slug": "probabilistic-cost-modelling",
+      "repo": "probabilistic-cost-modelling-article",
+      "path": "article/probabilistic-cost-modelling.md",
+      "draft": true
+    },
+    {
+      "slug": "monte-carlo-budget",
+      "repo": "monte-carlo-budget-article",
+      "path": "article/monte-carlo-budget.md",
+      "draft": true
+    },
+    {
+      "slug": "headcount-dynamics",
+      "repo": "headcount-dynamics-article",
+      "path": "article/headcount-dynamics.md",
+      "draft": true
+    },
+    {
+      "slug": "bayesian-fyf",
+      "repo": "bayesian-fyf-article",
+      "path": "article/bayesian-fyf.md",
+      "draft": true
+    },
+    {
+      "slug": "krippendorff-alpha",
+      "repo": "krippendorff-alpha-article",
+      "path": "article/krippendorff-alpha.md"
+    },
+    {
+      "slug": "not-all-errors-cost-the-same",
+      "repo": "precision-recall-fraud",
+      "path": "article/metrics-that-matter.md"
+    },
+    {
+      "slug": "benfords-law",
+      "repo": "benford-law-til",
+      "path": "article/benford-law-til.md"
+    },
+    {
+      "slug": "linearity-of-expectation-til",
+      "repo": "linearity-of-expectation-til",
+      "path": "article/linearity-of-expectation-til.md",
+      "draft": true
+    }
+  ]
+}
