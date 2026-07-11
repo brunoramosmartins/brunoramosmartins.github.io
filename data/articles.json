@@ -21,7 +21,12 @@
     "category": "machine-learning",
     "date": "2026-04-21",
     "reading_time": "30 min",
-    "tags": [],
+    "tags": [
+      "statistics",
+      "annotation",
+      "inter-rater-agreement",
+      "nlp-evaluation"
+    ],
     "url": "/posts/krippendorff-alpha.html"
   },
   {
