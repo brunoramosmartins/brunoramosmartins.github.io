@@ -141,7 +141,16 @@
         justify-content: center;
       }
       .article-nav { display: block; }
-      /* header and prose already max-width 780 + auto margins; fill the column */
+
+      /* Title spans both columns so the navigator (row 2, col 1) begins
+         below it — same feel as the article page, where the header sits
+         above the reading grid rather than beside the rail. */
+      .til-layout .til-header {
+        grid-column: 1 / -1;
+        max-width: none;
+        margin-left: 0;
+        margin-right: 0;
+      }
     }
   </style>
 </head>
@@ -170,32 +179,31 @@
     <div class="container container--wide">
       <div class="til-layout">
 
-        <!-- All writing — populated by articleNav.js from articles.json -->
-        <aside class="article-nav" aria-label="All writing">
+        <!-- Title spans the grid; the navigator below it lists sibling TILs -->
+        <header class="til-header">
+          <a href="../til.html" class="til-header__back">← TIL</a>
+          <p class="til-header__kicker">Today I Learned</p>
+          <h1 class="til-header__title">{{article_title}}</h1>
+          <div class="til-header__meta">
+            <time class="til-header__date" datetime="{{article_date_iso}}">{{article_date}}</time>
+            <div class="tags">
+              {{article_tags}}
+            </div>
+          </div>
+        </header>
+
+        <!-- Sibling TILs — populated by articleNav.js from articles.json -->
+        <aside class="article-nav" aria-label="All TILs">
           <nav class="article-nav__inner">
-            <p class="article-nav__title">All writing</p>
+            <p class="article-nav__title">All TILs</p>
             <ul class="article-nav__list" id="article-nav-list"></ul>
           </nav>
         </aside>
 
-        <div class="til-main">
-          <header class="til-header">
-            <a href="../til.html" class="til-header__back">← TIL</a>
-            <p class="til-header__kicker">Today I Learned</p>
-            <h1 class="til-header__title">{{article_title}}</h1>
-            <div class="til-header__meta">
-              <time class="til-header__date" datetime="{{article_date_iso}}">{{article_date}}</time>
-              <div class="tags">
-                {{article_tags}}
-              </div>
-            </div>
-          </header>
-
-          <article class="til-prose" aria-label="TIL content">
-            {{article_content}}
-            {{cross_link_box}}
-          </article>
-        </div>
+        <article class="til-prose" aria-label="TIL content">
+          {{article_content}}
+          {{cross_link_box}}
+        </article>
 
       </div>
     </div>

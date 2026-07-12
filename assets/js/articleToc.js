@@ -47,6 +47,12 @@
 
   tocList.appendChild(fragment);
 
+  // Sliding rail marker — a single accent bar that tracks the active section.
+  var marker = document.createElement('span');
+  marker.className = 'article-toc__marker';
+  marker.setAttribute('aria-hidden', 'true');
+  tocList.appendChild(marker);
+
   /* --- Hover anchor links on headings ------------------------------------ */
   anchorTargets.forEach(function (heading) {
     var anchor = document.createElement('a');
@@ -60,12 +66,22 @@
   /* --- Scroll spy --------------------------------------------------------- */
   var activeLink = null;
 
+  // Align the rail marker to a link's vertical extent within the list.
+  // (The list is position:relative, so offsetTop/offsetHeight are relative
+  // to it — the marker's own coordinate system.)
+  function moveMarker(link) {
+    marker.style.height = link.offsetHeight + 'px';
+    marker.style.transform = 'translateY(' + link.offsetTop + 'px)';
+    marker.style.opacity = '1';
+  }
+
   function setActive(id) {
     var link = linkById[id];
     if (link === activeLink) return;
     if (activeLink) activeLink.classList.remove('active');
     link.classList.add('active');
     activeLink = link;
+    moveMarker(link);
   }
 
   function onScroll() {
@@ -89,7 +105,17 @@
     }, 80);
   }
 
+  // Reposition the marker after layout shifts (font load, resize) without
+  // waiting for a scroll — the active link may have moved.
+  function reposition() {
+    if (activeLink) moveMarker(activeLink);
+  }
+
   document.addEventListener('scroll', onScrollThrottled, { passive: true });
-  window.addEventListener('resize', onScrollThrottled, { passive: true });
+  window.addEventListener('resize', function () {
+    onScrollThrottled();
+    reposition();
+  }, { passive: true });
+  window.addEventListener('load', reposition);
   onScroll();
 })();
