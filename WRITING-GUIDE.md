@@ -170,7 +170,11 @@ and experiment is the house signature.
 - Include a Notation table only when the symbol load is heavy (roughly:
   more than ~10 recurring symbols). Place it immediately after the
   orientation block, wrapped in `<details><summary>Notation</summary>…</details>`.
-- Currency: `R$ 50,000` in prose; `R\$\,50{,}000` inside math mode.
+- **Currency: always escape the dollar sign as `\$`** — `R\$ 50{,}000` in
+  prose, `R\$\,50{,}000` inside math. MathJax treats `$` as a math
+  delimiter everywhere on the page, so a bare `R$ 50,000` opens a spurious
+  math span that swallows text up to the next `$` and renders as garbled
+  math. This applies to US dollars too (`\$500`, not `$500`).
 
 ### Limitations
 
