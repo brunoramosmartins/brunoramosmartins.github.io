@@ -161,20 +161,30 @@
     h3:hover .heading-anchor { opacity: 1; }
     .heading-anchor:hover { color: var(--color-accent); }
 
-    /* === Two-column layout with "On this page" panel === */
+    /* === Reading layout: prose + On This Page (+ left navigator) === */
     .article-layout { display: block; }
     .article-toc { display: none; }
 
+    /* Medium screens: 2 columns (prose + On This Page) */
     @media (min-width: 1200px) {
       .article-layout {
         display: grid;
-        grid-template-columns: minmax(0, var(--container-max)) 220px;
-        gap: var(--space-16);
+        grid-template-columns: minmax(0, var(--container-max)) 210px;
+        gap: var(--space-12);
         justify-content: center;
-        /* grid items stretch by default: the aside spans the full article
-           height, giving the sticky inner panel room to travel */
+        /* grid items stretch by default: asides span the full article
+           height, giving the sticky inner panels room to travel */
       }
       .article-toc { display: block; }
+    }
+
+    /* Wide screens: 3 columns (navigator + prose + On This Page) */
+    @media (min-width: 1440px) {
+      .site-main .container--wide { max-width: 1360px; }
+      .article-layout {
+        grid-template-columns: 210px minmax(0, var(--container-max)) 210px;
+      }
+      .article-nav { display: block; }
     }
 
     .article-toc__inner {
@@ -222,6 +232,7 @@
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" id="reading-progress" aria-hidden="true"></div>
 
   <!-- =========================================================
        HEADER
@@ -268,6 +279,14 @@
 
       <div class="article-layout">
 
+        <!-- All writing — populated by articleNav.js from articles.json -->
+        <aside class="article-nav" aria-label="All writing">
+          <nav class="article-nav__inner">
+            <p class="article-nav__title">All writing</p>
+            <ul class="article-nav__list" id="article-nav-list"></ul>
+          </nav>
+        </aside>
+
         <!-- Article Body — injected by build_blog.py -->
         <article class="article-prose" aria-label="Article content">
           {{article_content}}
@@ -305,6 +324,10 @@
   <script src="../assets/js/navigation.js" defer></script>
   <!-- On This Page panel + heading anchors + scroll spy -->
   <script src="../assets/js/articleToc.js" defer></script>
+  <!-- Left "All writing" navigator -->
+  <script src="../assets/js/articleNav.js" defer></script>
+  <!-- Reading progress bar -->
+  <script src="../assets/js/readingProgress.js" defer></script>
 
 </body>
 </html>

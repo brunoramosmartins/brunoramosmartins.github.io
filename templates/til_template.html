@@ -128,10 +128,26 @@
       color: var(--color-text-muted);
       letter-spacing: 0.06em;
     }
+
+    /* === Reading layout: left navigator + content === */
+    .til-layout { display: block; }
+
+    @media (min-width: 1440px) {
+      .site-main .container--wide { max-width: 1360px; }
+      .til-layout {
+        display: grid;
+        grid-template-columns: 210px minmax(0, var(--container-max));
+        gap: var(--space-12);
+        justify-content: center;
+      }
+      .article-nav { display: block; }
+      /* header and prose already max-width 780 + auto margins; fill the column */
+    }
   </style>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" id="reading-progress" aria-hidden="true"></div>
 
   <header class="site-header" role="banner">
     <div class="container container--wide">
@@ -152,24 +168,36 @@
 
   <main class="site-main" id="main-content">
     <div class="container container--wide">
+      <div class="til-layout">
 
-      <header class="til-header">
-        <a href="../til.html" class="til-header__back">← TIL</a>
-        <p class="til-header__kicker">Today I Learned</p>
-        <h1 class="til-header__title">{{article_title}}</h1>
-        <div class="til-header__meta">
-          <time class="til-header__date" datetime="{{article_date_iso}}">{{article_date}}</time>
-          <div class="tags">
-            {{article_tags}}
-          </div>
+        <!-- All writing — populated by articleNav.js from articles.json -->
+        <aside class="article-nav" aria-label="All writing">
+          <nav class="article-nav__inner">
+            <p class="article-nav__title">All writing</p>
+            <ul class="article-nav__list" id="article-nav-list"></ul>
+          </nav>
+        </aside>
+
+        <div class="til-main">
+          <header class="til-header">
+            <a href="../til.html" class="til-header__back">← TIL</a>
+            <p class="til-header__kicker">Today I Learned</p>
+            <h1 class="til-header__title">{{article_title}}</h1>
+            <div class="til-header__meta">
+              <time class="til-header__date" datetime="{{article_date_iso}}">{{article_date}}</time>
+              <div class="tags">
+                {{article_tags}}
+              </div>
+            </div>
+          </header>
+
+          <article class="til-prose" aria-label="TIL content">
+            {{article_content}}
+            {{cross_link_box}}
+          </article>
         </div>
-      </header>
 
-      <article class="til-prose" aria-label="TIL content">
-        {{article_content}}
-        {{cross_link_box}}
-      </article>
-
+      </div>
     </div>
   </main>
 
@@ -185,6 +213,10 @@
   </footer>
 
   <script src="../assets/js/navigation.js" defer></script>
+  <!-- Left "All writing" navigator -->
+  <script src="../assets/js/articleNav.js" defer></script>
+  <!-- Reading progress bar -->
+  <script src="../assets/js/readingProgress.js" defer></script>
 
 </body>
 </html>

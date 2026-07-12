@@ -128,10 +128,26 @@
       color: var(--color-text-muted);
       letter-spacing: 0.06em;
     }
+
+    /* === Reading layout: left navigator + content === */
+    .til-layout { display: block; }
+
+    @media (min-width: 1440px) {
+      .site-main .container--wide { max-width: 1360px; }
+      .til-layout {
+        display: grid;
+        grid-template-columns: 210px minmax(0, var(--container-max));
+        gap: var(--space-12);
+        justify-content: center;
+      }
+      .article-nav { display: block; }
+      /* header and prose already max-width 780 + auto margins; fill the column */
+    }
   </style>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" id="reading-progress" aria-hidden="true"></div>
 
   <header class="site-header" role="banner">
     <div class="container container--wide">
@@ -152,21 +168,31 @@
 
   <main class="site-main" id="main-content">
     <div class="container container--wide">
+      <div class="til-layout">
 
-      <header class="til-header">
-        <a href="../til.html" class="til-header__back">← TIL</a>
-        <p class="til-header__kicker">Today I Learned</p>
-        <h1 class="til-header__title">Benford's Law: two derivations, four tests, one fraud detector</h1>
-        <div class="til-header__meta">
-          <time class="til-header__date" datetime="2026-05-03">May 2026</time>
-          <div class="tags">
-            <span class="tag" data-category="til">til</span><span class="tag">statistics</span><span class="tag">fraud-detection</span><span class="tag">mathematics</span><span class="tag">audit</span>
-          </div>
-        </div>
-      </header>
+        <!-- All writing — populated by articleNav.js from articles.json -->
+        <aside class="article-nav" aria-label="All writing">
+          <nav class="article-nav__inner">
+            <p class="article-nav__title">All writing</p>
+            <ul class="article-nav__list" id="article-nav-list"></ul>
+          </nav>
+        </aside>
 
-      <article class="til-prose" aria-label="TIL content">
-        <h1 id="benfords-law-two-derivations-four-tests-one-fraud-detector">Benford's Law: two derivations, four tests, one fraud detector</h1>
+        <div class="til-main">
+          <header class="til-header">
+            <a href="../til.html" class="til-header__back">← TIL</a>
+            <p class="til-header__kicker">Today I Learned</p>
+            <h1 class="til-header__title">Benford's Law: two derivations, four tests, one fraud detector</h1>
+            <div class="til-header__meta">
+              <time class="til-header__date" datetime="2026-05-03">May 2026</time>
+              <div class="tags">
+                <span class="tag" data-category="til">til</span><span class="tag">statistics</span><span class="tag">fraud-detection</span><span class="tag">mathematics</span><span class="tag">audit</span>
+              </div>
+            </div>
+          </header>
+
+          <article class="til-prose" aria-label="TIL content">
+            <h1 id="benfords-law-two-derivations-four-tests-one-fraud-detector">Benford's Law: two derivations, four tests, one fraud detector</h1>
 <blockquote>
 <p>The first digit of "natural" numerical data is not uniform but logarithmic: $P(d) = \log_{10}(1 + 1/d)$, so a leading 1 occurs about 30% of the time and a leading 9 less than 5%. This TIL gives two independent rigorous derivations, four conformity tests, and an end-to-end fraud-detection demo.</p>
 </blockquote>
@@ -363,9 +389,11 @@ $$</p>
 <li><strong>Berger, A. &amp; Hill, T. P.</strong> (2015). <em>An Introduction to Benford's Law</em>. Princeton University Press.</li>
 <li><strong>Rauch, B., Göttsche, M., Brähler, G. &amp; Engel, S.</strong> (2011). Fact and fiction in EU-governmental economic data. <em>German Economic Review</em>, <strong>12</strong>(3), 243–255.</li>
 </ul>
-        
-      </article>
+            
+          </article>
+        </div>
 
+      </div>
     </div>
   </main>
 
@@ -381,6 +409,10 @@ $$</p>
   </footer>
 
   <script src="../assets/js/navigation.js" defer></script>
+  <!-- Left "All writing" navigator -->
+  <script src="../assets/js/articleNav.js" defer></script>
+  <!-- Reading progress bar -->
+  <script src="../assets/js/readingProgress.js" defer></script>
 
 </body>
 </html>
