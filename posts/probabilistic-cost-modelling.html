@@ -568,9 +568,9 @@
 <h3 id="choosing-k">Choosing K</h3>
 <p>We use BIC to select the number of components: fit GMMs with $K = 1, 2, 3, \ldots$ and choose the $K$ that minimizes BIC.</p>
 <h3 id="the-budget-cost-of-ignoring-bimodality">The Budget Cost of Ignoring Bimodality</h3>
-<p>In <a href="#experiment-d-mixture-detection">Experiment D</a>, ignoring bimodality and forcing a single Normal on a 60% junior / 40% senior mixture:<br />
-- Inflates the estimated standard deviation by ~40%<br />
-- Distorts VaR(95%) by R\$ 1,500–2,500 per employee<br />
+<p>In <a href="#experiment-d-mixture-detection">Experiment D</a>, ignoring bimodality and forcing a single Normal on a 60% junior / 40% senior mixture:
+- Inflates the estimated standard deviation by ~40%
+- Distorts VaR(95%) by R\$ 1,500–2,500 per employee
 - For a 50-person team, this is R\$ 75K–125K of misallocated reserve</p>
 <p><strong>Mental hook:</strong> <em>In bimodal distributions, the average represents no one.</em></p>
 <figure><img src="../figures/probabilistic-cost-modelling/mixture_detection.png" alt="Mixture detection: GMM identifies bimodal structure" loading="lazy"><figcaption>Mixture detection: GMM identifies bimodal structure</figcaption></figure>
@@ -586,8 +586,8 @@
 <p>For $X \sim \text{Pareto}(\alpha, x_m)$:</p>
 <p>$$P(X > x) = \left(\frac{x_m}{x}\right)^\alpha$$</p>
 <p>This decays <strong>polynomially</strong>. Compare with the Normal, which decays as $e^{-x^2/2}$ (super-exponentially).</p>
-<p><strong>Tail thinning ratio:</strong><br />
-- Pareto: $P(X > 2c) / P(X > c) = 2^{-\alpha}$ (constant!)<br />
+<p><strong>Tail thinning ratio:</strong>
+- Pareto: $P(X > 2c) / P(X > c) = 2^{-\alpha}$ (constant!)
 - Normal: the same ratio decays exponentially</p>
 <blockquote>
 <p><strong>Mental hook.</strong> <em>Tail risk is where budgets fail, not where averages live.</em> In a Normal world, doubling the threshold makes the event astronomically rarer. In a Pareto world, doubling the threshold reduces the probability by a fixed factor — independent of where you started.</p>
@@ -686,23 +686,23 @@
 <h2 id="a-practical-framework">A Practical Framework</h2>
 <p>The theory and experiments above point to a concrete decision procedure. This section condenses everything into a five-step workflow that any analyst can apply to their own data.</p>
 <h3 id="decision-tree-for-distribution-selection">Decision Tree for Distribution Selection</h3>
-<p><strong>Step 1: Visualize</strong><br />
-- Histogram + Q-Q plot<br />
+<p><strong>Step 1: Visualize</strong>
+- Histogram + Q-Q plot
 - Is the data skewed? Multimodal? Are there extreme values?</p>
-<p><strong>Step 2: Fit candidates</strong><br />
-- Use MLE to fit 3-5 distribution families<br />
+<p><strong>Step 2: Fit candidates</strong>
+- Use MLE to fit 3-5 distribution families
 - Check convergence and parameter reasonableness</p>
-<p><strong>Step 3: Compare</strong><br />
-- Compute AIC and BIC for all candidates<br />
-- Compute Akaike weights — is there a clear winner?<br />
+<p><strong>Step 3: Compare</strong>
+- Compute AIC and BIC for all candidates
+- Compute Akaike weights — is there a clear winner?
 - Use AIC for prediction, BIC for identifying the "true" model</p>
-<p><strong>Step 4: Validate</strong><br />
-- Goodness-of-fit test (Anderson-Darling for tails)<br />
-- Q-Q plot of the winning model<br />
+<p><strong>Step 4: Validate</strong>
+- Goodness-of-fit test (Anderson-Darling for tails)
+- Q-Q plot of the winning model
 - Does the winning model actually fit well?</p>
-<p><strong>Step 5: Quantify impact</strong><br />
-- Compute VaR and ES under the selected model<br />
-- Compare with what Normal would have predicted<br />
+<p><strong>Step 5: Quantify impact</strong>
+- Compute VaR and ES under the selected model
+- Compare with what Normal would have predicted
 - Translate the difference into R\$ of budget reserve</p>
 <h3 id="common-pitfalls">Common Pitfalls</h3>
 <ol>

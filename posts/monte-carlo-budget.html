@@ -366,7 +366,7 @@
 </ul>
 <p>A point estimate gives you a number. A distribution gives you the <strong>policy</strong>: how much to reserve, when to escalate, and how confident to be at every step.</p>
 <h3 id="what-changes-with-a-distribution">What Changes With a Distribution</h3>
-<p>This article replaces the single number with a <strong>probability distribution</strong>. Using Monte Carlo simulation grounded in the Law of Large Numbers and the Central Limit Theorem, we transform "we expect to spend R$ 11.5M" into "we are 90% confident spending will fall between R$ 10.7M and R$ 12.4M, with a 3% probability of exceeding the ceiling."</p>
+<p>This article replaces the single number with a <strong>probability distribution</strong>. Using Monte Carlo simulation grounded in the Law of Large Numbers and the Central Limit Theorem, we transform "we expect to spend R\$ 11.5M" into "we are 90% confident spending will fall between R\$ 10.7M and R\$ 12.4M, with a 3% probability of exceeding the ceiling."</p>
 <blockquote>
 <p><strong>A budget is a distribution, not a number.</strong> This single shift changes how budgets are <em>approved</em>, not just how they are <em>calculated</em>. The output is no longer a target — it is a risk profile that a CFO can underwrite.</p>
 </blockquote>
@@ -378,7 +378,7 @@
 <p>$$
 \hat{X} = \sum_{k} (\text{quantity}_k \times \text{unit cost}_k) + \text{contingency}
 $$</p>
-<p>The result is a number — say, R$ 11.5 million. But this number is $E[X_{\text{total}}]$: the expected value of a random variable. It tells us the centre of the distribution. What it discards is everything else:</p>
+<p>The result is a number — say, R\$ 11.5 million. But this number is $E[X_{\text{total}}]$: the expected value of a random variable. It tells us the centre of the distribution. What it discards is everything else:</p>
 <ul>
 <li><strong>Variance:</strong> How spread out are the possible outcomes?</li>
 <li><strong>Skewness:</strong> Is the distribution symmetric, or could costs be pulled higher by a few extreme events?</li>
@@ -689,7 +689,7 @@ $$</p>
 <figure><img src="../figures/monte-carlo-budget/variance_reduction_comparison.png" alt="95% CI width versus N for naive Monte Carlo, antithetic variates, and control variates." loading="lazy"><figcaption>95% CI width versus N for naive Monte Carlo, antithetic variates, and control variates.</figcaption></figure>
 <h3 id="why-this-matters-beyond-the-math-compute-roi">Why This Matters Beyond the Math: Compute ROI</h3>
 <p>A 30× variance reduction sounds like a mathematical curiosity. It is a <strong>compute and response-time</strong> result.</p>
-<p>Suppose the naive simulation needs $N = 30{,}000$ runs to deliver a ±R$ 50K confidence interval. With control variates, the same precision lands at $N = 1{,}000$. Translating into engineering reality:</p>
+<p>Suppose the naive simulation needs $N = 30{,}000$ runs to deliver a ±R\$ 50K confidence interval. With control variates, the same precision lands at $N = 1{,}000$. Translating into engineering reality:</p>
 <table>
 <thead>
 <tr>
@@ -701,7 +701,7 @@ $$</p>
 </thead>
 <tbody>
 <tr>
-<td>Runs to ±R$ 50K CI</td>
+<td>Runs to ±R\$ 50K CI</td>
 <td>30,000</td>
 <td>1,000</td>
 <td>30× fewer scenarios</td>
@@ -810,7 +810,7 @@ $$</p>
 <h3 id="experiment-a-lln-convergence">Experiment A — LLN Convergence</h3>
 <p><strong>Claim.</strong> The sample mean converges to the analytical $E[X]$ as $N$ grows, with variance shrinking at rate $O(1/\sqrt{N})$.</p>
 <p><strong>Setup.</strong> 10 independent runs of LogNormal salary draws, $N$ from 1 to 10,000 each; absolute deviation $|\bar{X}_n - E[X]|$ tracked across runs, with the Chebyshev 95% band overlaid.</p>
-<p><strong>Result.</strong> At small $N$, runs spread widely; by $N = 5{,}000$, all 10 runs cluster within R$ 200 of the analytical mean. The empirical decay matches $\sigma/\sqrt{n}$ on a log-log plot.</p>
+<p><strong>Result.</strong> At small $N$, runs spread widely; by $N = 5{,}000$, all 10 runs cluster within R\$ 200 of the analytical mean. The empirical decay matches $\sigma/\sqrt{n}$ on a log-log plot.</p>
 <p><strong>Connection.</strong> The Weak Law proved in <a href="#the-law-of-large-numbers">The Law of Large Numbers</a>, observed at finite $N$ (the figure lives in that section).</p>
 <h3 id="experiment-b-clt-normality">Experiment B — CLT Normality</h3>
 <p><strong>Claim.</strong> The standardised sample mean of LogNormal draws converges in distribution to $N(0, 1)$ — right-skewed costs in, bell curve out.</p>
@@ -819,8 +819,8 @@ $$</p>
 <p><strong>Connection.</strong> The MGF proof in <a href="#the-central-limit-theorem">The Central Limit Theorem</a>, watched happening (the figure lives in that section).</p>
 <h3 id="experiment-c-full-budget-simulation">Experiment C — Full Budget Simulation</h3>
 <p><strong>Claim.</strong> Monte Carlo recovers the full distribution of $X_{\text{total}}$ — not just its mean — including the ceiling-breach probability no point estimate can produce.</p>
-<p><strong>Setup.</strong> $N = 50{,}000$ iterations of the IT headcount budget model with default parameters, seed 42; ceiling at R$ 12.5M; metrics: relative error of the MC mean vs analytical $E[X]$, 95% CI half-width, P5–P95 range, $P(X \gt \text{ceiling})$.</p>
-<p><strong>Result.</strong> MC mean within 0.1% of analytical. 95% CI half-width approximately R$ 4K. P5–P95 spans ~R$ 1.6M. The probability of exceeding R$ 12.5M is approximately 3%. The distribution is right-skewed.</p>
+<p><strong>Setup.</strong> $N = 50{,}000$ iterations of the IT headcount budget model with default parameters, seed 42; ceiling at R\$ 12.5M; metrics: relative error of the MC mean vs analytical $E[X]$, 95% CI half-width, P5–P95 range, $P(X \gt \text{ceiling})$.</p>
+<p><strong>Result.</strong> MC mean within 0.1% of analytical. 95% CI half-width approximately R\$ 4K. P5–P95 spans ~R\$ 1.6M. The probability of exceeding R\$ 12.5M is approximately 3%. The distribution is right-skewed.</p>
 <p><strong>Connection.</strong> Instantiates the full model of <a href="#budget-components-as-random-variables">Budget Components as Random Variables</a> and delivers the risk profile promised in <a href="#the-point-estimate-problem">The Point Estimate Problem</a>.</p>
 <figure><img src="../figures/monte-carlo-budget/budget_simulation.png" alt="Budget cost distribution (histogram and CDF) with mean, P5/P95, and the budget ceiling annotated." loading="lazy"><figcaption>Budget cost distribution (histogram and CDF) with mean, P5/P95, and the budget ceiling annotated.</figcaption></figure>
 <h3 id="experiment-d-variance-reduction">Experiment D — Variance Reduction</h3>
@@ -848,7 +848,7 @@ $$</p>
 <tbody>
 <tr>
 <td>Analytical $E[X]$</td>
-<td>R$ 11.55M</td>
+<td>R\$ 11.55M</td>
 </tr>
 <tr>
 <td>MC mean (N=50K)</td>
@@ -856,14 +856,14 @@ $$</p>
 </tr>
 <tr>
 <td>95% CI half-width (N=50K)</td>
-<td>~R$ 4K</td>
+<td>~R\$ 4K</td>
 </tr>
 <tr>
 <td>P5–P95 range</td>
-<td>~R$ 1.6M</td>
+<td>~R\$ 1.6M</td>
 </tr>
 <tr>
-<td>P(X exceeds R$ 12.5M)</td>
+<td>P(X exceeds R\$ 12.5M)</td>
 <td>~3%</td>
 </tr>
 <tr>
@@ -968,11 +968,11 @@ $$</p>
 <p>The single highest-leverage moment in this whole article is the language a budget owner uses in front of leadership. Print this side-by-side comparison and stick it on the wall.</p>
 <blockquote>
 <p><strong>Before — point estimate:</strong></p>
-<p><em>"The budget for next year is R$ 11.55M."</em></p>
+<p><em>"The budget for next year is R\$ 11.55M."</em></p>
 <p>A target. No risk attached. Every variance reads as a miss.</p>
 <p><strong>After — distribution + policy:</strong></p>
-<p><em>"We are 95% confident the cost will fall between R$ 10.7M and R$ 12.4M, with a mean of R$ 11.55M.</em></p>
-<p><em>We propose to reserve R$ 12.0M as the planned budget (P90), with an additional R$ 500K of risk capital available if needed (P99). The probability of exceeding R$ 12.5M is approximately 3%. The primary driver of uncertainty is [dominant component] — investing in better salary forecasts will tighten the range more than any other action."</em></p>
+<p><em>"We are 95% confident the cost will fall between R\$ 10.7M and R\$ 12.4M, with a mean of R\$ 11.55M.</em></p>
+<p><em>We propose to reserve R\$ 12.0M as the planned budget (P90), with an additional R\$ 500K of risk capital available if needed (P99). The probability of exceeding R\$ 12.5M is approximately 3%. The primary driver of uncertainty is [dominant component] — investing in better salary forecasts will tighten the range more than any other action."</em></p>
 <p>A risk profile leadership can underwrite. Variances read against the <em>interval</em>, not the mean.</p>
 </blockquote>
 <p>The "After" script is not longer because it is more verbose — it is longer because it carries the <strong>information the spreadsheet had to throw away</strong>. Practise saying it out loud.</p>
