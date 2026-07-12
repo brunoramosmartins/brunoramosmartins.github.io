@@ -141,7 +141,16 @@
         justify-content: center;
       }
       .article-nav { display: block; }
-      /* header and prose already max-width 780 + auto margins; fill the column */
+
+      /* Title spans both columns so the navigator (row 2, col 1) begins
+         below it — same feel as the article page, where the header sits
+         above the reading grid rather than beside the rail. */
+      .til-layout .til-header {
+        grid-column: 1 / -1;
+        max-width: none;
+        margin-left: 0;
+        margin-right: 0;
+      }
     }
   </style>
 </head>
@@ -170,29 +179,29 @@
     <div class="container container--wide">
       <div class="til-layout">
 
-        <!-- All writing — populated by articleNav.js from articles.json -->
-        <aside class="article-nav" aria-label="All writing">
+        <!-- Title spans the grid; the navigator below it lists sibling TILs -->
+        <header class="til-header">
+          <a href="../til.html" class="til-header__back">← TIL</a>
+          <p class="til-header__kicker">Today I Learned</p>
+          <h1 class="til-header__title">Benford's Law: two derivations, four tests, one fraud detector</h1>
+          <div class="til-header__meta">
+            <time class="til-header__date" datetime="2026-05-03">May 2026</time>
+            <div class="tags">
+              <span class="tag" data-category="til">til</span><span class="tag">statistics</span><span class="tag">fraud-detection</span><span class="tag">mathematics</span><span class="tag">audit</span>
+            </div>
+          </div>
+        </header>
+
+        <!-- Sibling TILs — populated by articleNav.js from articles.json -->
+        <aside class="article-nav" aria-label="All TILs">
           <nav class="article-nav__inner">
-            <p class="article-nav__title">All writing</p>
+            <p class="article-nav__title">All TILs</p>
             <ul class="article-nav__list" id="article-nav-list"></ul>
           </nav>
         </aside>
 
-        <div class="til-main">
-          <header class="til-header">
-            <a href="../til.html" class="til-header__back">← TIL</a>
-            <p class="til-header__kicker">Today I Learned</p>
-            <h1 class="til-header__title">Benford's Law: two derivations, four tests, one fraud detector</h1>
-            <div class="til-header__meta">
-              <time class="til-header__date" datetime="2026-05-03">May 2026</time>
-              <div class="tags">
-                <span class="tag" data-category="til">til</span><span class="tag">statistics</span><span class="tag">fraud-detection</span><span class="tag">mathematics</span><span class="tag">audit</span>
-              </div>
-            </div>
-          </header>
-
-          <article class="til-prose" aria-label="TIL content">
-            <h1 id="benfords-law-two-derivations-four-tests-one-fraud-detector">Benford's Law: two derivations, four tests, one fraud detector</h1>
+        <article class="til-prose" aria-label="TIL content">
+          <h1 id="benfords-law-two-derivations-four-tests-one-fraud-detector">Benford's Law: two derivations, four tests, one fraud detector</h1>
 <blockquote>
 <p><strong>What this is.</strong> The first digit of "natural" numerical data is not uniform but logarithmic: $P(d) = \log_{10}(1 + 1/d)$, so a leading 1 occurs about 30% of the time and a leading 9 less than 5%. This note reconstructs the law from two independent arguments — one probabilistic, one structural — shows real data landing on the curve, and closes the loop with a fraud-detection demo. It started as a margin note while rereading <em>The Drunkard's Walk</em>.</p>
 <p><strong>What you should know before reading.</strong> Comfort with logarithms, basic probability (PMF, CDF), and the idea of a hypothesis test. The measure-theoretic asides (Haar measure, equidistribution) are stated, not required.</p>
@@ -392,9 +401,8 @@ $$</p>
 <li>Berger, A. &amp; Hill, T. P. (2015). <em>An Introduction to Benford's Law</em>. Princeton University Press.</li>
 <li>Rauch, B., Göttsche, M., Brähler, G. &amp; Engel, S. (2011). Fact and fiction in EU-governmental economic data. <em>German Economic Review</em>, <strong>12</strong>(3), 243–255.</li>
 </ul>
-            
-          </article>
-        </div>
+          
+        </article>
 
       </div>
     </div>

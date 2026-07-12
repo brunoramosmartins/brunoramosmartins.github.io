@@ -141,7 +141,16 @@
         justify-content: center;
       }
       .article-nav { display: block; }
-      /* header and prose already max-width 780 + auto margins; fill the column */
+
+      /* Title spans both columns so the navigator (row 2, col 1) begins
+         below it — same feel as the article page, where the header sits
+         above the reading grid rather than beside the rail. */
+      .til-layout .til-header {
+        grid-column: 1 / -1;
+        max-width: none;
+        margin-left: 0;
+        margin-right: 0;
+      }
     }
   </style>
 </head>
@@ -170,29 +179,29 @@
     <div class="container container--wide">
       <div class="til-layout">
 
-        <!-- All writing — populated by articleNav.js from articles.json -->
-        <aside class="article-nav" aria-label="All writing">
+        <!-- Title spans the grid; the navigator below it lists sibling TILs -->
+        <header class="til-header">
+          <a href="../til.html" class="til-header__back">← TIL</a>
+          <p class="til-header__kicker">Today I Learned</p>
+          <h1 class="til-header__title">The Most Useful Theorem in Probability Has No Independence Hypothesis</h1>
+          <div class="til-header__meta">
+            <time class="til-header__date" datetime="2026-07-11">Jul 2026</time>
+            <div class="tags">
+              <span class="tag" data-category="til">til</span><span class="tag">probability</span><span class="tag">expectation</span><span class="tag">correlation</span>
+            </div>
+          </div>
+        </header>
+
+        <!-- Sibling TILs — populated by articleNav.js from articles.json -->
+        <aside class="article-nav" aria-label="All TILs">
           <nav class="article-nav__inner">
-            <p class="article-nav__title">All writing</p>
+            <p class="article-nav__title">All TILs</p>
             <ul class="article-nav__list" id="article-nav-list"></ul>
           </nav>
         </aside>
 
-        <div class="til-main">
-          <header class="til-header">
-            <a href="../til.html" class="til-header__back">← TIL</a>
-            <p class="til-header__kicker">Today I Learned</p>
-            <h1 class="til-header__title">The Most Useful Theorem in Probability Has No Independence Hypothesis</h1>
-            <div class="til-header__meta">
-              <time class="til-header__date" datetime="2026-07-11">Jul 2026</time>
-              <div class="tags">
-                <span class="tag" data-category="til">til</span><span class="tag">probability</span><span class="tag">expectation</span><span class="tag">correlation</span>
-              </div>
-            </div>
-          </header>
-
-          <article class="til-prose" aria-label="TIL content">
-            <h1 id="the-most-useful-theorem-in-probability-has-no-independence-hypothesis">The Most Useful Theorem in Probability Has No Independence Hypothesis</h1>
+        <article class="til-prose" aria-label="TIL content">
+          <h1 id="the-most-useful-theorem-in-probability-has-no-independence-hypothesis">The Most Useful Theorem in Probability Has No Independence Hypothesis</h1>
 <blockquote>
 <p><strong>What this is.</strong> The one everyday result in probability that needs no independence hypothesis — and why that makes the mean of a budget trustworthy while its risk band stays fragile. You should be comfortable with expectation, variance, and correlation. By the end you will know which half of a forecast survives correlated inputs, and which half does not. Figure and numbers reproduce from the <a href="https://github.com/brunoramosmartins/linearity-of-expectation-til">companion repository</a>.</p>
 </blockquote>
@@ -225,9 +234,8 @@ $$</p>
 <p>The failure mode I see most often is treating the second with tools that worked for the first. Result: budgets whose central estimates are right and whose risk bands are off by a factor of three. The quarter when everything correlates at once is the quarter that destroys the margin of safety.</p>
 <hr />
 <p><em>The figure and every number above are reproduced by versioned scripts with fixed seeds in the <a href="https://github.com/brunoramosmartins/linearity-of-expectation-til">companion repository</a>.</em></p>
-            
-          </article>
-        </div>
+          
+        </article>
 
       </div>
     </div>

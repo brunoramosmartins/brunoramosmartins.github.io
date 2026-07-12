@@ -721,6 +721,32 @@
   border-right: 1px solid var(--color-border);
 }
 
+/* Slim, unobtrusive scrollbar for the sticky reading panels — replaces the
+   chunky default track. Thumb is a soft rounded bar that only firms up on
+   hover; the track is invisible. Shared by the left rail and On This Page. */
+.article-nav__inner,
+.article-toc__inner {
+  scrollbar-width: thin;                              /* Firefox */
+  scrollbar-color: var(--color-border) transparent;
+}
+.article-nav__inner::-webkit-scrollbar,
+.article-toc__inner::-webkit-scrollbar {
+  width: 6px;
+}
+.article-nav__inner::-webkit-scrollbar-track,
+.article-toc__inner::-webkit-scrollbar-track {
+  background: transparent;
+}
+.article-nav__inner::-webkit-scrollbar-thumb,
+.article-toc__inner::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 999px;
+}
+.article-nav__inner:hover::-webkit-scrollbar-thumb,
+.article-toc__inner:hover::-webkit-scrollbar-thumb {
+  background-color: var(--color-text-muted);
+}
+
 .article-nav__title {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
