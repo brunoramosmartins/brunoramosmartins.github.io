@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Bayesian forecasting for periodic budget revisions — from prior beliefs to posterior certainty." />
+  <title>The Budget That Learns — Bruno Ramos Martins</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="article" />
+  <meta property="og:title"       content="The Budget That Learns — Bruno Ramos Martins" />
+  <meta property="og:description" content="Bayesian forecasting for periodic budget revisions — from prior beliefs to posterior certainty." />
+  <meta property="og:url"         content="https://brunoramosmartins.github.io/posts/bayesian-fyf.html" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet" />
+
+  <!-- MathJax — renders LaTeX math ($...$, $$...$$) -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath:  [['$', '$']],
+        displayMath: [['$$', '$$']],
+      },
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/layout.css" />
+  <link rel="stylesheet" href="../assets/css/components.css" />
+  <link rel="stylesheet" href="../assets/css/highlight.css" />
+
+  <style>
+    /* === Article-specific prose styles === */
+    .article-prose {
+      max-width: var(--container-max);
+      margin: 0 auto;
+    }
+
+    .article-prose h2 {
+      font-size: var(--text-3xl);
+      font-weight: var(--weight-bold);
+      letter-spacing: -0.02em;
+      margin-top: var(--space-16);
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-3);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .article-prose h3 {
+      font-size: var(--text-2xl);
+      font-weight: var(--weight-semibold);
+      letter-spacing: -0.01em;
+      margin-top: var(--space-10);
+      margin-bottom: var(--space-3);
+    }
+
+    .article-prose h4 {
+      font-size: var(--text-xl);
+      font-weight: var(--weight-medium);
+      margin-top: var(--space-8);
+      margin-bottom: var(--space-2);
+    }
+
+    .article-prose p {
+      font-size: var(--text-base);
+      line-height: var(--leading-relaxed);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-5);
+    }
+
+    .article-prose ul,
+    .article-prose ol {
+      list-style: revert;
+      padding-left: var(--space-6);
+      margin-bottom: var(--space-5);
+      color: var(--color-text-secondary);
+      line-height: var(--leading-relaxed);
+    }
+
+    .article-prose li { margin-bottom: var(--space-2); }
+
+    .article-prose img {
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      margin: var(--space-8) 0;
+    }
+
+    .article-header {
+      padding: var(--space-16) 0 var(--space-10);
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: var(--space-12);
+    }
+
+    .article-header__back {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+      display: inline-block;
+      margin-bottom: var(--space-6);
+      transition: color var(--transition-fast);
+    }
+    .article-header__back:hover { color: var(--color-accent); }
+
+    .article-header__title {
+      font-size: var(--text-4xl);
+      font-weight: var(--weight-bold);
+      letter-spacing: -0.03em;
+      line-height: var(--leading-tight);
+      margin-bottom: var(--space-4);
+    }
+
+    .article-header__meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .article-header__date {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      letter-spacing: 0.06em;
+    }
+
+    /* === Orientation block (first blockquote after the title) === */
+    .article-prose > blockquote:first-child {
+      border-left: 3px solid var(--color-accent);
+      background: var(--color-surface);
+      border-radius: var(--radius-md);
+      padding: var(--space-5) var(--space-6);
+      margin: 0 0 var(--space-10);
+    }
+    .article-prose > blockquote:first-child p {
+      margin-bottom: var(--space-3);
+    }
+    .article-prose > blockquote:first-child p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* === Heading anchor links === */
+    .heading-anchor {
+      margin-left: var(--space-2);
+      color: var(--color-text-muted);
+      font-size: 0.7em;
+      opacity: 0;
+      text-decoration: none;
+      transition: opacity var(--transition-fast);
+    }
+    h2:hover .heading-anchor,
+    h3:hover .heading-anchor { opacity: 1; }
+    .heading-anchor:hover { color: var(--color-accent); }
+
+    /* === Two-column layout with "On this page" panel === */
+    .article-layout { display: block; }
+    .article-toc { display: none; }
+
+    @media (min-width: 1200px) {
+      .article-layout {
+        display: grid;
+        grid-template-columns: minmax(0, var(--container-max)) 220px;
+        gap: var(--space-16);
+        justify-content: center;
+        /* grid items stretch by default: the aside spans the full article
+           height, giving the sticky inner panel room to travel */
+      }
+      .article-toc { display: block; }
+    }
+
+    .article-toc__inner {
+      position: sticky;
+      /* clear the fixed site header, plus breathing room */
+      top: calc(var(--header-height) + var(--space-6));
+      max-height: calc(100vh - var(--header-height) - var(--space-12));
+      overflow-y: auto;
+      padding-left: var(--space-4);
+      border-left: 1px solid var(--color-border);
+    }
+
+    .article-toc__title {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-4);
+    }
+
+    .article-toc__list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .article-toc__item { margin-bottom: var(--space-2); }
+    .article-toc__item--h3 { padding-left: var(--space-4); }
+
+    .article-toc__list a {
+      display: block;
+      font-size: var(--text-sm);
+      line-height: var(--leading-snug, 1.4);
+      color: var(--color-text-muted);
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+    .article-toc__list a:hover { color: var(--color-text-primary); }
+    .article-toc__list a.active {
+      color: var(--color-accent);
+      font-weight: var(--weight-medium);
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <!-- =========================================================
+       HEADER
+  ========================================================== -->
+  <header class="site-header" role="banner">
+    <div class="container container--wide">
+      <a href="../index.html" class="site-logo">Bruno Ramos Martins</a>
+
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="site-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav id="site-nav" class="site-nav" role="navigation" aria-label="Main navigation">
+        <a href="../index.html">Home</a>
+        <a href="../projects.html">Projects</a>
+        <a href="../articles.html" class="active" aria-current="page">Articles</a>
+        <a href="../til.html">TIL</a>
+        <a href="../resume.html">Resume</a>
+        <a href="../about.html">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       MAIN CONTENT
+  ========================================================== -->
+  <main class="site-main" id="main-content">
+    <div class="container container--wide">
+
+      <!-- Article Header -->
+      <header class="article-header">
+        <a href="../articles.html" class="article-header__back">← Articles</a>
+        <h1 class="article-header__title">The Budget That Learns</h1>
+        <div class="article-header__meta">
+          <time class="article-header__date" datetime="2026-07-11">Jul 2026</time>
+          <span class="article-header__date">29 min read</span>
+          <div class="tags">
+            <span class="tag" data-category="statistics">statistics</span><span class="tag">bayesian</span><span class="tag">forecasting</span><span class="tag">conjugate-priors</span><span class="tag">budgeting</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="article-layout">
+
+        <!-- Article Body — injected by build_blog.py -->
+        <article class="article-prose" aria-label="Article content">
+          <h1 id="the-budget-that-learns">The Budget That Learns</h1>
+<blockquote>
+<p><strong>What this is.</strong> A budget forecast that ignores its own history is a memoryless estimator — it discards the information accumulated in previous revisions and observed actuals. Bayesian updating provides the mathematically optimal way to combine prior beliefs (the original budget) with incoming evidence (monthly actuals): the posterior forecast is always at least as good as the prior, it sharpens monotonically as data arrives, and it automatically balances confidence in the plan against confidence in the data. <strong>Each FYF cycle is not a new forecast — it is a Bayesian update.</strong> The article's contribution is that closed-form conjugate updating is enough to explain and improve the whole revision cycle.</p>
+<p><strong>What you should know before reading.</strong> <em>Required:</em> a solid undergraduate background — integration by substitution, completing the square, the Normal/LogNormal/Poisson distributions, the law of total variance, and Bayes' theorem in its discrete form. Every continuous result is derived from these in full. <em>Out of scope:</em> MCMC, hierarchical models, nonparametric Bayes, variational inference, and real company data.</p>
+<p><strong>What you will take away.</strong> The four conjugate pairs that cover a budget model, the precision-weighted mean that replaces ad-hoc reweighting of plan vs actuals, the closed form for "what is the probability of ending the year over budget?", and the diagnostics that tell you when to stop trusting the machine.</p>
+<p><strong>Code.</strong> Every figure and number is reproduced by versioned scripts with fixed seeds in the <a href="https://github.com/brunoramosmartins/bayesian-fyf-article">companion repository</a>.</p>
+</blockquote>
+<hr />
+<h2 id="the-forecast-that-learns">The Forecast That Learns</h2>
+<p>Every budget analyst lives the same calendar. December: a plan is<br />
+approved. April, July, October, January-of-next-year: a Forecast<br />
+Year-end Financial (FYF) review revises the plan against year-to-date<br />
+actuals. The revisions are quarterly; the questions are perennial.<br />
+<em>By how much should I move the forecast? How tight is my new estimate?<br />
+What is the chance of breaching the budget ceiling by year-end?</em></p>
+<p>The traditional answer treats each revision as a fresh estimate. The<br />
+analyst stares at year-to-date actuals, mentally weighs them against<br />
+the plan, and produces a new number. The new number is then defended<br />
+in a meeting; the defence is usually qualitative; the weight chosen<br />
+is rarely auditable.</p>
+<p>This article argues that the FYF cycle is, in a precise mathematical<br />
+sense, <strong>sequential Bayesian updating</strong>. The plan is a <em>prior</em>. The<br />
+actuals are <em>data</em>. The revised forecast is a <em>posterior</em>. This is<br />
+not analogy; it is identity. And recognising the identity turns three<br />
+qualitative pain-points into closed-form results:</p>
+<ol>
+<li><em>How do I weight the plan against the data?</em> — The<br />
+<strong>precision-weighted mean</strong> of the Normal–Normal posterior. The<br />
+ weights are not a matter of judgement: they are functions of the<br />
+ stated prior uncertainty and the per-month observation noise.</li>
+<li><em>How tight is my forecast?</em> — The posterior variance shrinks<br />
+ monotonically with each new month.<br />
+<a href="#sequential-updating-and-shrinkage">Sequential Updating and Shrinkage</a><br />
+ makes this "monotonically" both rigorous and quantitative.</li>
+<li><em>What is the probability of ending the year over budget?</em> — The<br />
+ posterior <strong>predictive</strong> distribution applied to the unobserved<br />
+ months gives an exact closed form, not a heuristic.</li>
+</ol>
+<p>The route from claim to proof is short.<br />
+<a href="#bayes-theorem-for-budget-analysts">Bayes' Theorem for Budget Analysts</a><br />
+derives the continuous theorem and clarifies the difference between<br />
+credible and confidence intervals.<br />
+<a href="#conjugate-families">Conjugate Families</a> develops the four<br />
+prior–likelihood pairs that cover the FYF cost model.<br />
+<a href="#sequential-updating-and-shrinkage">Sequential Updating and Shrinkage</a><br />
+chains conjugate updates across the year and proves that sequential and<br />
+batch updating produce identical posteriors.<br />
+<a href="#the-posterior-predictive">The Posterior Predictive</a> layers on top what<br />
+the CFO actually wants. <a href="#the-fyf-model">The FYF Model</a> wires the<br />
+machinery into a complete annual cycle of a 50-person IT-headcount<br />
+budget; the <a href="#experiments-and-results">experiments</a> validate it; and<br />
+<a href="#diagnostics">Diagnostics</a> supplies the checks that decide when the<br />
+model is to be trusted and when its mechanical answer is misleading.</p>
+<hr />
+<h2 id="bayes-theorem-for-budget-analysts">Bayes' Theorem for Budget Analysts</h2>
+<p>Let $X$ denote observed data and $\theta$ an unknown parameter,<br />
+both treated as random variables. The <strong>product rule for densities</strong><br />
+factorises the joint two ways:</p>
+<p>$$
+f(x, \theta) = f(x \mid \theta) \pi(\theta) = \pi(\theta \mid x) f(x).
+$$</p>
+<p>Equating and solving for the second factor gives <strong>Bayes' theorem<br />
+for continuous parameters</strong>:</p>
+<p>$$
+\boxed{\quad
+\pi(\theta \mid x) = \frac{f(x \mid \theta) \pi(\theta)}{f(x)},
+\qquad
+f(x) = \int f(x \mid \theta) \pi(\theta) \mathrm d\theta.
+\quad}
+$$</p>
+<p>The four objects have names. $\pi(\theta)$ is the <strong>prior</strong>; in FYF,<br />
+the budget plan expressed as a distribution. $f(x \mid \theta)$ is<br />
+the <strong>sampling density</strong>, viewed as a function of $\theta$ for fixed<br />
+$x$ it is the <strong>likelihood</strong>. $f(x)$ is the <strong>marginal likelihood</strong><br />
+or evidence — the probability of the data averaged over the prior.<br />
+$\pi(\theta \mid x)$ is the <strong>posterior</strong>: the revised forecast.</p>
+<p>Because $f(x)$ does not involve $\theta$, the proportional form<br />
+$\pi(\theta \mid x) \propto f(x \mid \theta) \pi(\theta)$ is<br />
+operationally enough. In conjugate families we recognise the<br />
+kernel of the right-hand side as that of a known distribution and<br />
+read off the hyperparameters; the marginal likelihood is implied by<br />
+the family and never has to be integrated.</p>
+<h3 id="point-summaries">Point summaries</h3>
+<p>When a number is required:</p>
+<ul>
+<li><strong>Maximum a posteriori (MAP)</strong>: $\hat\theta_{\text{MAP}} = \arg\max_\theta \pi(\theta \mid x)$.</li>
+<li><strong>Posterior mean</strong>: $\hat\theta_{\text{PM}} = \mathbb E[\theta \mid x]$.</li>
+<li><strong>Posterior median</strong>.</li>
+</ul>
+<p>For symmetric unimodal posteriors (every Normal posterior in this<br />
+article) the three coincide. For a uniform prior the MAP equals the<br />
+maximum-likelihood estimator: a flat prior produces the classical<br />
+point estimate, but with a credible-interval interpretation that<br />
+remains different from a confidence interval — see below.</p>
+<h3 id="credible-intervals-vs-confidence-intervals">Credible intervals vs confidence intervals</h3>
+<p>A <strong>$100(1-\alpha)\%$ credible interval</strong> for $\theta$ is any subset<br />
+$C$ with $\Pr(\theta \in C \mid x) = 1 - \alpha$. The most-used choice<br />
+is the equal-tailed interval bounded by the $\alpha/2$ and<br />
+$1 - \alpha/2$ posterior quantiles.</p>
+<p>The contrast with the frequentist confidence interval is the<br />
+conceptual hinge of the article. The credible interval makes a<br />
+direct probability statement <em>about $\theta$</em> given the realised<br />
+data: "given what I saw, there is a 95 % chance the parameter lies<br />
+in $[a, b]$". The frequentist interval makes a statement <em>about the<br />
+procedure</em>: 95 % of the intervals constructed by this rule, across<br />
+hypothetical repetitions of the experiment, would contain the true<br />
+$\theta$. After observing one specific dataset, the frequentist<br />
+interval either contains $\theta$ or it does not — there is no<br />
+probability statement about <em>that</em> interval. Both intervals can<br />
+numerically agree in simple cases, but their interpretations differ.</p>
+<p>For a budget committee asking "will we exceed R\$ 13.2 M?" the<br />
+relevant statement is about the parameter (or the forecast), not<br />
+about the procedure. The credible interval is the operational<br />
+object.</p>
+<h3 id="prior-elicitation-the-budget-plan-is-a-prior">Prior elicitation: the budget plan IS a prior</h3>
+<p>The classic objection — "but the prior is subjective" — misses the<br />
+point. The budget plan was always subjective. The Bayesian framework<br />
+makes the subjectivity explicit and updateable. A planner who states<br />
+"we expect monthly cost $\mu_0$ with $\gamma$-confidence that the<br />
+truth is within $\pm w$" is implicitly specifying a Normal prior<br />
+$N(\mu_0, \sigma_0^2)$ with</p>
+<p>$$
+\sigma_0 = \frac{w}{z_{(1+\gamma)/2}},
+$$</p>
+<p>where $z_q$ is the standard-Normal quantile. The article's reference<br />
+scenario uses $\mu_0$ = R\$ 1,050,000,<br />
+$\sigma_0$ = R\$ 150,000 — a budget plan and a stated<br />
+uncertainty, translated into a prior in one line.</p>
+<hr />
+<h2 id="conjugate-families">Conjugate Families</h2>
+<p>A family $\mathcal F$ of priors is <strong>conjugate</strong> to a sampling model<br />
+if the posterior obtained by Bayes' theorem stays in $\mathcal F$.<br />
+Hyperparameters update by an explicit rule; the marginal likelihood<br />
+is implied; sequential updating becomes addition, as the<br />
+<a href="#sequential-updating-and-shrinkage">next section</a> shows. The four<br />
+pairs in this section cover every component of the FYF cost model.</p>
+<figure><img src="../figures/bayesian-fyf/exp_b_conjugate_families.png" alt="Experiment B — four conjugate pairs side by side. Each panel: prior in steelblue, posterior in crimson after a small batch of synthetic data." loading="lazy"><figcaption>Experiment B — four conjugate pairs side by side. Each panel: prior in steelblue, posterior in crimson after a small batch of synthetic data.</figcaption></figure>
+<h3 id="normalnormal-known-variance-the-articles-anchor">Normal–Normal (known variance) — the article's anchor</h3>
+<p>Let $\theta$ be the unknown mean of a Normal sampling model with<br />
+<strong>known</strong> variance $\sigma^2$:</p>
+<p>$$
+x_1, \ldots, x_n \mid \theta \overset{\text{iid}}{\sim} N(\theta, \sigma^2),
+\qquad
+\theta \sim N(\mu_0, \sigma_0^2).
+$$</p>
+<p>The likelihood, viewed as a function of $\theta$ and after expanding<br />
+$\sum (x_i - \theta)^2 = \sum (x_i - \bar x)^2 + n(\bar x - \theta)^2$,<br />
+is proportional to $\exp\big(-\tfrac{n}{2\sigma^2}(\theta - \bar x)^2\big)$.<br />
+Multiplying by the prior, grouping powers of $\theta$, and completing<br />
+the square yields a Normal kernel with</p>
+<p>$$
+\boxed{\quad
+\theta \mid x_{1:n} \sim N(\mu_n, \sigma_n^2),
+\qquad
+\tau_n = \tau_0 + n\tau,
+\qquad
+\mu_n = \frac{\tau_0\mu_0 + n\tau\bar x}{\tau_n},
+\quad}
+$$</p>
+<p>where $\tau \equiv 1/\sigma^2$ and $\tau_0 \equiv 1/\sigma_0^2$ are<br />
+the <strong>precisions</strong> (inverse variances). Equivalently, in variance<br />
+form,</p>
+<p>$$
+\mu_n = \frac{\sigma^2 \mu_0 + n \sigma_0^2 \bar x}{\sigma^2 + n \sigma_0^2},
+\qquad
+\sigma_n^2 = \frac{\sigma^2 \sigma_0^2}{\sigma^2 + n \sigma_0^2}.
+$$</p>
+<p>This identity admits three equivalent readings.</p>
+<p><strong>Precision additivity.</strong> $\tau_n = \tau_0 + n\tau$. Each new<br />
+observation adds exactly $\tau$ units of precision, regardless of<br />
+its value.</p>
+<p><strong>Weighted average of means.</strong> With $w_0 \equiv \tau_0 / (\tau_0 + n\tau)$<br />
+and $w_d \equiv 1 - w_0$, $\mu_n = w_0\mu_0 + w_d \bar x$. The<br />
+weights are proportional to the <em>information content</em> of each<br />
+source — prior information $\tau_0$, data information $n\tau$.</p>
+<p><strong>Shrinkage to the prior.</strong> Equivalently, $\mu_n = \bar x + w_0(\mu_0 - \bar x)$:<br />
+the data mean is shrunk toward the prior mean by a factor $w_0$.</p>
+<h3 id="normalinverse-gamma-unknown-variance">Normal–Inverse-Gamma (unknown variance)</h3>
+<p>When $\sigma^2$ is also unknown, the conjugate prior is the<br />
+<strong>Normal–Inverse-Gamma</strong>:<br />
+$\sigma^2 \sim \text{Inverse-Gamma}(\alpha_0, \beta_0)$,<br />
+$\theta \mid \sigma^2 \sim N(\mu_0, \sigma^2/\kappa_0)$. The same<br />
+"completing the square" argument gives the four updates</p>
+<p>$$
+\mu_n = \frac{\kappa_0 \mu_0 + n\bar x}{\kappa_0 + n},
+\quad
+\kappa_n = \kappa_0 + n,
+\quad
+\alpha_n = \alpha_0 + \frac{n}{2},
+$$</p>
+<p>$$
+\beta_n = \beta_0 + \tfrac{1}{2} S + \tfrac{1}{2} \frac{\kappa_0 n}{\kappa_0 + n} (\bar x - \mu_0)^2,
+\quad S = \sum_{i=1}^n (x_i - \bar x)^2.
+$$</p>
+<p>The marginal posterior of $\theta$ is a Student-$t$ with $2\alpha_n$<br />
+degrees of freedom; the marginal of $\sigma^2$ is<br />
+Inverse-Gamma$(\alpha_n, \beta_n)$. As $n \to \infty$ the posterior<br />
+concentrates on $(\bar x, S/n) \to (\theta_\star, \sigma_\star^2)$.</p>
+<h3 id="gammapoisson-updating-event-rates">Gamma–Poisson: updating event rates</h3>
+<p>For monthly incident counts modelled as<br />
+$x_i \mid \lambda \sim \text{Poisson}(\lambda)$ with prior<br />
+$\lambda \sim \text{Gamma}(\alpha_0, \beta_0)$ (rate<br />
+parameterisation), the posterior is</p>
+<p>$$
+\boxed{\quad
+\lambda \mid x_{1:n} \sim \text{Gamma}\Big(\alpha_0 + \textstyle\sum_i x_i, \beta_0 + n\Big).
+\quad}
+$$</p>
+<p>The interpretation is <strong>pseudo-observations</strong>: $\alpha_0$ acts as<br />
+"prior event count", $\beta_0$ as "prior pseudo-observation period".<br />
+Real events and real periods simply add.</p>
+<h3 id="betabinomial-updating-proportions">Beta–Binomial: updating proportions</h3>
+<p>For an overtime proportion $p$ with prior $\text{Beta}(\alpha_0, \beta_0)$<br />
+and observation $x \mid p \sim \text{Binomial}(n, p)$,</p>
+<p>$$
+\boxed{\quad
+p \mid x \sim \text{Beta}(\alpha_0 + x, \beta_0 + n - x).
+\quad}
+$$</p>
+<p>The pattern repeats: $\alpha_0$ are prior successes, $\beta_0$ prior<br />
+failures, real data adds.</p>
+<h3 id="the-pattern">The pattern</h3>
+<p>All four pairs share the same shape: the prior contributes a finite<br />
+"imaginary" sample, the data contributes a real sample, and the<br />
+totals add. This is the intuitive content of conjugacy — and the<br />
+algebraic foundation for everything that follows.</p>
+<hr />
+<h2 id="sequential-updating-and-shrinkage">Sequential Updating and Shrinkage</h2>
+<h3 id="sequential-batch">Sequential = batch</h3>
+<p>The FYF cycle feeds data <strong>one month at a time</strong>. Does the result<br />
+agree with what the analyst would obtain by waiting until December<br />
+and computing one batch posterior?</p>
+<p><strong>Theorem (sequential = batch).</strong> Under conditional independence,<br />
+applying the conjugate update once per observation (using the<br />
+previous posterior as the next prior) produces the <strong>same</strong><br />
+hyperparameters as applying the batch update directly to all data.</p>
+<p>For Normal–Normal the proof is direct: $\tau_n = \tau_0 + n\tau$ is<br />
+linear in $n$ and accumulates the same $\tau$ regardless of the<br />
+order of operations; the mean update $\mu_n = (\tau_0\mu_0 + n\tau\bar x)/\tau_n$<br />
+is the same telescoping sum either way. For general exponential<br />
+families the conjugate hyperparameter map is <em>additive</em> in $n$ and<br />
+in the sufficient statistic $\sum_i T(x_i)$, so the cumulative<br />
+increments after $n$ sequential steps equal the batch increments.</p>
+<p>The theorem says the FYF cycle is <strong>not</strong> a heuristic. An analyst<br />
+who saves the previous posterior and applies the conjugate rule<br />
+month by month will, by year-end, hold exactly the posterior they<br />
+would have obtained had they waited and done one big update.</p>
+<h3 id="the-shrinkage-formula-and-three-consequences">The shrinkage formula and three consequences</h3>
+<p>The Normal–Normal posterior mean is the convex combination</p>
+<p>$$
+\mu_n = w_0(n) \mu_0 + (1 - w_0(n)) \bar x_n,
+\qquad
+w_0(n) = \frac{\tau_0}{\tau_0 + n\tau} = \frac{\sigma^2/\sigma_0^2}{\sigma^2/\sigma_0^2 + n}.
+$$</p>
+<p>Three consequences follow immediately:</p>
+<ul>
+<li><strong>Shrinkage weight decays as $1/n$</strong>. $w_0(n) = \Theta(1/n)$, with<br />
+ leading constant $\sigma^2/\sigma_0^2$.</li>
+<li><strong>Posterior variance decays as $1/n$</strong>. $\sigma_n^2 = 1/(\tau_0 + n\tau) \sim \sigma^2/n$,<br />
+ matching the frequentist sampling variance of $\bar X_n$<br />
+ asymptotically.</li>
+<li><strong>Posterior mean converges to the data mean</strong>.<br />
+ $\mu_n - \bar x_n = w_0(n)(\mu_0 - \bar x_n) \to 0$.</li>
+</ul>
+<p>The recursive <strong>Kalman-gain</strong> form</p>
+<p>$$
+\mu_n = \mu_{n-1} + K_n(x_n - \mu_{n-1}),
+\qquad
+K_n = \frac{\sigma_{n-1}^2}{\sigma_{n-1}^2 + \sigma^2}
+$$</p>
+<p>makes the update look like signal processing: the "innovation"<br />
+$x_n - \mu_{n-1}$ is the surprise, and $K_n$ scales how much of it<br />
+the posterior absorbs. This is the discrete Kalman filter for a<br />
+static parameter.</p>
+<figure><img src="../figures/bayesian-fyf/exp_c_sequential_shrinkage.png" alt="Experiment C — sequential shrinkage. Left: posterior trajectory and 95 % credible band over 12 months. Right: the closed-form prior weight $w_0(n)$ decaying toward zero, with markers at the 80 % and 95 % data-weight thresholds." loading="lazy"><figcaption>Experiment C — sequential shrinkage. Left: posterior trajectory and 95 % credible band over 12 months. Right: the closed-form prior weight $w_0(n)$ decaying toward zero, with markers at the 80 % and 95 % data-weight thresholds.</figcaption></figure>
+<h3 id="when-does-the-data-dominate">When does the data dominate?</h3>
+<p>With reference parameters $\sigma_0 = 150{,}000$, $\sigma = 80{,}000$,<br />
+the ratio $\sigma^2/\sigma_0^2 \approx 0.2844$:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Month $n$</th>
+<th style="text-align: right;">$w_0(n)$</th>
+<th style="text-align: right;">$1 - w_0(n)$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.2215</td>
+<td style="text-align: right;">0.7785</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.0866</td>
+<td style="text-align: right;">0.9134</td>
+</tr>
+<tr>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0.0453</td>
+<td style="text-align: right;">0.9547</td>
+</tr>
+<tr>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">0.0232</td>
+<td style="text-align: right;">0.9768</td>
+</tr>
+</tbody>
+</table>
+<p>The data's share crosses <strong>80 % at $n = 2$</strong> (already by February<br />
+with monthly revisions), <strong>95 % at $n = 6$</strong> (mid-year FYF). By the<br />
+year-end posterior, the budget plan accounts for ≈ 2.3 % of the<br />
+answer.</p>
+<h3 id="prior-sensitivity">Prior sensitivity</h3>
+<p>Two analysts with the same $\sigma_0$ but different prior means<br />
+$\mu_0^{(A)} \ne \mu_0^{(B)}$ produce posteriors whose disagreement<br />
+shrinks at exactly $w_0(n)$:</p>
+<p>$$
+\big|\mu_n^{(A)} - \mu_n^{(B)}\big| = w_0(n) \cdot \big|\mu_0^{(A)} - \mu_0^{(B)}\big|.
+$$</p>
+<p>By month 6, an initial gap of R\$ 150{,}000 has shrunk to ≈ R\$ 6{,}780.<br />
+By year-end, to ≈ R\$ 3{,}460. The data forces consensus.</p>
+<figure><img src="../figures/bayesian-fyf/exp_d_prior_sensitivity.png" alt="Experiment D — three priors converging under the same data. The right panel plots the gap on a log scale against the closed-form prediction $w_0(n) \cdot \Delta\mu_0$." loading="lazy"><figcaption>Experiment D — three priors converging under the same data. The right panel plots the gap on a log scale against the closed-form prediction $w_0(n) \cdot \Delta\mu_0$.</figcaption></figure>
+<h3 id="priordata-conflict">Prior–data conflict</h3>
+<p>Define the discrepancy $D_n = |\mu_0 - \bar x_n|/\sigma_0$. When<br />
+$D_n \gg 3$ — the data is "far from" the prior, in prior units —<br />
+the conjugate update still produces a number, but that number is<br />
+mechanical rather than meaningful. The model has assumed the prior<br />
+is correctly elicited and the sampling model is well specified; if<br />
+either fails the posterior interpolates between two wrong sources.</p>
+<p>Operationally: at any FYF, if $D_n > 3$, <em>stop and diagnose</em>. Either<br />
+re-elicit the prior, or change the sampling model (often: the world<br />
+changed — re-org, vendor switch, structural shock). The Bayesian<br />
+machine answers; the analyst owns the interpretation.</p>
+<hr />
+<h2 id="the-posterior-predictive">The Posterior Predictive</h2>
+<p>The posterior $\pi(\theta \mid x)$ is a means; the posterior<br />
+<strong>predictive</strong> $p(\tilde x \mid x)$ is the end. The predictive is<br />
+what the business wants: not "what is the mean cost?" but "what<br />
+will next month cost? what will the year-end total cost?".</p>
+<h3 id="definition-and-decomposition">Definition and decomposition</h3>
+<p>$$
+\boxed{\quad
+p(\tilde x \mid x) = \int f(\tilde x \mid \theta) \pi(\theta \mid x) \mathrm d\theta.
+\quad}
+$$</p>
+<p>The predictive variance decomposes via the <strong>law of total variance</strong>:</p>
+<p>$$
+\mathrm{Var}(\tilde x \mid x)
+ = 
+\underbrace{\mathbb E\big[\mathrm{Var}(\tilde x \mid \theta) \mid x\big]}_{\text{expected sampling noise}}
+ + 
+\underbrace{\mathrm{Var}\big(\mathbb E[\tilde x \mid \theta] \mid x\big)}_{\text{parameter uncertainty}}.
+$$</p>
+<p>The first term is <strong>irreducible noise</strong>. The second term shrinks<br />
+with more data. A predictive interval is therefore always <strong>wider</strong><br />
+than the credible interval for $\theta$, and the gap closes<br />
+asymptotically toward $\pm 1.96\sigma$ — never toward zero. This is<br />
+the formal reason credible intervals on the parameter alone<br />
+under-state the uncertainty about future observations.</p>
+<figure><img src="../figures/bayesian-fyf/exp_a_prior_to_posterior.png" alt="Experiment A — single Normal-Normal update with the precision-weighted-mean decomposition. The credible interval for $\theta$ (steelblue band) is narrower than the predictive interval for the next observation (crimson band)." loading="lazy"><figcaption>Experiment A — single Normal-Normal update with the precision-weighted-mean decomposition. The credible interval for $\theta$ (steelblue band) is narrower than the predictive interval for the next observation (crimson band).</figcaption></figure>
+<h3 id="closed-forms">Closed forms</h3>
+<p>For the three pairs the article uses operationally:</p>
+<ul>
+<li><strong>Normal–Normal</strong>: $\tilde x \mid x \sim N(\mu_n, \sigma_n^2 + \sigma^2)$.</li>
+<li><strong>Gamma–Poisson</strong>: $\tilde x \mid x \sim \text{NegBin}(\alpha_n, \beta_n/(\beta_n+1))$,<br />
+ shape–success parameterisation. Predictive mean $\alpha_n/\beta_n$,<br />
+ variance $\alpha_n(\beta_n+1)/\beta_n^2 > \alpha_n/\beta_n$ —<br />
+<strong>overdispersion</strong> induced by parameter uncertainty.</li>
+<li><strong>Beta–Binomial</strong>: future batch of size $m$ has predictive PMF<br />
+ $\Pr(\tilde x = k) = \binom{m}{k} B(\alpha_n + k, \beta_n + m - k)/B(\alpha_n, \beta_n)$.</li>
+</ul>
+<h3 id="the-year-end-total-beware-of-independence">The year-end total — beware of independence</h3>
+<p>After observing $m$ months with cumulative $S_m$, the remaining<br />
+total $\tilde S = \sum_{t=m+1}^{12} \tilde x_t$ is <strong>not</strong> the sum<br />
+of iid predictives. The future months share the unknown $\theta$<br />
+and are therefore correlated under the posterior.</p>
+<p>Writing $\tilde x_t = \theta + \varepsilon_t$ with $\varepsilon_t$<br />
+iid $N(0, \sigma^2)$ independent of $\theta$, the sum is<br />
+$(12 - m)\theta + \sum \varepsilon_t$. The two summands are<br />
+independent given $x_{1:m}$; their variances add:</p>
+<p>$$
+\boxed{\quad
+\tilde S \mid x_{1:m} \sim N\big((12-m) \mu_m, (12-m)^2 \sigma_m^2 + (12-m) \sigma^2\big).
+\quad}
+$$</p>
+<p>The parameter-uncertainty term is <strong>quadratic</strong> in the horizon<br />
+$(12-m)$, not linear. The naïve "iid future months" formula<br />
+$(12-m)(\sigma_m^2 + \sigma^2)$ under-estimates the variance by a<br />
+factor of $(12-m)$ in the parameter share. In early months the<br />
+horizon is long and the naïve under-estimate is large.</p>
+<p>The annual total is $T = S_m + \tilde S$, a Normal with mean<br />
+$S_m + (12-m)\mu_m$ and the variance above. Then</p>
+<p>$$
+P(T > B \mid x_{1:m})
+ = 
+1 - \Phi\Big(\frac{B - (S_m + (12-m)\mu_m)}{\sqrt{(12-m)^2 \sigma_m^2 + (12-m)\sigma^2}}\Big).
+$$</p>
+<p>For the reference scenario at mid-year with<br />
+$\mu_6$ = R\$ 1,085,000,<br />
+$\sigma_6$ = R\$ 32,000,<br />
+$S_6$ = R\$ 6,510,000, $B$ = R\$ 13,200,000:<br />
+$P(T > B) \approx 26\%$ under the correct formula, vs ≈ 20 % under<br />
+the naïve iid calculation. <strong>The dependence between future months<br />
+is not a rounding error.</strong></p>
+<h3 id="monte-carlo-posterior-predictive">Monte Carlo posterior predictive</h3>
+<p>The closed forms are convenient, but the Monte Carlo recipe works<br />
+in any setting:</p>
+<ol>
+<li>Draw $\theta^{(s)} \sim \pi(\theta \mid x)$.</li>
+<li>Draw $\tilde x^{(s)} \sim f( \cdot \mid \theta^{(s)})$.</li>
+</ol>
+<p>This is exactly the simulation strategy of the companion article<br />
+<a href="monte-carlo-budget.html">Why Your Budget Never Hits the Exact Number</a>,<br />
+applied to the posterior. That article sampled from the prior; this<br />
+one samples from the posterior, which is the prior updated with<br />
+observed months. Same machine, better input. Crucially, for<br />
+multi-period sums <strong>reuse the same $\theta^{(s)}$ across all future<br />
+months in a replication</strong> — that is what preserves the correlation<br />
+that produces the quadratic variance term.</p>
+<h3 id="bayes-factors-brief">Bayes factors (brief)</h3>
+<p>For two competing models $M_1, M_2$ the <strong>Bayes factor</strong> is<br />
+$BF_{12} = p(x \mid M_1)/p(x \mid M_2)$, the ratio of marginal<br />
+likelihoods. Combined with prior model probabilities it yields<br />
+posterior model odds. Under Jeffreys' scale,<br />
+$\log_{10} BF \in [1, 1.5]$ is "strong", $> 2$ is "decisive". In<br />
+large samples $\log BF \approx -\tfrac{1}{2}(\Delta\text{BIC})$,<br />
+linking the Bayes factor to BIC and (approximately) AIC. We use the<br />
+Bayes factor as a conceptually cleaner comparator to the AIC/BIC<br />
+machinery of the companion article<br />
+<a href="probabilistic-cost-modelling.html">The Shape of What You'll Spend</a>;<br />
+we do not use it as the article's primary inference tool.</p>
+<hr />
+<h2 id="the-fyf-model">The FYF Model</h2>
+<h3 id="the-cost-decomposition">The cost decomposition</h3>
+<p>Monthly cost decomposes into three components — salary plus<br />
+benefits, overtime, and incidents:</p>
+<p>$$
+X_t = \underbrace{n_t \cdot \bar S_t \cdot \beta}_{\text{salary + benefits}}
+ + \underbrace{C_{\text{ot},t}}_{\text{overtime}}
+ + \underbrace{C_{\text{inc},t}}_{\text{incidents}}.
+$$</p>
+<p>For the article's central inference layer, $\theta$ is the <strong>mean<br />
+monthly cost</strong> with $X_t \mid \theta \sim N(\theta, \sigma^2)$ and<br />
+$\sigma$ known. The Gamma–Poisson incident-count and Beta–Binomial<br />
+overtime-proportion priors developed in<br />
+<a href="#conjugate-families">Conjugate Families</a> cover the other two<br />
+components and slot into the same machine; we keep the canonical<br />
+scenarios in this section single-component to isolate the Bayesian<br />
+mechanics.</p>
+<h3 id="the-revision-calendar">The revision calendar</h3>
+<table>
+<thead>
+<tr>
+<th>Month</th>
+<th>Event</th>
+<th>Bayesian analogue</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>December (year N−1)</td>
+<td>Budget plan approved</td>
+<td>Prior $\pi(\theta)$</td>
+</tr>
+<tr>
+<td>Jan–Mar</td>
+<td>Q1 actuals arrive</td>
+<td>Likelihood $L(\theta\mid x_{1:3})$</td>
+</tr>
+<tr>
+<td><strong>April</strong></td>
+<td><strong>FYF #1 (Q1 review)</strong></td>
+<td>Posterior #1</td>
+</tr>
+<tr>
+<td>Apr–Jun</td>
+<td>Q2 actuals arrive</td>
+<td>New likelihood</td>
+</tr>
+<tr>
+<td><strong>July</strong></td>
+<td><strong>FYF #2 (mid-year)</strong></td>
+<td>Posterior #2</td>
+</tr>
+<tr>
+<td>Jul–Sep</td>
+<td>Q3 actuals arrive</td>
+<td>New likelihood</td>
+</tr>
+<tr>
+<td><strong>October</strong></td>
+<td><strong>FYF #3 (Q3 review)</strong></td>
+<td>Posterior #3</td>
+</tr>
+<tr>
+<td>Oct–Dec</td>
+<td>Q4 actuals arrive</td>
+<td>Final data</td>
+</tr>
+<tr>
+<td>Jan (year N+1)</td>
+<td>Year-end close</td>
+<td>Posterior #4</td>
+</tr>
+</tbody>
+</table>
+<p>Each FYF is a posterior. The previous posterior becomes the next<br />
+prior. By the<br />
+<a href="#sequential-updating-and-shrinkage">sequential = batch theorem</a>, the<br />
+year-end posterior equals the single batch posterior conditioned on<br />
+all 12 actuals.</p>
+<h3 id="reference-parameters">Reference parameters</h3>
+<p>A 50-person IT team, average gross monthly salary R\$ 12{,}000,<br />
+benefit-and-charge multiplier 1.75:</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prior mean $\mu_0$</td>
+<td>R\$ 1{,}050{,}000 | $50 \times 12{,}000 \times 1.75$.</td>
+<td></td>
+</tr>
+<tr>
+<td>Prior s.d. $\sigma_0$</td>
+<td>R\$ 150{,}000</td>
+<td>Planner is ≈ 90 % sure within ±15 %.</td>
+</tr>
+<tr>
+<td>Observation s.d. $\sigma$</td>
+<td>R\$ 80{,}000</td>
+<td>Observed month-to-month variability.</td>
+</tr>
+<tr>
+<td>Budget ceiling $B$</td>
+<td>R\$ 13{,}200{,}000 | A typical guard-rail at $\mu_0 \times 12 \times 1.05$.</td>
+<td></td>
+</tr>
+<tr>
+<td>Incident-rate prior</td>
+<td>$\text{Gamma}(3, 1)$</td>
+<td>Prior expectation 3 incidents/month.</td>
+</tr>
+<tr>
+<td>Overtime-proportion prior</td>
+<td>$\text{Beta}(2, 8)$</td>
+<td>Prior expectation 20 %.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-fyf-model-object">The FYF model object</h3>
+<p>Operationally we package the engine as a stateful object that, for<br />
+each incoming month, (i) computes the surprise z-score before<br />
+consuming the actual, (ii) feeds the actual through the conjugate<br />
+updater, (iii) refreshes the year-end forecast and $P(T > B)$. At<br />
+the close of each quarter the same object emits a <code>QuarterlyReview</code><br />
+record with the posterior, the year-end forecast, the maximum<br />
+absolute surprise in the quarter, and a one-line recommendation<br />
+("hold", "re-elicit", "investigate shock", "request budget<br />
+revision").</p>
+<h3 id="the-annual-cycle-end-to-end">The annual cycle, end to end</h3>
+<p>The figure below shows a full simulation of the <strong>on-target<br />
+scenario</strong>: 12 monthly actuals drawn from<br />
+$N(\theta_\star = 1{,}080{,}000, \sigma)$ (so the true mean is<br />
+slightly above the planner's expectation). The top panel walks the<br />
+posterior: a steep correction in Q1, then month-by-month tightening.<br />
+The bottom panel walks the year-end forecast: the predictive interval<br />
+narrows from $\pm \approx$ R\$ 950,000 at month 1 to<br />
+$\pm \approx$ R\$ 50,000 at month 11.</p>
+<figure><img src="../figures/bayesian-fyf/exp_e_fyf_quarterly.png" alt="Experiment E — full annual FYF cycle. Top: posterior trajectory with a 95 % credible band, monthly actuals as grey dots, and quarterly FYF review boxes. Bottom: year-end total predictive vs the budget ceiling." loading="lazy"><figcaption>Experiment E — full annual FYF cycle. Top: posterior trajectory with a 95 % credible band, monthly actuals as grey dots, and quarterly FYF review boxes. Bottom: year-end total predictive vs the budget ceiling.</figcaption></figure>
+<h3 id="key-questions-the-model-answers">Key questions the model answers</h3>
+<p>Five practical questions, each mapping cleanly onto a Bayesian<br />
+quantity:</p>
+<ol>
+<li><strong>Shrinkage</strong>: how much does each month pull the forecast away<br />
+ from the plan? — The trajectory $\mu_n$.</li>
+<li><strong>Precision</strong>: how tight is the 95 % credible interval at each<br />
+ FYF? — $\pm 1.96\sigma_n$.</li>
+<li><strong>Surprise detection</strong>: when should we override the update? —<br />
+ The surprise z-score of <a href="#diagnostics">Diagnostics</a>.</li>
+<li><strong>Prior sensitivity</strong>: how much does the prior choice matter<br />
+ after 6 months? — The shrinkage of the prior gap by $w_0(n)$.</li>
+<li><strong>Predictive accuracy</strong>: what is $P(T > B)$? — The<br />
+<a href="#the-year-end-total-beware-of-independence">year-end closed form</a>.</li>
+</ol>
+<hr />
+<h2 id="experiments-and-results">Experiments and Results</h2>
+<p>We run eight experiments end-to-end and one animated companion. Each<br />
+script is in <code>scripts/</code>; each figure is at 300 DPI with a fixed<br />
+seed. The table indexes all eight; the three that carry the article's<br />
+sharpest claims then get the full <strong>Claim / Setup / Result /<br />
+Connection</strong> treatment.</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Topic</th>
+<th>Headline</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>Prior to posterior</td>
+<td>A single update visualised end to end (figure in <a href="#the-posterior-predictive">The Posterior Predictive</a>).</td>
+</tr>
+<tr>
+<td>B</td>
+<td>Four conjugate families</td>
+<td>One update rule, four families (figure in <a href="#conjugate-families">Conjugate Families</a>).</td>
+</tr>
+<tr>
+<td>C</td>
+<td>Sequential shrinkage</td>
+<td>Posterior tightens monotonically; $w_0(n) \to 0$ at rate $1/n$ (figure in <a href="#sequential-updating-and-shrinkage">Sequential Updating</a>).</td>
+</tr>
+<tr>
+<td>D</td>
+<td>Prior sensitivity</td>
+<td>Three priors converge by Q3; gap decays at $w_0(n)$ (figure in <a href="#sequential-updating-and-shrinkage">Sequential Updating</a>).</td>
+</tr>
+<tr>
+<td>E</td>
+<td>Full FYF quarterly cycle</td>
+<td>Annual cycle with quarterly review boxes (figure in <a href="#the-fyf-model">The FYF Model</a>).</td>
+</tr>
+<tr>
+<td>F</td>
+<td>Bayesian vs frequentist</td>
+<td>100 frequentist CIs (~5 % miss) vs a single credible interval.</td>
+</tr>
+<tr>
+<td>G</td>
+<td>Bayes factor vs AIC</td>
+<td>Both converge; Bayes factor sits on the Jeffreys scale.</td>
+</tr>
+<tr>
+<td>H</td>
+<td>Posterior predictive check</td>
+<td>Calibration plot, z-score histogram, p-value CDF.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="experiment-f-bayesian-vs-frequentist">Experiment F — Bayesian vs frequentist</h3>
+<p><strong>Claim.</strong> The frequentist coverage guarantee is about the procedure;<br />
+the credible interval is about <em>this</em> forecast — and for a budget<br />
+committee, the second is the operational statement.</p>
+<p><strong>Setup.</strong> 100 simulated samples of size $n = 30$ from<br />
+$N(\theta_\star, \sigma^2)$; the frequentist 95 % CI computed for<br />
+each; one sample additionally analysed with the Bayesian machinery.</p>
+<p><strong>Result.</strong> Empirical coverage sits within Monte Carlo error of the<br />
+nominal 95 % — approximately five intervals miss the truth, the<br />
+procedure-level guarantee. The credible interval on the highlighted<br />
+sample nearly coincides numerically with the frequentist interval<br />
+(formally: the improper-prior Bayesian recovers the frequentist<br />
+sampling distribution), but the <em>statements</em> differ: probability<br />
+about $\theta$ given this dataset vs frequency across hypothetical<br />
+repetitions.</p>
+<p><strong>Connection.</strong> The credible-vs-confidence distinction drawn in<br />
+<a href="#bayes-theorem-for-budget-analysts">Bayes' Theorem for Budget Analysts</a>,<br />
+made visual.</p>
+<figure><img src="../figures/bayesian-fyf/exp_f_bayesian_vs_frequentist.png" alt="Experiment F — frequentist coverage simulation (top) vs a single Bayesian credible interval (bottom)." loading="lazy"><figcaption>Experiment F — frequentist coverage simulation (top) vs a single Bayesian credible interval (bottom).</figcaption></figure>
+<h3 id="experiment-g-bayes-factors-and-aic">Experiment G — Bayes factors and AIC</h3>
+<p><strong>Claim.</strong> With even a few months of data, the Bayes factor<br />
+decisively separates a well-centred prior from a badly-centred one.</p>
+<p><strong>Setup.</strong> Data simulated from a prior centred at the truth; compared<br />
+against an alternative prior 5 prior standard deviations off. Log<br />
+marginal likelihoods computed in closed form; AIC computed under the<br />
+same identification.</p>
+<p><strong>Result.</strong> The Bayes factor in favour of the right prior crosses the<br />
+"decisive" threshold on Jeffreys' scale by about $n = 6$ and grows<br />
+exponentially thereafter. AIC agrees on direction.</p>
+<p><strong>Connection.</strong> The <a href="#bayes-factors-brief">Bayes-factor comparator</a><br />
+in action, and the bridge to the model-selection machinery of<br />
+<a href="probabilistic-cost-modelling.html">The Shape of What You'll Spend</a>.</p>
+<figure><img src="../figures/bayesian-fyf/exp_g_model_comparison.png" alt="Experiment G — log marginal likelihoods, Bayes factor trajectory, and Jeffreys-scale interpretation." loading="lazy"><figcaption>Experiment G — log marginal likelihoods, Bayes factor trajectory, and Jeffreys-scale interpretation.</figcaption></figure>
+<h3 id="experiment-h-posterior-predictive-check">Experiment H — Posterior predictive check</h3>
+<p><strong>Claim.</strong> Under correct specification, the model's own predictions<br />
+are calibrated — and the calibration triple is a usable self-test.</p>
+<p><strong>Setup.</strong> 250 simulated annual cycles: for each, a true $\theta$<br />
+drawn from the prior, 12 actuals drawn from $N(\theta, \sigma^2)$,<br />
+the model fed those actuals and its predictive intervals recorded.</p>
+<p><strong>Result.</strong> Aggregated across replications: (i) the calibration plot<br />
+lies on the diagonal (empirical coverage matches nominal), (ii) the<br />
+histogram of surprise z-scores is approximately $N(0, 1)$, (iii) the<br />
+CDF of two-sided predictive p-values is approximately Uniform.<br />
+Deviations indicate mis-specification, not random Monte Carlo wiggle.</p>
+<p><strong>Connection.</strong> Validates every check used operationally in<br />
+<a href="#diagnostics">Diagnostics</a>.</p>
+<figure><img src="../figures/bayesian-fyf/exp_h_posterior_predictive_check.png" alt="Experiment H — calibration plot (left), z-score histogram (centre), p-value CDF (right). Aggregated over 250 simulated cycles." loading="lazy"><figcaption>Experiment H — calibration plot (left), z-score histogram (centre), p-value CDF (right). Aggregated over 250 simulated cycles.</figcaption></figure>
+<hr />
+<h2 id="diagnostics">Diagnostics</h2>
+<p>A Bayesian model is only as good as its assumptions. The diagnostic<br />
+layer answers a single question: when should we stop trusting the<br />
+output?</p>
+<h3 id="the-surprise-z-score">The surprise z-score</h3>
+<p>The standardised innovation under the posterior predictive is</p>
+<p>$$
+z_t = \frac{x_t - \mu_{t-1}}{\sqrt{\sigma_{t-1}^2 + \sigma^2}}.
+$$</p>
+<p>Under correct specification $z_t \mid x_{1:t-1} \sim N(0, 1)$. The<br />
+heuristic thresholds: $|z_t| > 2$ is "uncomfortable", $|z_t| > 3$<br />
+is "investigate". The $z$ scores are not iid in finite samples —<br />
+the previous posterior is itself random — but they are exchangeable<br />
+under correct specification, which is enough for routine practice.</p>
+<h3 id="calibration">Calibration</h3>
+<p>A 95 % equal-tailed predictive interval should contain the next<br />
+actual approximately 95 % of the time. Aggregating across $T$<br />
+months and $K$ years, the <strong>calibration score</strong> is the fraction of<br />
+actuals inside the interval. A binomial test checks whether the<br />
+score deviates significantly from the nominal level.</p>
+<p>Under-coverage at the steady-state, large-$n$ regime indicates the<br />
+sampling-noise term $\sigma$ is too small. Over-coverage indicates<br />
+$\sigma$ is too large. Persistent miscalibration that <em>changes with<br />
+$n$</em> points instead at the prior — too tight or too loose.</p>
+<h3 id="cumulative-surprise">Cumulative surprise</h3>
+<p>$S_n = \sum_{t \le n} z_t$ is, under correct specification, a<br />
+random walk with mean zero and variance growing linearly in $n$.<br />
+A sustained drift of $S_n / \sqrt n$ outside $[-2, 2]$ flags<br />
+<strong>structural drift</strong> — the sampling model has gone stale.</p>
+<h3 id="when-the-diagnostic-fires">When the diagnostic fires</h3>
+<p>The article's operational rule:</p>
+<table>
+<thead>
+<tr>
+<th>Diagnostic</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Single $\lvert z_t\rvert > 3$</td>
+<td>One-off shock; trust the update; flag.</td>
+</tr>
+<tr>
+<td>Repeated $\lvert z_t\rvert > 2$ same sign</td>
+<td>Drift; re-elicit prior or change model.</td>
+</tr>
+<tr>
+<td>Calibration $\widehat C \le 0.85$</td>
+<td>Underconfident model; $\sigma$ too small.</td>
+</tr>
+<tr>
+<td>Calibration $\widehat C \ge 0.99$</td>
+<td>Over-cautious; $\sigma$ too large; vague.</td>
+</tr>
+</tbody>
+</table>
+<p>The diagnostic does not replace judgement. It tells the analyst<br />
+when to stop trusting the conjugate update and start asking why.</p>
+<hr />
+<h2 id="connection-to-the-series">Connection to the Series</h2>
+<p>This is the fourth article in a series on probabilistic methods for<br />
+budget analytics. Each earlier article supplies a building block that<br />
+this one uses or extends.</p>
+<ul>
+<li><strong><a href="monte-carlo-budget.html">Why Your Budget Never Hits the Exact Number</a>.</strong><br />
+ Its simulation strategy reappears here as the<br />
+<a href="#monte-carlo-posterior-predictive">Monte Carlo posterior predictive</a>.<br />
+ The only change is the <em>input</em> distribution: that article sampled<br />
+ from the prior; this one samples from the posterior, which is the<br />
+ prior updated with observed months. Same machine, better input.</li>
+<li><strong><a href="probabilistic-cost-modelling.html">The Shape of What You'll Spend</a>.</strong><br />
+ The four conjugate prior distributions — Normal, Inverse-Gamma,<br />
+ Gamma, Beta — are exactly the families fitted there, and the<br />
+ likelihood building blocks (Normal, Poisson, Binomial) come from<br />
+ the same catalogue. Its MLE / AIC / BIC machinery appears here as<br />
+ the comparator in <a href="#bayes-factors-brief">Bayes factors</a> and<br />
+ Experiment G.</li>
+<li><strong><a href="headcount-dynamics.html">The Team That Replaces Itself</a>.</strong><br />
+ That article modelled the evolution of $n_t$ — team size — via a<br />
+ birth-death chain. Plugged into<br />
+<a href="#the-cost-decomposition">the cost decomposition</a><br />
+ $X_t = n_t \bar S_t \beta + \cdots$, it allows $n_t$ to drift over<br />
+ the year: its transition rates feed the headcount portion, while<br />
+ the Bayesian layer here infers the cost-per-head given $n_t$.</li>
+</ul>
+<p>Together the four articles cover a single problem from four sides:<br />
+how to <em>simulate</em> it, how to <em>fit</em> its components, how its<br />
+<em>components evolve</em>, and — this article — how to <em>learn from<br />
+incoming data</em>.</p>
+<hr />
+<h2 id="a-practical-framework">A Practical Framework</h2>
+<p>A short checklist, derived from the article's central results.</p>
+<ol>
+<li><strong>Translate the plan into a prior.</strong> Plan value is $\mu_0$;<br />
+ stated confidence and band width fix $\sigma_0 = w/z_{(1+\gamma)/2}$.<br />
+ Document both. Re-elicit at the start of each fiscal year.</li>
+<li><strong>Score every FYF on shrinkage and precision.</strong> Report<br />
+ $\mu_n$, $\sigma_n$, the 95 % credible interval, and the prior<br />
+ weight $w_0(n)$. The prior weight tells the audience how much<br />
+ the new forecast still leans on the original plan; it should<br />
+ trend toward zero.</li>
+<li><strong>Report the predictive, not the posterior, for forward-looking<br />
+ questions.</strong> Internal "what is our best estimate of the mean?"<br />
+ uses the credible interval. External "will we exceed the<br />
+ budget?" uses the predictive: $P(T > B)$ via the<br />
+<a href="#the-year-end-total-beware-of-independence">year-end formula</a>,<br />
+ with the <strong>correct</strong> quadratic-horizon variance.</li>
+<li><strong>Run the diagnostic at every quarterly review.</strong> Compute the<br />
+ surprise z-scores for the months of the quarter, the calibration<br />
+ score on the year-to-date, and the cumulative surprise.<br />
+ Investigate any single $|z| > 3$, any pattern of $|z| > 2$, or<br />
+ persistent miscalibration.</li>
+<li><strong>Treat prior–data conflict as a signal, not a number.</strong> When<br />
+ $D_n = |\mu_0 - \bar x_n|/\sigma_0 > 3$, stop and ask why. The<br />
+ model assumed both the prior and the sampling model were well<br />
+ specified; if either fails, the posterior interpolates between<br />
+ two wrong sources. The right action is rarely to trust the<br />
+ posterior — usually it is to step outside the model and<br />
+ diagnose.</li>
+</ol>
+<p>The framework is short by design. Bayesian inference does the math;<br />
+the analyst does the judgement.</p>
+<hr />
+<h2 id="limitations">Limitations</h2>
+<p>The closed forms are the article's selling point — and its boundary.</p>
+<p><strong>Known observation noise.</strong> The central Normal–Normal layer treats<br />
+$\sigma$ as known. In practice it is estimated from history, and<br />
+underestimating it makes every posterior overconfident. The<br />
+Normal–Inverse-Gamma extension handles unknown variance at the cost<br />
+of Student-$t$ predictives; the diagnostics exist precisely to catch<br />
+a mis-set $\sigma$.</p>
+<p><strong>Exchangeable months.</strong> The sampling model treats monthly actuals as<br />
+iid draws around $\theta$. Seasonality, one-off events booked to a<br />
+single month, and within-year trends violate this; the cumulative<br />
+surprise statistic detects the drift but the model itself cannot<br />
+represent it.</p>
+<p><strong>Correct specification is assumed, not tested by the update.</strong> The<br />
+conjugate machine always returns a number. Under prior–data conflict<br />
+($D_n > 3$) that number interpolates between two wrong sources — the<br />
+framework's own advice is to stop and step outside the model.</p>
+<p><strong>Conjugate-only scope.</strong> No MCMC, no hierarchical pooling across<br />
+cost centres, no nonparametrics. The single-team, single-parameter<br />
+scenarios isolate the mechanics; a portfolio of teams sharing<br />
+information requires the hierarchical extension deferred to future<br />
+work.</p>
+<p><strong>Synthetic data.</strong> All experiments use simulated actuals with known<br />
+ground truth — the right tool for validating the machinery, but real<br />
+FYF data brings reporting lags, accrual adjustments, and re-orgs<br />
+that the clean model does not see.</p>
+<hr />
+<h2 id="conclusion">Conclusion</h2>
+<p>A budget forecast that ignores its own history is a memoryless<br />
+estimator. Bayesian updating is the corrective: it combines the<br />
+budget plan (prior) with the observed actuals (likelihood) into a<br />
+revised forecast (posterior) that is mathematically optimal under<br />
+squared-error loss, monotonically tightens with each new month of<br />
+data, and reports its own uncertainty with auditable closed-form<br />
+intervals.</p>
+<p>Three operational gains follow:</p>
+<ul>
+<li>The <strong>precision-weighted mean</strong> replaces ad-hoc reweighting of<br />
+ plan vs actuals. The weights are functions of stated<br />
+ uncertainties, not gut feeling.</li>
+<li><strong>Monotonic shrinkage</strong> replaces vague claims that "the forecast<br />
+ got tighter": $\sigma_n$ decays at exactly $1/\sqrt n$, with a<br />
+ closed form for the data-share threshold.</li>
+<li>The <strong>posterior predictive</strong> answers $P(\text{annual total} > B)$<br />
+ directly, accounting for both parameter uncertainty and future<br />
+ noise — and including the often-missed dependence between<br />
+ unobserved months that share $\theta$.</li>
+</ul>
+<p>The natural next article extends this framework to <strong>hierarchical<br />
+models</strong>: pooling information across cost centres, business units,<br />
+or teams. The conjugate machinery generalises directly; the<br />
+hierarchical step couples multiple FYF cycles through a shared<br />
+prior on the cross-team variation. That generalisation is for<br />
+another article.</p>
+<p>For now: every FYF is a Bayesian update. The framework above turns<br />
+that observation into a tool.</p>
+<hr />
+<h2 id="references">References</h2>
+<ul>
+<li>Berger, J. (1985). <em>Statistical Decision Theory and Bayesian Analysis</em>. Springer.</li>
+<li>DeGroot, M. (1970). <em>Optimal Statistical Decisions</em>. McGraw-Hill.</li>
+<li>Gelman, A. et al. (2013). <em>Bayesian Data Analysis</em>, 3rd ed. CRC Press.</li>
+<li>Hoff, P. (2009). <em>A First Course in Bayesian Statistical Methods</em>. Springer.</li>
+<li>Kass, R. E. &amp; Raftery, A. E. (1995). "Bayes factors". <em>J. Amer. Statist. Assoc.</em> 90, 773–795.</li>
+<li>Murphy, K. (2012). <em>Machine Learning: A Probabilistic Perspective</em>. MIT Press.</li>
+<li>Robert, C. (2007). <em>The Bayesian Choice</em>. Springer.</li>
+<li>Stein, C. (1956). "Inadmissibility of the usual estimator for the mean of a multivariate normal distribution". <em>Proc. Third Berkeley Symp.</em></li>
+<li>West, M. &amp; Harrison, J. (1997). <em>Bayesian Forecasting and Dynamic Models</em>. Springer.</li>
+</ul>
+<hr />
+<p><em>All figures and numbers in this article are reproduced by versioned<br />
+scripts with fixed seeds in the<br />
+<a href="https://github.com/brunoramosmartins/bayesian-fyf-article">companion repository</a>.<br />
+The conjugate updaters (<code>src/conjugate.py</code>), sequential engine<br />
+(<code>src/updating.py</code>), predictive (<code>src/predictive.py</code>), FYF model<br />
+(<code>src/fyf_model.py</code>), and diagnostics (<code>src/diagnostics.py</code>) are<br />
+documented and unit-tested.</em></p>
+          
+        </article>
+
+        <!-- On This Page — populated by articleToc.js from heading ids -->
+        <aside class="article-toc" aria-label="On this page">
+          <nav class="article-toc__inner">
+            <p class="article-toc__title">On this page</p>
+            <ul class="article-toc__list" id="article-toc-list"></ul>
+          </nav>
+        </aside>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- =========================================================
+       FOOTER
+  ========================================================== -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container container--wide">
+      <span class="footer-copy">© 2026 Bruno Ramos Martins</span>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="https://github.com/brunoramosmartins" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/bruno-ramos-martins-22a6a61a0/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="../about.html">About</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- Nav toggle script -->
+  <script src="../assets/js/navigation.js" defer></script>
+  <!-- On This Page panel + heading anchors + scroll spy -->
+  <script src="../assets/js/articleToc.js" defer></script>
+
+</body>
+</html>

@@ -1,5 +1,35 @@
 [
   {
+    "id": "bayesian-fyf",
+    "title": "The Budget That Learns",
+    "description": "Bayesian forecasting for periodic budget revisions — from prior beliefs to posterior certainty.",
+    "category": "statistics",
+    "date": "2026-07-11",
+    "reading_time": "29 min",
+    "tags": [
+      "bayesian",
+      "forecasting",
+      "conjugate-priors",
+      "budgeting"
+    ],
+    "url": "/posts/bayesian-fyf.html"
+  },
+  {
+    "id": "headcount-dynamics",
+    "title": "The Team That Replaces Itself",
+    "description": "Headcount dynamics and turnover as stochastic processes — from Markov chains to birth-death models.",
+    "category": "statistics",
+    "date": "2026-07-11",
+    "reading_time": "33 min",
+    "tags": [
+      "markov-chains",
+      "stochastic-processes",
+      "workforce-planning",
+      "budgeting"
+    ],
+    "url": "/posts/headcount-dynamics.html"
+  },
+  {
     "id": "linearity-of-expectation-til",
     "title": "The Most Useful Theorem in Probability Has No Independence Hypothesis",
     "description": "Linearity of expectation holds under any dependence — correlation never touches the first moment, only the variance.",
