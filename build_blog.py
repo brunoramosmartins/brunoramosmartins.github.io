@@ -384,7 +384,7 @@ def build_article(md_path: Path, templates: dict[str, str], dry_run: bool = Fals
 
     html_body = markdown.markdown(
         protected_body,
-        extensions=["fenced_code", "codehilite", "tables", "toc", "nl2br"],
+        extensions=["fenced_code", "codehilite", "tables", "toc"],
         extension_configs={
             "codehilite": {"css_class": "highlight", "guess_lang": False},
         },
