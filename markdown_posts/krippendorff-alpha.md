@@ -23,23 +23,25 @@ tags: statistics, annotation, inter-rater-agreement, nlp-evaluation
 
 ## Introduction
 
-You run an annotation exercise with a small panel of analysts. The task is simple: assign each work item to one of a few predefined categories based on its description. In parallel, you prompt an LLM to perform the same classification. The expectation is straightforward — humans provide the reference, the model approximates them.
+Let me start with the moment that sent me down this rabbit hole.
 
-What happens instead is less comfortable. The annotators do not consistently agree with each other. The same item is mapped to different categories depending on who reads it. Meanwhile, the LLM — given a fixed prompt — produces stable, repeatable outputs. At that point, a natural question emerges: if humans do not agree among themselves, what exactly are we asking the model to replicate?
+A small panel of analysts is working through a queue of items. The task looks trivial: read each short description, drop it into one of a handful of categories. To move faster, we also gave the same queue to an LLM with a fixed prompt. My mental model going in was the obvious one — the analysts are the reference, the model is a cheap stand-in for them.
 
-I first encountered this setup in a workplace project where the pragmatic conclusion was that the LLM may be preferable precisely because it is consistent, even if humans are not. This conclusion is operationally appealing — but statistically fragile.
+Then the labels came back and refused to cooperate. The analysts didn't agree with each other. The same item landed in different categories depending on who read it. The LLM, meanwhile, didn't budge: same prompt, same answer, every single time. So who do you trust — the humans who disagree, or the machine that never wavers?
 
-A high observed agreement, whether between humans or between humans and a model, does not necessarily indicate shared understanding. It may reflect **prevalence** (one category dominates), bias in marginal distributions, or structured randomness. Under skewed class distributions, independent annotators who share no latent signal can still agree on more than half of all items — and a model that shadows the majority class can look excellent without adding careful judgement.
+The argument that came up in the room was seductive, and I've heard versions of it many times since: the model is at least *consistent*, and the people clearly aren't, so maybe we should just trust the model. It sounds like plain common sense. It's also, as far as I can tell, exactly where the reasoning quietly falls apart — and figuring out why is what this whole article is about.
 
-Computational linguistics has relied on agreement coefficients since the era of corpus annotation (Artstein and Poesio, 2008), yet the community's maturity about $\kappa$ remains uneven: leaderboards still mix accuracy-style summaries with prevalence-heavy tasks. As **foundation models** become default labellers — deterministic annotators conditioned on prompts — the question shifts from "did we hit 80%?" to "does this automation **track** human exchangeability under the same instructions?" That reframing pushes toward coefficients that tolerate **partial** observation and respect **scale**.
+The problem lives in one word. **Being consistent is not the same as being right, and a high agreement number won't tell you which one you've got.** A model that answers "category A" every time is perfectly consistent and completely useless. And two people who share no real understanding can still agree most of the time, just because one category is common and they're bound to collide on it. Agreement, it turns out, is cheap. You can get a lot of it from prevalence, from lopsided category rates, or from plain randomness — with nothing underneath.
 
-This article follows one arc:
+So the question I actually needed to answer wasn't "how often do they agree?" It was: **when the people disagree and the machine is consistent, how do I know if that consistency means anything at all?** That is the question this article is built around, and every section is a step toward answering it:
 
-1. Formalise agreement as an **estimator** and separate **signal** from **chance**.
-2. Introduce **Cohen's** and **Fleiss'** $\kappa$ as the standard correction, then show where they **break**.
-3. Reframe reliability through **disagreement** and the **coincidence matrix**, leading to **Krippendorff's** $\alpha$.
-4. **Validate** with four controlled simulations.
-5. Close with a **practical framework** and honest limits.
+- Why raw agreement can't answer it on its own — two independent labellers, human or model, agree at a rate fixed by nothing more than the class balance (*Agreement as an estimator*, *The chance agreement problem*).
+- Cohen's and Fleiss' $\kappa$, which subtract that chance rate — and the messy, everyday conditions where they fall over, which are exactly the conditions my panel was in (*The Kappa family*, *Limitations of Kappa*).
+- Krippendorff's $\alpha$, which flips the question around to *disagreement* and keeps working when you have many raters, missing labels, and ordered scales (*From agreement to disagreement*, *Krippendorff's Alpha*).
+- Four small simulations where we know the truth up front, so we can watch these numbers behave (*Experiments*).
+- And a practical guide with its honest limits — including the uncomfortable one this whole story is really about: even a perfect $\alpha$ can't tell you the consistent model is *right* (*A practical framework*).
+
+Keep that panel in the back of your mind. Every coefficient in here is, in the end, just a different answer to what those analysts were really telling us.
 
 ---
 
@@ -47,7 +49,7 @@ This article follows one arc:
 
 ### The annotation problem
 
-We consider a reliability study in which multiple annotators assign one of $K$ nominal categories to each of $n$ items. This setup appears deceptively simple. In practice, it often corresponds to tasks such as categorising work items based on textual descriptions, assigning labels in NLP pipelines, or evaluating model outputs against human judgement.
+We consider a reliability study in which multiple annotators assign one of $K$ nominal categories to each of $n$ items. This setup appears deceptively simple. In practice, it often corresponds to tasks such as categorising work items based on textual descriptions, assigning labels in NLP pipelines, or evaluating model outputs against human judgement — the kind of corpus work computational linguistics has measured with agreement coefficients since Artstein and Poesio (2008).
 
 Crucially, **no ground truth is directly observed**. What we observe is a collection of human judgments, each shaped by interpretation, ambiguity, and individual bias. We are not measuring accuracy — we are measuring **consistency** of a measurement process under repeated application.
 
@@ -143,6 +145,8 @@ Suppose every matrix entry is drawn **independently** from $\pi$ (no shared late
 
 So **"random" does not mean "zero agreement"**; it means agreement at the **chance** level implied by the marginals. Any headline that cites $A_o$ without that context risks overstating reliability.
 
+This is also the cleanest way to see what the consistent LLM from the opening really is. A model pinned to a fixed prompt is Model 1 taken to the limit: perfectly predictable, and carrying no item-by-item signal of its own. Its steadiness is not evidence that it understands anything — it is what "no signal" looks like once you stop it from varying. That is precisely why we can't read its agreement with the panel at face value.
+
 ### Empirical check: convergence to $\sum_k \pi_k^2$
 
 The companion codebase simulates Model 1 annotators and tracks $A_o$ as item count grows. The simulation matches theory: empirical agreement concentrates on $\sum_k \pi_k^2$. If real data looked like this, the annotation process would carry no item-specific signal. Real studies usually violate that assumption — which is why we need coefficients that separate structured agreement from prevalence-driven overlap.
@@ -154,6 +158,8 @@ The implication is clear: $A_o$ alone cannot distinguish between genuine consens
 ---
 
 ## The Kappa family
+
+The fix everyone reaches for first is disarmingly simple: measure how much the panel actually agrees, subtract how much it would have agreed by luck alone, and look at what's left over.
 
 ### The chance-correction pattern
 
@@ -223,6 +229,8 @@ Both $\kappa_C$ and $\kappa_F$ **re-express** overlap relative to a **data-drive
 
 ## Limitations of Kappa
 
+That correction is real, but it isn't bulletproof — and the two places it cracks are exactly the places real annotation work tends to sit.
+
 ### The Kappa paradox
 
 When one category is **very prevalent**, independent raters still agree often because $\bar P_e = \sum_k p_k^2$ is dominated by $p_{\text{major}}^2$. A high **raw** agreement can therefore coexist with **low** $\kappa$: the coefficient is doing its job, but readers who only track $A_o$ feel a **paradox**.
@@ -230,6 +238,8 @@ When one category is **very prevalent**, independent raters still agree often be
 Clinicians have long documented **"high agreement but low kappa"** scenarios (Feinstein and Cicchetti, 1990): the statistical structure is the same **prevalence inflation** of the chance baseline. The paradox is not a quirk of one subfield — it is the predictable algebra of $\sum_k p_k^2$ when one $p_k$ nears one.
 
 The companion codebase sweeps imbalance at fixed noise; Fleiss' $\kappa$ can sit far below raw agreement while $A_o$ stays in the "excellent" band on naive scales. The figure is not a proof; it is a **visual reminder** that **ranking models** by raw agreement can invert a ranking by $\kappa_F$ when class balance differs across conditions.
+
+This is exactly how a lazy model fools you. An LLM that quietly falls back on the majority class whenever it's unsure will rack up a gaudy raw-agreement score and a $\kappa_F$ hovering near zero. The raw number says "excellent"; the corrected one says "it's barely doing anything." If you only look at the first, you promote the model that learned to shrug.
 
 ![Fleiss' kappa versus class imbalance at fixed annotation noise (Kappa paradox).](../figures/krippendorff-alpha/kappa_paradox.png)
 
@@ -253,13 +263,15 @@ We need a coefficient that:
 
 Krippendorff's $\alpha$ is built for that role. It does not erase the need for careful **study design**: if instructions are ambiguous, no coefficient will rescue interpretability. What $\alpha$ offers is a **single algebraic skeleton** that extends from nominal through ratio scales and respects **pairable** information only — the same philosophical move as using **effective sample sizes** in other parts of statistics.
 
+This matters for the opening dilemma more than it first looks. The decision about whether to trust the consistent model is never made on a tidy, complete grid. It's made on real annotation data, where raters skip items, panels grow and shrink between batches, and some labels are ordered rather than just different. $\alpha$ is the coefficient that still hands you an honest number in that mess — which is the only place the question was ever going to be settled.
+
 ---
 
 ## From agreement to disagreement
 
 ### Why shift the lens
 
-Raw agreement and Kappa-style numerators count **matches**: how many pairs gave the same label? An equivalent dual view counts **mismatches** weighted by how far apart the assigned categories are. For nominal data, "distance" is binary — same or not. For interval data, squared differences penalise large errors more than small ones. This dual view turns out to be more general: it naturally accommodates **measurement scales** beyond the nominal and leads to a single formula that unifies all cases.
+Here is the small change of viewpoint that makes everything downstream work. Raw agreement and Kappa-style numerators count **matches**: how many pairs gave the same label? Flip it over and count **mismatches** instead, weighted by how far apart the assigned categories are. For nominal data, "distance" is binary — same or not. For interval data, squared differences penalise large errors more than small ones. This dual view turns out to be more general: it naturally accommodates **measurement scales** beyond the nominal and leads to a single formula that unifies all cases.
 
 ### The reliability matrix
 
@@ -309,6 +321,8 @@ The conceptual shift is simple: instead of "how often do we agree?", ask **"how 
 ---
 
 ## Krippendorff's Alpha
+
+Everything so far has been building toward one coefficient that keeps its footing under the conditions our panel actually worked in — many raters, missing labels, ordered scales. Here it is.
 
 ### Definition
 
@@ -397,9 +411,9 @@ They are **synthetic** on purpose: closed-form targets exist for random labellin
 
 **Expectation.** $A_o \approx 1/K$; $\kappa_F \approx 0$; $\alpha \approx 0$.
 
-**Result.** Empirical curves match theory within tight tolerance. This is a **sanity check**, not a finding: chance-corrected coefficients vanish when there is no shared structure. The near-perfect overlap between the $A_o$ curve and $1/K$ is a property of the model, not a bug — we simulated exactly the analytic scenario.
+**Result.** The empirical curves land on theory within a tight tolerance. Read the figure as the introduction's claim made literal: the shaded band under the $A_o$ curve is agreement produced by pure chance, and at $K=2$ it swallows fully half of all items — from raters with nothing shared to say. Meanwhile $\kappa_F$ and $\alpha$ sit flat on zero, exactly where they belong when there is no structure to find. This is a sanity check, not a finding; the near-perfect overlap of $A_o$ and $1/K$ is the model behaving as designed, not a bug.
 
-![Experiment A: $A_o$, Fleiss' $\kappa_F$, and Krippendorff's $\alpha$ across $K$ for random i.i.d. raters.](../figures/krippendorff-alpha/exp_a_random_metrics.png)
+![Experiment A: raw agreement $A_o$ tracks the chance baseline $1/K$ (shaded region), reaching 0.5 at $K=2$, while Fleiss' $\kappa_F$ and Krippendorff's $\alpha$ stay at zero for random i.i.d. raters.](../figures/krippendorff-alpha/exp_a_random_metrics.png)
 
 ### Experiment B: the agreement trap
 
@@ -413,7 +427,7 @@ $$
 
 This region exists because $A_e = \sum_k \pi_k^2$ grows with class imbalance. When $\pi_{\text{major}}$ nears 1, even noisy annotators agree on the dominant class most of the time, inflating $A_o$ without genuine item-level signal.
 
-**Result.** Heatmaps of $A_o$ and $\alpha$ show a visible wedge occupying $\mathcal{T}$. A concrete example: with $\pi = (0.85, 0.10, 0.05)$ and $\varepsilon = 0.05$, one obtains $A_o \approx 0.84$ while $\alpha \approx 0.35$. Stakeholders see a comfortable raw percentage; the chance-corrected coefficient reveals the panel is only modestly better than a prevalence-aware random benchmark. The operational lesson: put **both** views in the same table by default.
+**Result.** Heatmaps of $A_o$ and $\alpha$ show a visible wedge occupying $\mathcal{T}$. A concrete example: with $\pi = (0.85, 0.10, 0.05)$ and $\varepsilon = 0.05$, one obtains $A_o \approx 0.84$ while $\alpha \approx 0.35$. Stakeholders see a comfortable raw percentage; the chance-corrected coefficient reveals the panel is only modestly better than a prevalence-aware random benchmark. The operational lesson: put **both** views in the same table by default. This heatmap is the introduction's warning drawn as a map — anywhere inside the wedge, a model or a panel can post a reassuring raw score while telling you almost nothing.
 
 ![Experiment B: heatmaps of $\alpha$ and $A_o$ over imbalance and noise; red boxes mark the trap region.](../figures/krippendorff-alpha/exp_b_agreement_trap_heatmap.png)
 
@@ -421,7 +435,7 @@ This region exists because $A_e = \sum_k \pi_k^2$ grows with class imbalance. Wh
 
 **Setup.** Model 2 with three "human" annotators ($\varepsilon = 0.10$) and one "LLM" annotator ($\varepsilon$ swept in $[0, 0.5]$) on a three-class task.
 
-**Result.** $\alpha$ tracks panel quality; adding a noisier rater reduces panel $\alpha$ relative to humans-only. The sensitivity curve makes the dose–response visible.
+**Result.** $\alpha$ tracks panel quality; adding a noisier rater reduces panel $\alpha$ relative to humans-only. The sensitivity curve makes the dose–response visible. This is the experiment closest to the opening question: drop a consistent-but-noisier model into the panel and $\alpha$ is what tells you whether it actually helped or just quietly blended in.
 
 **Important caveat.** This experiment models LLM error as **symmetric i.i.d. noise** (Model 2). In practice, LLM errors are **structured**: a model may systematically over-predict the majority class, exhibit prompt-dependent bias, or fail on specific semantic patterns. Symmetric noise is a useful baseline, but real LLM evaluation requires additional diagnostics — confusion matrices stratified by class, adversarial probes, and analysis of **where** (not just how often) disagreements occur. A scenario with **directional bias** (e.g. the LLM always predicts the majority class when uncertain) would likely show $\alpha$ degrading faster than the symmetric case predicts.
 
@@ -429,15 +443,17 @@ This region exists because $A_e = \sum_k \pi_k^2$ grows with class imbalance. Wh
 
 ### Experiment D: missing data
 
-**Setup.** Fixed balanced panel with moderate noise; inject MCAR missingness from 0% to 50%.
+**Setup.** Fixed balanced panel with moderate noise; inject MCAR missingness from 0% to 50% of cells.
 
-**Expectation.** Fleiss' formulation (complete matrix) becomes **undefined** or **NaN** once entries are missing; $\alpha$ **degrades gracefully** because it is defined on pairable units.
+**Expectation.** Fleiss' formulation needs a complete matrix, so it becomes **undefined** the moment any cell goes missing; $\alpha$ **degrades gracefully** because it is defined on pairable units.
 
-**Result.** $\alpha$ remains stable near its complete-data value while Fleiss drops out — a practical reason to prefer $\alpha$ in sparse annotation regimes. The **pairwise retention advantage** is key: $\alpha$ uses all available pair information per unit, while Fleiss requires the full grid. Dropping to complete cases introduces **complete-case bias** when missingness correlates with item difficulty or annotator workload.
+**Result.** Three curves tell the story. $\alpha$ barely moves — it uses every surviving pair, so it holds near its complete-data value all the way out to 50% missingness. Fleiss on the full matrix returns a number only at 0% and then drops out entirely. The tempting workaround — throw away every item with a missing cell and run Fleiss on what's left — is the third curve, and it exposes the real cost: under MCAR the deleted-case estimate stays roughly unbiased, but its variance balloons as the sample shrinks, and by 50% missingness only about **3%** of items survive intact. You end up estimating reliability from a sliver of your data and calling it robustness.
 
-Real annotators quit mid-batch, merge requests split reviewer pools, and LLM calls time out. $\alpha$'s coincidence logic is not magic — if missingness is **informative** (harder items are more often skipped), no coefficient is safe — but it avoids the **structural** failure mode of requiring imputation or row deletion just to return a number.
+Two honest caveats. That "roughly unbiased" holds only because the missingness here is **MCAR** — purely random. If it were **informative** instead (harder items skipped more often), complete-case deletion would bias the estimate itself, not just inflate its variance, and no coefficient would be safe. And $\alpha$ is not magic either; it simply refuses to fail **structurally**, the way a method that demands a full grid before it will return anything does.
 
-![Experiment D: $\alpha$ vs Fleiss' $\kappa$ as missing rate increases.](../figures/krippendorff-alpha/exp_d_missing_robustness.png)
+This is the least glamorous experiment and the one that matters most day to day. Real annotators quit halfway through a batch, review pools get reshuffled, and — back to the panel that opened this article — LLM calls time out and leave holes in the grid. The coefficient you want is the one that keeps answering when the data gets ragged, not the one that folds its arms.
+
+![Experiment D: Krippendorff's $\alpha$ holds near its complete-data value as MCAR missingness rises, while Fleiss' $\kappa$ is undefined beyond 0% missing and complete-case deletion keeps only a shrinking sliver of items.](../figures/krippendorff-alpha/exp_d_missing_robustness.png)
 
 ### Synthesis
 
@@ -499,7 +515,7 @@ $\alpha$ is not a silver bullet. It is not a substitute for **clear coding rules
 
 ## Conclusion
 
-We opened with a concrete scenario: annotators disagree, an LLM is consistent, and the temptation is to trust the number that looks best. The article's argument is that **high agreement can be misleading** under class imbalance and independent marginals — not that it is always misleading, but that without explicitly modelling chance, there is no way to tell.
+We started with the panel: the analysts disagreed, the LLM was consistent, and the pull was to trust whichever number looked best. The point of everything since is that **a high agreement number can be quietly misleading** under class imbalance and independent marginals — not that it always is, but that until you model chance explicitly, you simply can't tell the difference between real consensus and a coin that keeps landing the same way.
 
 Cohen's and Fleiss' $\kappa$ subtract a prevalence-aware baseline and improve interpretation, yet they buckle under **imbalance paradoxes**, **missing data**, and **inflexible** nominal scaffolding. Krippendorff's $\alpha$ reframes the question around **disagreement** weighted by meaningful distances, with a coincidence construction that absorbs **partial** observation patterns. The four experiments show, in controlled settings under two explicit data generating processes, that $\alpha$ behaves as theory demands: it vanishes under pure random labelling, flags the agreement trap, responds to panel composition, and survives missingness where Fleiss cannot.
 
