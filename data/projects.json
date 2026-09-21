@@ -1,5 +1,17 @@
 [
   {
+    "id": "fliphex",
+    "title": "FLIPHEX",
+    "description": "Computational study of an original hexagonal board game designed at IME-USP and FAU-USP, now on display at the Matemateca. Two reduced boards strongly solved (17.5 billion configurations, first player wins both), an AlphaZero-style learner measured against that exact ground truth, and closed-form complexity bounds that refute two widely cited figures from the literature. Six hypotheses pre-registered and locked before any experiment ran; two came back rejected. Playable in the browser on the project's real Python engine under Pyodide, with no reimplementation of the rules in JavaScript.",
+    "tags": ["game-ai", "reinforcement-learning", "search"],
+    "stack": ["Python", "PyTorch", "Pyodide", "WebAssembly", "pygame"],
+    "github_url": "https://github.com/brunoramosmartins/fliphex",
+    "demo_url": "https://brunoramosmartins.github.io/fliphex/",
+    "featured": true,
+    "status": "in-progress",
+    "date": "2026-09-21"
+  },
+  {
     "id": "rag-pix-regulation",
     "title": "RAG Pix Regulation",
     "description": "Retrieval-Augmented Generation system for interpreting Brazilian Pix regulatory documents (BCB resolutions + MED 2.0). Compares baseline LLM responses against RAG-enhanced responses, evaluates retrieval quality (Recall@K, Precision@K), grounding, and hallucination rates with Phoenix observability.",
