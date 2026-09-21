@@ -63,7 +63,7 @@ export function createProjectCard(project) {
 
   const linksHTML = [
     github_url ? `<a href="${github_url}" class="card__link" target="_blank" rel="noopener noreferrer">GitHub →</a>` : '',
-    demo_url   ? `<a href="${demo_url}"   class="card__link" target="_blank" rel="noopener noreferrer">Demo →</a>`   : '',
+    demo_url   ? `<a href="${demo_url}"   class="card__link" target="_blank" rel="noopener noreferrer">Play ↗</a>`   : '',
   ].filter(Boolean).join('');
 
   return `
